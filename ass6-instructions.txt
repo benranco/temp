@@ -1,0 +1,504 @@
+
+
+Next stop we’ll move to the large project. How to transfer the big data to you is a issue. Brian mentioned a big data storage/transfer via Amazon cloudy storage account, but no account ready yet. Quite sure that you need use his HPC system and AAFC-GRDI package (such as Trinity run with random memory > one TB, and down-stream data processing) that has been installed in the HPC, run by Kangokola last year. Or, I just handle you the hard-drive and upload all data into the HPC system.
+
+- (also see Jun-Jun's email Work-Flow, and second half of email "writting seqs into csv file")
+- put three datasets of dna data together 
+- simplify them with Trinity
+- translate dna data to protein data (using Trinity's trans-decoder)
+- do further analysis, compare protein similarity, to further simplify the data
+- use CLC...
+
+===============================
+
+brancourt@jump2 Data-Dec2020]$ cd LP-NGS-RawData/
+[brancourt@jump2 LP-NGS-RawData]$ ls
+Cankered stem-14  Exome-2  LimP-Exom-Raw-data-Feb-2016  LimP-Fluidigm  Needle-4  Res-13  Sus-13  Trinity-sub-assembly
+[brancourt@jump2 LP-NGS-RawData]$ 
+[brancourt@jump2 LP-NGS-RawData]$ less Trinity-sub-assembly/
+
+-rwxrwxrwx.  1 brancourt genomics 424820863 Sep 18  2019 ***CC-clean-480,846nt-GenBank_GHWB00000000.fasta*
+-rwxrwxrwx.  1 brancourt genomics 187587342 Nov 19  2015 (needles)***LPndtranscript163,075.fasta*
+-rwxrwxrwx.  1 brancourt genomics 312749379 Jul  7  2017 LP-SUS-St-309,529nt.fasta*
+-rwxrwxrwx.  1 brancourt genomics 395093824 Sep 23  2019 RS-clean-470,428nt-GHWE00000000.fasta*
+-rwxrwxrwx.  1 brancourt genomics 350217664 Sep 18  2019 SS-clean-379,355nt-GenBank_GHWC00000000.fasta*
+-rwxrwxrwx.  1 brancourt genomics 117598669 Jul  7  2017 SUS-St-cds-205,762-updat.fa*
+-rwxrwxrwx.  1 brancourt genomics 554280953 Jul 31 17:22 ***Trinity_RS_SS_D641,657.fasta*
+- combine the three *** files into one fasta (not sure if they need to be in one file or not)
+- then:
+https://github.com/LANL-Bioinformatics/MeGAMerge
+This link is a pipeline for assembly of three subset data which Kangokola assembled from RNA-seq data on limber pine samples usingTrinity. 
+- try with a smaller subset of sequences first (10000) for above
+- use default parameters for above, for the first
+- before running above, see how much cpu is needed, depends on input data
+
+- this megamerge is giving me the dna sequences, and tells which seq combines into which seq
+- take the output of this, and use Trinty's transdecoder to convert the dna seqs into protein seqs
+- then use another pipeline to compare protein seqs and then combine them
+
+---
+Hello, I'm trying to find a copy of Newbler (specifically runAssembly) for Linux as a prerequisite to running some bioinformatics software, and I'm wondering if you can send me a link to where I might find a download of it. Thanks!
+
+https://en.wikipedia.org/wiki/Newbler
+https://www.biostars.org/p/260053/
+http://seqanswers.com/forums/showthread.php?t=25339
+https://jeff.wintersinger.org/posts/2013/07/how-to-run-454s-gs-de-novo-assembler-newbler-v28-in-ubuntu-1204/
+https://ubuntuforums.org/showthread.php?t=1624351
+***(download)*** http://seqanswers.com/forums/showthread.php?t=19472 
+
+https://bioinformatictools.wordpress.com/tag/newbler/
+
+http://amos.sourceforge.net/wiki/index.php/AMOS
+http://mummer.sourceforge.net/
+ 
+
+
+===============================================
+
+Hello, Ben:
+
+It looks great, seg no decrease from 1,285,578 to 619,892.
+At next you can try to run CD-HIT-EST (v4.8.1) tool with 95% identity threshold.
+https://github.com/weizhongli/cdhit
+
+Or, try TransDecode using Trinity package
+
+Thanks for your great progress.
+Happy New Year!
+
+Jun-Jun
+
+nohup cd-hit-est -i MergedContigs-CC-LPnd-Trin.fasta -o MergedContigs-CC-LPnd-Trin--cd-hit-est-out.fasta -c 0.95 -n 10 -d 0 -M 36000 -T 0 > cd-hit-est.log &
+
+===============================================
+TransDecoder links:
+https://github.com/TransDecoder/TransDecoder/wiki
+(search for "Running TransDecoder is a two-step process): 
+https://bioinformaticsdotca.github.io/RNAseq_2019_Module8_lab
+https://github.com/TransDecoder/TransDecoder
+https://github.com/TransDecoder/TransDecoder/blob/devel/TransDecoder.Predict
+
+
+Hello, Ben:
+
+Happy New Year!
+
+CD-hit works well, decreases seq no from 641,657 to 556,707.
+
+Please go ahead to TransDecorder at ORF length at least 50 genetic codons (amino acid). Thanks
+
+Jun-Jun
+
+
+Solution here: https://github.com/TransDecoder/TransDecoder/issues/76
+I had to install the perl module:
+$ sudo cpan URI::Escape
+
+
+nohup TransDecoder.LongOrfs -m 50 -t ../CdHitEstResults/MergedContigs-CC-LPnd-Trin--cd-hit-est-out.fasta > TransDecoder.LongOrgs.log &
+
+===============================================
+
+Hello, Ben:
+
+Great outcomes!
+
+Please run TransDecoder.LongOrgs using MergedContigs-CC-LPnd-Trin 641,657 at LongOrfs -m 50 –t. Then run cd-hit using amino acid sequences (pep. file) of MergedContigs-CC-LPnd-Trin 641,657 at 0.98.
+
+Thanks.
+
+MeGAMerge-1.1.pl -d out-full CC-clean-480,846nt-GenBank_GHWB00000000.fasta LPndtranscript163,075.fasta Trinity_RS_SS_D641,657.fasta
+
+nohup TransDecoder.LongOrfs -m 50 -t ../MeGAMerge-fullResults/MergedContigs-CC-LPnd-Trin.fasta > TransDecoder.LongOrfs-try2.log &
+
+nohup TransDecoder.Predict --single_best_only -t ../MeGAMerge-fullResults/MergedContigs-CC-LPnd-Trin.fasta > TransDecoder.Predict.log &
+
+nohup cd-hit-est -i ../TransDecoderResults-try2-afterMeGAMerge--singleBestOnly/MergedContigs-CC-LPnd-Trin.fasta.transdecoder.pep -o MergedContigs-CC-LPnd-Trin.transdecoder.pep-cd-hit-est.pep -c 0.98 -n 10 -d 0 -M 36000 -T 0 > cd-hit-est.log &
+
+
+[centos@ben-a work]$ grep -c ">" MeGAMerge-fullResults/MergedContigs-CC-LPnd-Trin.fasta 
+619892
+[centos@ben-a TransDecoderResults-try2-afterMeGAMerge--singleBestOnly]$ grep -c ">" MergedContigs-CC-LPnd-Trin.fasta.transdecoder.pep 
+399753
+[centos@ben-a CdHitEstResults-afterTransDecoder]$ grep -c ">" MergedContigs-CC-LPnd-Trin.transdecoder.pep-cd-hit-est.pep
+399599
+
+===============================================
+
+GREAT!
+
+It looks cd-hits running at pep level just decrease number a little bit (from 399,753 to 399,599).
+
+Please send me a few more files:
+
+1.       MergedContigs-CC-LPnd-Trin.fasta  (seq619,892);
+2.       MergedContigs-CC-LPnd-Trin.fasta.transdecoder.pep (seq399,753);
+3.       MergedContigs-CC-LPnd-Trin.fasta.transdecoder.cds (seq399,753);
+
+Please go ahead to run Metagenome Analyzer (MEGAN, ver 5.7.1) (Huson et al. 2011) using ‘MergedContigs-CC-LPnd-Trin.fasta.transdecoder.pep (seq399,753)’ as input.
+
+THANKS!
+
+---
+Megagenome Analyzer 6 links:
+from: https://bio.tools/megan
+"Metagenome Analysis Software - MEGAN (MEtaGenome ANalyzer) is a new computer program that allows laptop analysis of large metagenomic datasets. In a preprocessing step, the set of DNA reads (or contigs) is compared against databases of known sequences using BLAST or another comparison tool. MEGAN can then be used to compute and interactively explore the taxonomical content of the dataset, employing the NCBI taxonomy to summarize and order the results."
+
+https://uni-tuebingen.de/fakultaeten/mathematisch-naturwissenschaftliche-fakultaet/fachbereiche/informatik/lehrstuehle/algorithms-in-bioinformatics/software/megan6/
+https://software-ab.informatik.uni-tuebingen.de/download/megan6/welcome.html
+https://software-ab.informatik.uni-tuebingen.de/download/megan6/manual.pdf
+- requires jdk 11 or later (packed with it for windows and and mac)
+
+Useful info for installing java-11: 
+https://www.linode.com/docs/guides/how-to-install-openjdk-on-centos-8/
+
+---
+Hi Jun-Jun, I installed MEGAN 6 community edition and tried to open MergedContigs-CC-LPnd-Trin.fasta.transdecoder.pep, but it gave me an error, saying the file has an unknown type. 
+
+Here's the manual: 
+https://software-ab.informatik.uni-tuebingen.de/download/megan6/manual.pdf
+
+The manual, section 5, gives information on the file types it can open. Let me know if I need to convert it to something else. Section 4 gives a helpful overview of the program. Also, Section 3 tells how to install it, and it seems like it would be very easy for you to install it on Windows (might be more complex if you're using Linux and have an older version of Java). On Windows it should be as simple as downloading the .exe file and double-clicking on it. You could try running it yourself to see if you can discover how you'd like to use it.
+
+Here's the download page: 
+https://software-ab.informatik.uni-tuebingen.de/download/megan6/welcome.html
+
+
+---
+
+I believe That Emily has installed all related software and databases in Boreal Cloudy system, including BLAST the reads (or protein seq,  in fasta file) against a database of reference sequences (commonly using NCBI-NR).
+
+Before MEGAN running, we need run BLASTp first using fasta file as input and getting the BLAST file as output. Them the BLAAST file as input for MEGA, and get output to show ‘first three levels of the taxonomy’ and further ‘to show all nodes on the next level of the taxonomy’. Then based on seq IDs, we can assign each seq onto different ‘nodes of taxonomy’.
+
+Q's:
+1. I'm going to start with just a small 1000-sequence test from the output of one of the completed BLASTp runs. Does this seem like a valid way to test MEGAN6 to you?
+ - It would fine to try it.
+
+2. Currently each of the ten BLASTp runs produces a very large file of 5-6 GB. Am I supposed to combine them into one gigantic file to read with MEGAN6, or can I keep them separate?
+ - Keep them separately, you can combine output files at some stage later.
+
+3. I've read through the first 6 sections of the manual. Section 6, "Long Reads", says:
+"MEGAN explicitly supports the analysis of long reads, by which we mean reads or other input sequences, such as contigs, that are long enough to contain or cover more than one gene, ≤ 500 bp, say. This mode must be set before MEGAN parses or meganizes input files, because it effects the way that input files are processed."
+Does this apply to us?
+ - Here, I don’t understand at all. The input file is out file of Blastp, not reads of sequence at any length, right?
+ - If seq fasta files can be input into MEGAN6 for processing, that means this pipeline has included an initial step of BLAST (BLASTn, BLASTp, BLASTx, etc).
+
+---
+Hello, Ben:
+
+A trial run of 100-1,000 seqs would be fine for a test of BLAST.
+
+As for the RAM and processing power for BLAST, you may check the link as below. Thanks. Jun-Jun
+https://doctorlib.info/medical/blast/13.html
+
+---
+Just to be sure, here are my questions: 
+
+Which file would you like me to run BLAST on?  
+Divide ‘MergedContigs-CC-LPnd-Trin.fasta.transdecoder.pep (399,753) into ten fasta file, each with ~40,000 protein sequences for run of BLASTp.
+
+Also, how large was the fasta file that Emily divided into ten parts?
+
+You are sure the database we need is NCBI-NR? I'll start the download now.  
+Sure just to use NCBI-NR. This time keep it somewhere in boreal cloud as we need to use this database in long time in many ways.
+
+---
+Links and instructions for downloading the NCBI-NR database for BLAST here:
+https://www.biostars.org/p/154704/
+ftp://ftp.ncbi.nlm.nih.gov/blast/db/
+ftp://ftp.ncbi.nlm.nih.gov/blast/db/README
+
+nohup wget -a wget.log ftp://ftp.ncbi.nlm.nih.gov/blast/db/nr.* &
+---
+
+Downloading and installing BLAST:
+https://blast.ncbi.nlm.nih.gov/Blast.cgi?PAGE_TYPE=BlastDocs&DOC_TYPE=Download
+Basic instructions, see CentOS (seems you just need to download the tar.gz, decompress, and add it's bin folder to your PATH):
+http://www.metagenomics.wiki/tools/blast/install
+
+wget ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/LATEST/ncbi-blast-2.11.0+-x64-linux.tar.gz
+wget ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/LATEST/ncbi-blast-2.11.0+-x64-linux.tar.gz.md5
+
+curl -o ncbi-blast-2.11.0+-x64-linux.tar.gz ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/LATEST/ncbi-blast-2.11.0+-x64-linux.tar.gz
+
+The above methods were resulting in corrupted downloads, so trying this script which is included in the blast package (use it with no parameters to get usage): 
+
+nohup ../blast-2.11/ncbi-blast-2.11.0+/bin/update_blastdb.pl --verbose --timeout 180 nr > update_blastdb.log &
+
+---
+
+BLAST+ user manual: 
+https://www.ncbi.nlm.nih.gov/books/NBK279691/
+https://www.ncbi.nlm.nih.gov/books/NBK279690/
+Configuring: https://www.ncbi.nlm.nih.gov/books/NBK279695/
+Overview of features: https://www.ncbi.nlm.nih.gov/books/NBK279668/
+Quick start: https://www.ncbi.nlm.nih.gov/books/NBK279680/
+The online blastp tool: https://blast.ncbi.nlm.nih.gov/Blast.cgi?PROGRAM=blastp&PAGE_TYPE=BlastSearch&LINK_LOC=MultiSensor
+
+My command:
+nohup blastp -db nr -query MergedContigs-CC-LPnd-Trin.fasta.transdecoder-first1000.pep -out results.out & > test.log
+nohup blastp -db nr -query MergedContigs-CC-LPnd-Trin.fasta.transdecoder-first4seqs.pep -out results.out & > test.log
+nohup blastp -num_threads 16 -db nr -query MergedContigs-CC-LPnd-Trin.fasta.transdecoder-first4seqs.pep -out results.out & > test.log
+nohup blastp -num_threads 16 -db nr -query MergedContigs-CC-LPnd-Trin.fasta.transdecoder-first1000.pep -out results.out & > test.log
+
+An example of someone else's command:
+https://www.biostars.org/p/117274/
+
+Why is blast taking so long?:
+https://secure.clcbio.com/helpspot/index.php?pg=kb.page&id=248
+
+================================================
+
+Dividing MergedContigs-CC-LPnd-Trin.fasta.transdecoder.pep  into 10 ~equal parts:
+
+[centos@ben-a blastrun]$ grep -c ">" MergedContigs-CC-LPnd-Trin.fasta.transdecoder.pep 
+399753
+[centos@ben-a blastrun]$ grep -n ">" MergedContigs-CC-LPnd-Trin.fasta.transdecoder.pep > linNums.txt
+[centos@ben-a blastrun]$ 
+[centos@ben-a blastrun]$ 
+[centos@ben-a blastrun]$ awk 'NR == 40001' lineNums.txt 
+273989:>Contig_141537.p1 GENE.Contig_141537~~Contig_141537.p1  ORF type:complete len:449 (+),score=40.37 Contig_141537:37-1383(+)
+[centos@ben-a blastrun]$ awk 'NR == 80001' lineNums.txt 
+517924:>Contig_187441.p1 GENE.Contig_187441~~Contig_187441.p1  ORF type:complete len:72 (+),score=16.84 Contig_187441:44-259(+)
+[centos@ben-a blastrun]$ awk 'NR == 120001' lineNums.txt 
+684166:>Contig_245223.p1 GENE.Contig_245223~~Contig_245223.p1  ORF type:internal len:131 (+),score=15.48 Contig_245223:1-390(+)
+[centos@ben-a blastrun]$ awk 'NR == 160001' lineNums.txt 
+843521:>Contig_303762.p1 GENE.Contig_303762~~Contig_303762.p1  ORF type:internal len:139 (-),score=16.17 Contig_303762:2-415(-)
+[centos@ben-a blastrun]$ awk 'NR == 2000001' lineNums.txt 
+[centos@ben-a blastrun]$ awk 'NR == 200001' lineNums.txt 
+1003153:>Contig_364096.p1 GENE.Contig_364096~~Contig_364096.p1  ORF type:complete len:54 (-),score=0.53 Contig_364096:273-434(-)
+[centos@ben-a blastrun]$ awk 'NR == 240001' lineNums.txt 
+1159249:>Contig_428474.p1 GENE.Contig_428474~~Contig_428474.p1  ORF type:5prime_partial len:75 (-),score=20.09 Contig_428474:200-424(-)
+[centos@ben-a blastrun]$ awk 'NR == 280001' lineNums.txt 
+1311290:>Contig_494.p1 GENE.Contig_494~~Contig_494.p1  ORF type:complete len:335 (+),score=19.35 Contig_494:203-1207(+)
+[centos@ben-a blastrun]$ awk 'NR == 320001' lineNums.txt 
+1460333:>Contig_553000.p1 GENE.Contig_553000~~Contig_553000.p1  ORF type:5prime_partial len:76 (-),score=3.35 Contig_553000:1190-1417(-)
+[centos@ben-a blastrun]$ awk 'NR == 360001' lineNums.txt 
+1604172:>Contig_601865.p2 GENE.Contig_601865~~Contig_601865.p2  ORF type:3prime_partial len:66 (+),score=6.47 Contig_601865:187-381(+)
+[centos@ben-a blastrun]$ awk 'NR == 400001' lineNums.txt 
+[centos@ben-a blastrun]$ 
+
+Beginning line nums:
+1
+273989
+517924
+684166
+843521
+1003153
+1159249
+1311290
+1460333
+1604172
+
+Ending line nums:
+273988
+517923
+684165
+843520
+1003152
+1159248
+1311289
+1460332
+1604171
+1763447
+
+
+awk 'NR >= 1 && NR <= 273988' MergedContigs-CC-LPnd-Trin.fasta.transdecoder.pep > MergedContigs-CC-LPnd-Trin.fasta.transdecoder.pep-01.pep
+awk 'NR >= 273989 && NR <= 517923' MergedContigs-CC-LPnd-Trin.fasta.transdecoder.pep > MergedContigs-CC-LPnd-Trin.fasta.transdecoder.pep-02.pep
+awk 'NR >= 517924 && NR <= 684165' MergedContigs-CC-LPnd-Trin.fasta.transdecoder.pep > MergedContigs-CC-LPnd-Trin.fasta.transdecoder.pep-03.pep
+awk 'NR >= 684166 && NR <= 843520' MergedContigs-CC-LPnd-Trin.fasta.transdecoder.pep > MergedContigs-CC-LPnd-Trin.fasta.transdecoder.pep-04.pep
+awk 'NR >= 843521 && NR <= 1003152' MergedContigs-CC-LPnd-Trin.fasta.transdecoder.pep > MergedContigs-CC-LPnd-Trin.fasta.transdecoder.pep-05.pep
+awk 'NR >= 1003153 && NR <= 1159248' MergedContigs-CC-LPnd-Trin.fasta.transdecoder.pep > MergedContigs-CC-LPnd-Trin.fasta.transdecoder.pep-06.pep
+awk 'NR >= 1159249 && NR <= 1311289' MergedContigs-CC-LPnd-Trin.fasta.transdecoder.pep > MergedContigs-CC-LPnd-Trin.fasta.transdecoder.pep-07.pep
+awk 'NR >= 1311290 && NR <= 1460332' MergedContigs-CC-LPnd-Trin.fasta.transdecoder.pep > MergedContigs-CC-LPnd-Trin.fasta.transdecoder.pep-08.pep
+awk 'NR >= 1460333 && NR <= 1604171' MergedContigs-CC-LPnd-Trin.fasta.transdecoder.pep > MergedContigs-CC-LPnd-Trin.fasta.transdecoder.pep-09.pep
+awk 'NR >= 1604172 && NR <= 1763447' MergedContigs-CC-LPnd-Trin.fasta.transdecoder.pep > MergedContigs-CC-LPnd-Trin.fasta.transdecoder.pep-10.pep
+
+
+[centos@ben-a blastrun]$ ls -lah
+total 279M
+drwxrwxr-x. 3 centos centos 4.0K Jan 19  2021 .
+drwxrwxrwx. 5   5061   5008 4.0K Jan 19 20:21 ..
+-rw-rw-r--. 1 centos centos  50M Jan 13 06:38 lineNums.txt
+-rw-rw-r--. 1 centos centos 115M Jan 13 06:37 MergedContigs-CC-LPnd-Trin.fasta.transdecoder.pep
+-rw-rw-r--. 1 centos centos  18M Jan 19  2021 MergedContigs-CC-LPnd-Trin.fasta.transdecoder.pep-01.pep
+-rw-rw-r--. 1 centos centos  16M Jan 19  2021 MergedContigs-CC-LPnd-Trin.fasta.transdecoder.pep-02.pep
+-rw-rw-r--. 1 centos centos  11M Jan 19  2021 MergedContigs-CC-LPnd-Trin.fasta.transdecoder.pep-03.pep
+-rw-rw-r--. 1 centos centos  11M Jan 19  2021 MergedContigs-CC-LPnd-Trin.fasta.transdecoder.pep-04.pep
+-rw-rw-r--. 1 centos centos  11M Jan 19  2021 MergedContigs-CC-LPnd-Trin.fasta.transdecoder.pep-05.pep
+-rw-rw-r--. 1 centos centos  11M Jan 19  2021 MergedContigs-CC-LPnd-Trin.fasta.transdecoder.pep-06.pep
+-rw-rw-r--. 1 centos centos  10M Jan 19  2021 MergedContigs-CC-LPnd-Trin.fasta.transdecoder.pep-07.pep
+-rw-rw-r--. 1 centos centos 9.9M Jan 19  2021 MergedContigs-CC-LPnd-Trin.fasta.transdecoder.pep-08.pep
+-rw-rw-r--. 1 centos centos 9.7M Jan 19  2021 MergedContigs-CC-LPnd-Trin.fasta.transdecoder.pep-09.pep
+-rw-rw-r--. 1 centos centos  11M Jan 19  2021 MergedContigs-CC-LPnd-Trin.fasta.transdecoder.pep-10.pep
+drwxrwxr-x. 7 centos centos 4.0K Jan 19 21:50 tests
+[centos@ben-a blastrun]$ 
+
+
+...probably best to split the -01 and -02 files in half, with -01a, -01b, -02a, -02b:
+
+[centos@ben-a blastrun]$ awk 'NR == 20001' lineNums.txt
+96712:>Contig_123360.p1 GENE.Contig_123360~~Contig_123360.p1  ORF type:complete len:303 (+),score=72.50 Contig_123360:1539-2447(+)
+[centos@ben-a blastrun]$ 
+[centos@ben-a blastrun]$ awk 'NR == 60001' lineNums.txt
+431998:>Contig_160144.p1 GENE.Contig_160144~~Contig_160144.p1  ORF type:5prime_partial len:69 (-),score=1.58 Contig_160144:50-256(-)
+
+
+awk 'NR >= 1 && NR <= 96711' MergedContigs-CC-LPnd-Trin.fasta.transdecoder.pep > MergedContigs-CC-LPnd-Trin.fasta.transdecoder.pep-01a.pep
+awk 'NR >= 96712 && NR <= 273988' MergedContigs-CC-LPnd-Trin.fasta.transdecoder.pep > MergedContigs-CC-LPnd-Trin.fasta.transdecoder.pep-01b.pep
+awk 'NR >= 273989 && NR <= 431997' MergedContigs-CC-LPnd-Trin.fasta.transdecoder.pep > MergedContigs-CC-LPnd-Trin.fasta.transdecoder.pep-02a.pep
+awk 'NR >= 431998 && NR <= 517923' MergedContigs-CC-LPnd-Trin.fasta.transdecoder.pep > MergedContigs-CC-LPnd-Trin.fasta.transdecoder.pep-02b.pep
+
+
+-------------
+The blastp commands were based on the below three options, depending on the number of processors available, and specific file names: 
+
+sudo mount -t nfs 10.20.0.6:/Public/genomics/NCBI-NR /work2
+sudo mount -t nfs 10.20.0.6:/Public/genomics/Data-Dec2020/ben2021/a6/blastrun/blast0 /work
+
+nohup blastp -num_threads 28 -db nr -query MergedContigs-CC-LPnd-Trin.fasta.transdecoder.pep -out results.out > console.log &
+nohup blastp -num_threads 56 -db nr -query MergedContigs-CC-LPnd-Trin.fasta.transdecoder.pep -out results.out > console.log &
+nohup blastp -num_threads 16 -db nr -query MergedContigs-CC-LPnd-Trin.fasta.transdecoder.pep -out results.out > console.log &
+
+
+These are the commands I used for the ones I had to move to a different machine for "part 2":
+
+nohup blastp -num_threads 28 -db nr -query MergedContigs-CC-LPnd-Trin.fasta.transdecoder.pep-06.part2.pep -out results.out.part2 > console.log &
+
+nohup blastp -num_threads 28 -db nr -query MergedContigs-CC-LPnd-Trin.fasta.transdecoder.pep-05.part2.pep -out 05-results.out.part2 > console.log &
+
+nohup blastp -num_threads 16 -db nr -query MergedContigs-CC-LPnd-Trin.fasta.transdecoder.pep-04.part2.pep -out 04-results.out.part2 > console.log &
+
+nohup blastp -num_threads 56 -db nr -query MergedContigs-CC-LPnd-Trin.fasta.transdecoder.pep-01b.part2.pep -out 01b-results.out.part2 > console.log &
+
+nohup blastp -num_threads 56 -db nr -query MergedContigs-CC-LPnd-Trin.fasta.transdecoder.pep-02a.part2.pep -out 02a-results.out.part2 > console.log &
+
+nohup blastp -num_threads 28 -db nr -query MergedContigs-CC-LPnd-Trin.fasta.transdecoder.pep-03.part2.pep -out 03-results.out.part2 > console.log &
+
+nohup blastp -num_threads 28 -db nr -query MergedContigs-CC-LPnd-Trin.fasta.transdecoder.pep-01a.part2.pep -out 01a-results.out.part2 > console.log &
+
+nohup blastp -num_threads 28 -db nr -query MergedContigs-CC-LPnd-Trin.fasta.transdecoder.pep-02b.part2.pep -out 02b-results.out.part2 > console.log &
+
+nohup blastp -num_threads 64 -db nr -query MergedContigs-CC-LPnd-Trin.fasta.transdecoder.pep-03.part3.pep -out 03-results.out.part3 > console.log &
+
+
+...
+To check the progress of each individual run, do something like this: 
+grep -c "Query=" 08-results.out
+or
+grep -n "Query=" 08-results.out > lineNums08-results.txt
+...and count the number of lines. The finished results will have the same number as input sequences.
+
+---
+To split the input files in preparation for killing the process and beginning where it left off on another machine:
+
+Example: 
+grep -n "Query=" 06-results.out > lineNums06-results-pt1.txt
+tail lineNums06-results-pt1.txt 
+grep -n "Contig_369577.p1" MergedContigs-CC-LPnd-Trin.fasta.transdecoder.pep-06.pep 
+awk 'NR >= 1 && NR <= 14896' MergedContigs-CC-LPnd-Trin.fasta.transdecoder.pep-06.pep > MergedContigs-CC-LPnd-Trin.fasta.transdecoder.pep-06.part1.pep
+awk 'NR >= 14897' MergedContigs-CC-LPnd-Trin.fasta.transdecoder.pep-06.pep > MergedContigs-CC-LPnd-Trin.fasta.transdecoder.pep-06.part2.pep 
+kill...
+mv 06-results.out 06-results.out.part1-withOverlap
+
+---
+
+
+=========================================
+
+Hello, Ben:
+
+Before you run MEGA, can you run ‘OrthoFinder’ first. It is also a BALST-based pipeline. We get comments back from Journal about our submitted manuscript, requiring some related results. I like to run ‘OrthoFinder’ to compare three sets of protein sequence data as enclosed.
+
+Thanks.
+
+Jun-Jun
+
+https://github.com/davidemms/OrthoFinder#what-orthofinder-provides
+https://davidemms.github.io/menu/tutorials.html
+
+Resolving install issues (used the release version for glibc-2.15 (I had glibc-2.17):
+https://github.com/davidemms/OrthoFinder/issues/305
+https://www.linuxquestions.org/questions/linux-software-2/how-to-check-glibc-version-263103/
+https://github.com/davidemms/OrthoFinder/releases
+
+
+nohup ./orthofinder -f /work/April-30-2019 2>&1 1> /work/April-30-2019/OrthoFinder_run.log &
+
+
+
+=========================================
+
+BLASTp runs all complete. Next step: combine all BLASTp files into one giant one, then open it in MEGAN6 and see what happens. For context, see notes at around line 170 (search "Before MEGAN running").
+
+
+Finished blastp runs, all in one file: 
+07, 08, 09, 10, 
+Finished, need to join together: 
+01a, 01b (big), 02a (big), 02b, 03 (3 parts), 04, 05, 06, 
+
+- step one: recombine those runs which I had split into 2 or 3 output files.
+- step two: combine all ten outputs into one giant one.
+
+Step 1:
+tail lineNums02b-results-pt1.txt 
+grep -n "Query=" -m 2 02b-results.out.part2
+awk 'NR >= 1 && NR < 74609648' 02b-results.out.part1-withOverlap > 02b-results.blastp
+wc -l 02b-results.blastp
+awk 'NR >= 24' 02b-results.out.part2 >> 02b-results.blastp
+
+wc -l 02b-results.blastp
+wc -l 02b-results.out.part2
+echo $((74609647 + 11044219))
+grep -c "Query=" 02b-results.blastp 
+
+done: 01a, 01b, 02a, 02b, 04, 05, 06
+
+
+Step 2: 
+#!/bin/bash
+
+echo "copying 01a"
+cp 01a-results.blastp total-results.blastp
+echo "concatenating 01b"
+awk 'NR >= 23' 01b-results.blastp >> total-results.blastp
+echo "concatenating 02a"
+awk 'NR >= 23' 02a-results.blastp >> total-results.blastp
+echo "concatenating 02b"
+awk 'NR >= 23' 02b-results.blastp >> total-results.blastp
+echo "concatenating 03"
+awk 'NR >= 23' 03-results.blastp >> total-results.blastp
+echo "concatenating 04"
+awk 'NR >= 23' 04-results.blastp >> total-results.blastp
+echo "concatenating 05"
+awk 'NR >= 23' 05-results.blastp >> total-results.blastp
+echo "concatenating 06"
+awk 'NR >= 23' 06-results.blastp >> total-results.blastp
+echo "concatenating 07"
+awk 'NR >= 23' 07-results.blastp >> total-results.blastp
+echo "concatenating 08"
+awk 'NR >= 23' 08-results.blastp >> total-results.blastp
+echo "concatenating 09"
+awk 'NR >= 23' 09-results.blastp >> total-results.blastp
+echo "concatenating 10"
+awk 'NR >= 23' 10-results.blastp >> total-results.blastp
+echo "done."
+
+--------------
+
+Next step:
+- open the tree to the levels Jun-Jun wants
+- get list of sequence ids at each node
+
+===========
+temp: 
+
+#   ExecStart=/usr/sbin/runuser -l centos -c "/usr/bin/vncserver %i -geometry 1200x1000"
+#   PIDFile=/home/centos/.vnc/%H%i.pid
+
+pid 8969
+
+
+
+
+
