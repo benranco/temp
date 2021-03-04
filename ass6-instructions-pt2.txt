@@ -1,0 +1,18 @@
+===========
+Hello, Ben:
+
+Your running outcome looks great, they are what we want. Next step, please consider move onto whitebark pine, starting from Trinity first, then transdecode, and megan6. Thanks.
+
+Jun-Jun
+
+Steps:
+- raw data is in four subfolders of /public/genomics/Data-Dec2020/WBP-NGS-rawData
+- trimmomatic for quality control on each raw data file
+- combine the files into a master R1 and R2 file for Trinity?
+- will I need 1 TB or 2 TB memory for Trinity? Hopefully can use 2 TB. Will I need to split it into two subsets and run on Trinity separately?
+- Trinity
+- Transdecode
+- BLASTp (using a different strategy?)
+- MEGAN6
+
+
