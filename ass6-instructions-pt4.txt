@@ -1,0 +1,181 @@
+---
+Hello, Ben:
+
+Great progress! Please go ahead to assembly RNA-sea data in the folder ‘Hemlock_Heterobasidion-2017’, where there are 30 samples.
+---
+
+----------------------
+I began running trimmomatic on the files: 
+
+nohup ./trimmomatic_run_multiple.sh 2>&1 1>trim_master_log.txt &
+
+...finished trimmomatic.
+
+scp -J inf2 brancourt@borealpfc.nfis.org:/public/genomics/Data-Dec2020/Hemlock-Heterobasidion-2017/trimmomatic_scripts/trim_master_log.txt .
+
+
+To create: trim_master_log-highlights.txt 
+grep -E "^==.*|--.*|running.*|r1.*|Input.*" trim_master_log.txt > trim_master_log-highlights.txt 
+
+
+----------------------
+
+Real Trinity command, but without filename lists yet: 
+nohup /home/centos/software/trinity/trinityrnaseq-Trinity-v2.8.5/Trinity --seqType fq --left ./all_1P.fq  --right ./all_2P.fq --max_memory 944G --CPU 64 --output trinityOut 2>&1 1>trinity_run.log &
+
+Real Trinity command, with filename lists : 
+nohup /home/centos/software/trinity/trinityrnaseq-Trinity-v2.8.5/Trinity --seqType fq --left Control/HI.4195.005.Index_10.16B_filtered_R_1P.fq,Control/HI.4195.005.Index_11.16C_filtered_R_1P.fq,Control/HI.4195.005.Index_20.17B_filtered_R_1P.fq,Control/HI.4195.005.Index_22.17C_filtered_R_1P.fq,Control/HI.4195.006.Index_1.29B_filtered_R_1P.fq,Control/HI.4195.006.Index_23.21B_filtered_R_1P.fq,Control/HI.4195.006.Index_27.21C_filtered_R_1P.fq,Control/HI.4195.006.Index_3.29C_filtered_R_1P.fq,Control/HI.4195.006.Index_4.22B_filtered_R_1P.fq,Control/HI.4195.006.Index_5.22C_filtered_R_1P.fq,Cured/HI.4195.004.Index_12.10B_filtered_R_1P.fq,Cured/HI.4195.004.Index_13.13C_filtered_R_1P.fq,Cured/HI.4195.004.Index_19.10C_filtered_R_1P.fq,Cured/HI.4195.004.Index_2.13B_filtered_R_1P.fq,Cured/HI.4195.004.Index_8.12C_filtered_R_1P.fq,Cured/HI.4195.004.Index_9.12B_filtered_R_1P.fq,Cured/HI.4195.005.Index_15.14C_filtered_R_1P.fq,Cured/HI.4195.005.Index_6.14B_filtered_R_1P.fq,Pot-15/HI.4195.005.Index_14.15WB_filtered_R_1P.fq,Pot-15/HI.4195.005.Index_16.15WC_filtered_R_1P.fq,Pot-15/HI.4195.005.Index_18.15C_filtered_R_1P.fq,Pot-15/HI.4195.005.Index_7.15B_filtered_R_1P.fq,Wild/HI.4195.004.Index_1.11B_filtered_R_1P.fq,Wild/HI.4195.004.Index_3.11C_filtered_R_1P.fq,Wild/HI.4195.004.Index_4.8B_filtered_R_1P.fq,Wild/HI.4195.004.Index_5.8C_filtered_R_1P.fq,Wild/HI.4195.006.Index_12.27B_filtered_R_1P.fq,Wild/HI.4195.006.Index_19.27C_filtered_R_1P.fq,Wild/HI.4195.006.Index_21.20C_filtered_R_1P.fq,Wild/HI.4195.006.Index_25.20B_filtered_R_1P.fq  --right Control/HI.4195.005.Index_10.16B_filtered_R_2P.fq,Control/HI.4195.005.Index_11.16C_filtered_R_2P.fq,Control/HI.4195.005.Index_20.17B_filtered_R_2P.fq,Control/HI.4195.005.Index_22.17C_filtered_R_2P.fq,Control/HI.4195.006.Index_1.29B_filtered_R_2P.fq,Control/HI.4195.006.Index_23.21B_filtered_R_2P.fq,Control/HI.4195.006.Index_27.21C_filtered_R_2P.fq,Control/HI.4195.006.Index_3.29C_filtered_R_2P.fq,Control/HI.4195.006.Index_4.22B_filtered_R_2P.fq,Control/HI.4195.006.Index_5.22C_filtered_R_2P.fq,Cured/HI.4195.004.Index_12.10B_filtered_R_2P.fq,Cured/HI.4195.004.Index_13.13C_filtered_R_2P.fq,Cured/HI.4195.004.Index_19.10C_filtered_R_2P.fq,Cured/HI.4195.004.Index_2.13B_filtered_R_2P.fq,Cured/HI.4195.004.Index_8.12C_filtered_R_2P.fq,Cured/HI.4195.004.Index_9.12B_filtered_R_2P.fq,Cured/HI.4195.005.Index_15.14C_filtered_R_2P.fq,Cured/HI.4195.005.Index_6.14B_filtered_R_2P.fq,Pot-15/HI.4195.005.Index_14.15WB_filtered_R_2P.fq,Pot-15/HI.4195.005.Index_16.15WC_filtered_R_2P.fq,Pot-15/HI.4195.005.Index_18.15C_filtered_R_2P.fq,Pot-15/HI.4195.005.Index_7.15B_filtered_R_2P.fq,Wild/HI.4195.004.Index_1.11B_filtered_R_2P.fq,Wild/HI.4195.004.Index_3.11C_filtered_R_2P.fq,Wild/HI.4195.004.Index_4.8B_filtered_R_2P.fq,Wild/HI.4195.004.Index_5.8C_filtered_R_2P.fq,Wild/HI.4195.006.Index_12.27B_filtered_R_2P.fq,Wild/HI.4195.006.Index_19.27C_filtered_R_2P.fq,Wild/HI.4195.006.Index_21.20C_filtered_R_2P.fq,Wild/HI.4195.006.Index_25.20B_filtered_R_2P.fq --max_memory 944G --CPU 64 --output trinityOut 2>&1 1>trinity_run.log &
+
+-----
+--left parameter:
+
+Control/HI.4195.005.Index_10.16B_filtered_R_1P.fq,Control/HI.4195.005.Index_11.16C_filtered_R_1P.fq,Control/HI.4195.005.Index_20.17B_filtered_R_1P.fq,Control/HI.4195.005.Index_22.17C_filtered_R_1P.fq,Control/HI.4195.006.Index_1.29B_filtered_R_1P.fq,Control/HI.4195.006.Index_23.21B_filtered_R_1P.fq,Control/HI.4195.006.Index_27.21C_filtered_R_1P.fq,Control/HI.4195.006.Index_3.29C_filtered_R_1P.fq,Control/HI.4195.006.Index_4.22B_filtered_R_1P.fq,Control/HI.4195.006.Index_5.22C_filtered_R_1P.fq,Cured/HI.4195.004.Index_12.10B_filtered_R_1P.fq,Cured/HI.4195.004.Index_13.13C_filtered_R_1P.fq,Cured/HI.4195.004.Index_19.10C_filtered_R_1P.fq,Cured/HI.4195.004.Index_2.13B_filtered_R_1P.fq,Cured/HI.4195.004.Index_8.12C_filtered_R_1P.fq,Cured/HI.4195.004.Index_9.12B_filtered_R_1P.fq,Cured/HI.4195.005.Index_15.14C_filtered_R_1P.fq,Cured/HI.4195.005.Index_6.14B_filtered_R_1P.fq,Pot-15/HI.4195.005.Index_14.15WB_filtered_R_1P.fq,Pot-15/HI.4195.005.Index_16.15WC_filtered_R_1P.fq,Pot-15/HI.4195.005.Index_18.15C_filtered_R_1P.fq,Pot-15/HI.4195.005.Index_7.15B_filtered_R_1P.fq,Wild/HI.4195.004.Index_1.11B_filtered_R_1P.fq,Wild/HI.4195.004.Index_3.11C_filtered_R_1P.fq,Wild/HI.4195.004.Index_4.8B_filtered_R_1P.fq,Wild/HI.4195.004.Index_5.8C_filtered_R_1P.fq,Wild/HI.4195.006.Index_12.27B_filtered_R_1P.fq,Wild/HI.4195.006.Index_19.27C_filtered_R_1P.fq,Wild/HI.4195.006.Index_21.20C_filtered_R_1P.fq,Wild/HI.4195.006.Index_25.20B_filtered_R_1P.fq
+
+-----
+--right parameter:
+
+Control/HI.4195.005.Index_10.16B_filtered_R_2P.fq,Control/HI.4195.005.Index_11.16C_filtered_R_2P.fq,Control/HI.4195.005.Index_20.17B_filtered_R_2P.fq,Control/HI.4195.005.Index_22.17C_filtered_R_2P.fq,Control/HI.4195.006.Index_1.29B_filtered_R_2P.fq,Control/HI.4195.006.Index_23.21B_filtered_R_2P.fq,Control/HI.4195.006.Index_27.21C_filtered_R_2P.fq,Control/HI.4195.006.Index_3.29C_filtered_R_2P.fq,Control/HI.4195.006.Index_4.22B_filtered_R_2P.fq,Control/HI.4195.006.Index_5.22C_filtered_R_2P.fq,Cured/HI.4195.004.Index_12.10B_filtered_R_2P.fq,Cured/HI.4195.004.Index_13.13C_filtered_R_2P.fq,Cured/HI.4195.004.Index_19.10C_filtered_R_2P.fq,Cured/HI.4195.004.Index_2.13B_filtered_R_2P.fq,Cured/HI.4195.004.Index_8.12C_filtered_R_2P.fq,Cured/HI.4195.004.Index_9.12B_filtered_R_2P.fq,Cured/HI.4195.005.Index_15.14C_filtered_R_2P.fq,Cured/HI.4195.005.Index_6.14B_filtered_R_2P.fq,Pot-15/HI.4195.005.Index_14.15WB_filtered_R_2P.fq,Pot-15/HI.4195.005.Index_16.15WC_filtered_R_2P.fq,Pot-15/HI.4195.005.Index_18.15C_filtered_R_2P.fq,Pot-15/HI.4195.005.Index_7.15B_filtered_R_2P.fq,Wild/HI.4195.004.Index_1.11B_filtered_R_2P.fq,Wild/HI.4195.004.Index_3.11C_filtered_R_2P.fq,Wild/HI.4195.004.Index_4.8B_filtered_R_2P.fq,Wild/HI.4195.004.Index_5.8C_filtered_R_2P.fq,Wild/HI.4195.006.Index_12.27B_filtered_R_2P.fq,Wild/HI.4195.006.Index_19.27C_filtered_R_2P.fq,Wild/HI.4195.006.Index_21.20C_filtered_R_2P.fq,Wild/HI.4195.006.Index_25.20B_filtered_R_2P.fq
+
+
+-----
+Files used in the --left parameter:
+
+ls Control/*1P.fq | cat
+Control/HI.4195.005.Index_10.16B_filtered_R_1P.fq
+Control/HI.4195.005.Index_11.16C_filtered_R_1P.fq
+Control/HI.4195.005.Index_20.17B_filtered_R_1P.fq
+Control/HI.4195.005.Index_22.17C_filtered_R_1P.fq
+Control/HI.4195.006.Index_1.29B_filtered_R_1P.fq
+Control/HI.4195.006.Index_23.21B_filtered_R_1P.fq
+Control/HI.4195.006.Index_27.21C_filtered_R_1P.fq
+Control/HI.4195.006.Index_3.29C_filtered_R_1P.fq
+Control/HI.4195.006.Index_4.22B_filtered_R_1P.fq
+Control/HI.4195.006.Index_5.22C_filtered_R_1P.fq
+
+ls Cured/*1P.fq | cat
+Cured/HI.4195.004.Index_12.10B_filtered_R_1P.fq
+Cured/HI.4195.004.Index_13.13C_filtered_R_1P.fq
+Cured/HI.4195.004.Index_19.10C_filtered_R_1P.fq
+Cured/HI.4195.004.Index_2.13B_filtered_R_1P.fq
+Cured/HI.4195.004.Index_8.12C_filtered_R_1P.fq
+Cured/HI.4195.004.Index_9.12B_filtered_R_1P.fq
+Cured/HI.4195.005.Index_15.14C_filtered_R_1P.fq
+Cured/HI.4195.005.Index_6.14B_filtered_R_1P.fq
+
+ls Pot-15/*1P.fq | cat
+Pot-15/HI.4195.005.Index_14.15WB_filtered_R_1P.fq
+Pot-15/HI.4195.005.Index_16.15WC_filtered_R_1P.fq
+Pot-15/HI.4195.005.Index_18.15C_filtered_R_1P.fq
+Pot-15/HI.4195.005.Index_7.15B_filtered_R_1P.fq
+
+ls Wild/*1P.fq | cat
+Wild/HI.4195.004.Index_1.11B_filtered_R_1P.fq
+Wild/HI.4195.004.Index_3.11C_filtered_R_1P.fq
+Wild/HI.4195.004.Index_4.8B_filtered_R_1P.fq
+Wild/HI.4195.004.Index_5.8C_filtered_R_1P.fq
+Wild/HI.4195.006.Index_12.27B_filtered_R_1P.fq
+Wild/HI.4195.006.Index_19.27C_filtered_R_1P.fq
+Wild/HI.4195.006.Index_21.20C_filtered_R_1P.fq
+Wild/HI.4195.006.Index_25.20B_filtered_R_1P.fq
+
+-----
+Files used in the --right parameter:
+
+ls Control/*2P.fq | cat
+Control/HI.4195.005.Index_10.16B_filtered_R_2P.fq
+Control/HI.4195.005.Index_11.16C_filtered_R_2P.fq
+Control/HI.4195.005.Index_20.17B_filtered_R_2P.fq
+Control/HI.4195.005.Index_22.17C_filtered_R_2P.fq
+Control/HI.4195.006.Index_1.29B_filtered_R_2P.fq
+Control/HI.4195.006.Index_23.21B_filtered_R_2P.fq
+Control/HI.4195.006.Index_27.21C_filtered_R_2P.fq
+Control/HI.4195.006.Index_3.29C_filtered_R_2P.fq
+Control/HI.4195.006.Index_4.22B_filtered_R_2P.fq
+Control/HI.4195.006.Index_5.22C_filtered_R_2P.fq
+
+
+ls Cured/*2P.fq | cat
+Cured/HI.4195.004.Index_12.10B_filtered_R_2P.fq
+Cured/HI.4195.004.Index_13.13C_filtered_R_2P.fq
+Cured/HI.4195.004.Index_19.10C_filtered_R_2P.fq
+Cured/HI.4195.004.Index_2.13B_filtered_R_2P.fq
+Cured/HI.4195.004.Index_8.12C_filtered_R_2P.fq
+Cured/HI.4195.004.Index_9.12B_filtered_R_2P.fq
+Cured/HI.4195.005.Index_15.14C_filtered_R_2P.fq
+Cured/HI.4195.005.Index_6.14B_filtered_R_2P.fq
+
+ls Pot-15/*2P.fq | cat
+Pot-15/HI.4195.005.Index_14.15WB_filtered_R_2P.fq
+Pot-15/HI.4195.005.Index_16.15WC_filtered_R_2P.fq
+Pot-15/HI.4195.005.Index_18.15C_filtered_R_2P.fq
+Pot-15/HI.4195.005.Index_7.15B_filtered_R_2P.fq
+
+ls Wild/*2P.fq | cat
+Wild/HI.4195.004.Index_1.11B_filtered_R_2P.fq
+Wild/HI.4195.004.Index_3.11C_filtered_R_2P.fq
+Wild/HI.4195.004.Index_4.8B_filtered_R_2P.fq
+Wild/HI.4195.004.Index_5.8C_filtered_R_2P.fq
+Wild/HI.4195.006.Index_12.27B_filtered_R_2P.fq
+Wild/HI.4195.006.Index_19.27C_filtered_R_2P.fq
+Wild/HI.4195.006.Index_21.20C_filtered_R_2P.fq
+Wild/HI.4195.006.Index_25.20B_filtered_R_2P.fq
+
+
+
+
+-------------------------
+The first Trinity run, which was unfortunately done on the pre-Trimmomatic data:
+Hi Jun-Jun,
+
+Trinity on the Hemlock_Heterobasidion data has completed successfully. Here's a link to the output Trinity.fasta file:
+https://www.dropbox.com/s/lcxiku24kmwbq0v/Hemlock_Heterobasidion-2017-Trinity.zip?dl=1
+
+I counted 1259975 transcripts in the final Trinity.fasta output file, based on how many times ">" occurred.
+
+
+Here's some information I extracted from the log file about the percentage of reads selected during normalization:
+110898328 / 813383764 = 13.63% reads selected during normalization.
+0 / 813383764 = 0.00% reads discarded as likely aberrant based on coverage profiles.
+0 / 813383764 = 0.00% reads discarded as below minimum coverage threshold=1
+
+
+Paired mode
+ Input data
+  Left.fasta    15180 MByte
+  Right.fasta   15180 MByte
+  Number of unique KMERs: 3287186500
+  Number of reads:        221796656 Output data
+  Trinity.fasta 811 MByte
+
+
+Ben
+
+-------------------------
+scp -J inf2 brancourt@borealpfc.nfis.org:/public/genomics/Data-Dec2020/Hemlock-Heterobasidion-2017-trimmomatic/Hemlock_Heterobasidion-2017-Trimmomatic-Trinity.zip .
+
+--------------------------
+Hi Jun-Jun,
+
+Trinity has successfully finished running on the Trimmomatic output of the Hemlock_Heterobasidion data. Here's a link to the output Trinity.fasta file:
+https://www.dropbox.com/s/y2rfsj2z19amvq1/Hemlock_Heterobasidion-2017-Trimmomatic-Trinity.zip?dl=1
+
+
+I counted 1193147 transcripts in the final Trinity.fasta output file, based on how many times ">" occurred.
+
+
+Here's some information from the log file about the percentage of reads selected during normalization:
+
+102125931 / 755630920 = 13.52% reads selected during normalization.
+0 / 755630920 = 0.00% reads discarded as likely aberrant based on coverage profiles.
+0 / 755630920 = 0.00% reads discarded as below minimum coverage threshold=1
+
+
+Paired mode
+ Input data
+  Left.fasta    13791 MByte
+  Right.fasta   13617 MByte
+  Number of unique KMERs: 2283670813
+  Number of reads:        204251862 Output data
+  Trinity.fasta 776 MByte
+
+

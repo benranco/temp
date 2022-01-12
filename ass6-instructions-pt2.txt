@@ -15,4 +15,447 @@ Steps:
 - BLASTp (using a different strategy?)
 - MEGAN6
 
+---
+Step 1: trimmomatic:
+
+Trimmomatic jar file and manual downloaded from (quick start also on that page): 
+http://www.usadellab.org/cms/?page=trimmomatic
+
+I created a run script to run trimmomatic on multiple files in a folder: 
+trimmomatic_ben_bash_sript.sh
+
+Modify it as needed. Pay attention to trimmomatic parameters to suit your needs.
+
+nohup ./trimmomatic_run_multiple.sh 2>&1 1>trim_master_log.txt &
+---
+Hello, Ben:
+Trimmomatic setting is fine. Make include all raw data as below. Have a nice weekend. 
+
+Jun-Jun
+
+File list:
+WBP-MJ9-2013:   9 samples and 18 files;
+WBP-Organ9-2013: 9 samples and 18 files;
+WBP-SA9-2013:  9 samples and 18 files;
+WBP-rust20-Jan-2016: 20 samples and 40 files;
+In total: 47 samples and 94 files.
+---
+Hi Jun-Jun, 
+
+Yes, all the samples are there. 
+
+Trimmomatic has completed successfully on all samples. For each sample it has produced four files, for example: 
+S001AA4_AGTCAA_L003_filtered_R_1P.fq - 3.8 GB
+S001AA4_AGTCAA_L003_filtered_R_1U.fq - 104 MB
+S001AA4_AGTCAA_L003_filtered_R_2P.fq - 3.8 GB
+S001AA4_AGTCAA_L003_filtered_R_2U.fq - 12 MB
+
+According to the manual the P files are for "paired forward reads" and the U file are for "unpaired forward reads". In all cases the U files are much smaller than the P files. Do you want me to just used the P files as a basis for input to Trinity?
+
+Thanks, 
+
+Ben
+---
+Hello, Ben:
+
+Hope Trimmomatic is well running this week. After running, we need a table to show running results:
+Input file ID,  input reads (N), output-P reads (N), output-U reads (N), discard reads (N).
+
+This will give us a general idea about the quality of raw reads.
+
+Thanks.Have nice weekend.
+---
+
+=================================
+running trimmomatic_ben_bash_sript-2021_WBP_MJ9-2013.sh
+running run_trimmomatic_on_all_pairs.sh
+-----------
+r1 in: S001ABA_AGTCAA_L006_R1.fq
+r2 in: S001ABA_AGTCAA_L006_R2.fq
+
+Input Read Pairs: 16148572 Both Surviving: 15645977 (96.89%) Forward Only Surviving: 356826 (2.21%) Reverse Only Surviving: 42397 (0.26%) Dropped: 103372 (0.64%)
+
+Input Read Pairs: 16148572 
+Both Surviving: 15645977 (96.89%) 
+Forward Only Surviving: 356826 (2.21%) 
+Reverse Only Surviving: 42397 (0.26%) 
+Dropped: 103372 (0.64%)
+
+=15645977+356826+42397+103372 = 16148572
+
+To create: trim_master_log-highlights.txt 
+grep -E "^==.*|--.*|running.*|r1.*|Input.*" trim_master_log.txt > trim_master_log-highlights.txt 
+
+---
+Hi Jun-Jun, I've attached the trimmomatic output statistics which I gleaned from the log file. There are a few extra columns in case you are interested in percentages, and the total U1-only and U2-only reads were separate so I kept them separate.
+I've done a small test of Trinity, and next I'll work on combining the files. Kristian says we can run two VM's with 1TB RAM each, but we can't run one VM with the full 2TB RAM. 
+I'm thinking about combining all the .fq files to run on one VM, and combining all the .fastq.gz (just the rust dataset) to run on the other VM. Do you still want me to include the Unpaired reads in the combined input files? I haven't yet investigated if this will affect how we must run Trinity.
+Ben
+---
+Hi Jun-Jun, do you think the order that the data is in matters? Would I be able to join all the P files together first, and then add all the U files on at the end, or does the data in the U files have to come right after the P data from the same source? If it doesn't matter then I'd like to join all the P files first, in case for some reason I end up having to use just the P data for it to work properly with Trinity. For example, maybe the matching R1 and R2 data needs to be in exactly the same order in each file for Trinity to process it successfully. In that case then I wouldn't be able to include the U data at all because they don't have matches, and furthermore it would cause the matching P data to be out of place if the U data was mixed in with the P data.
+---
+I believe it does not matter. Just combine all p-reads first in a sample order first, and then combine all u-reads in the same sample order. Do the U-reads and P-reads need to be specified in different files in Trinitty?
+---
+It seems like it might be possible to run Trinity on both paired and unpaired reads, but from this post it doesn't seem like it's designed to be run that way: 
+https://github.com/trinityrnaseq/trinityrnaseq/issues/552
+
+Here are the required parameters for running Trinity, and it looks like we are supposed to specify either paired or unpaired:
+#
+# Required:
+#
+#  --seqType <string>      :type of reads: ('fa' or 'fq')
+#
+#  --max_memory <string>      :suggested max memory to use by Trinity where limiting can be enabled. (jellyfish, sorting, etc)
+#                            provided in Gb of RAM, ie.  '--max_memory 10G'
+#
+#  If paired reads:
+#      --left  <string>    :left reads, one or more file names (separated by commas, no spaces)
+#      --right <string>    :right reads, one or more file names (separated by commas, no spaces)
+#
+#  Or, if unpaired reads:
+#      --single <string>   :single reads, one or more file names, comma-delimited (note, if single file contains pairs, can use flag: --run_as_paired )
+#
+#  Or,
+#      --samples_file <string>         tab-delimited text file indicating biological replicate relationships.
+#                                   ex.
+#                                        cond_A    cond_A_rep1    A_rep1_left.fq    A_rep1_right.fq
+#                                        cond_A    cond_A_rep2    A_rep2_left.fq    A_rep2_right.fq
+#                                        cond_B    cond_B_rep1    B_rep1_left.fq    B_rep1_right.fq
+#                                        cond_B    cond_B_rep2    B_rep2_left.fq    B_rep2_right.fq
+#
+#                      # if single-end instead of paired-end, then leave the 4th column above empty.
+#
+
+Here's what it says about --no_normalize_reads, which that post mentioned:
+#
+#  --no_normalize_reads            :Do *not* run in silico normalization of reads. Defaults to max. read coverage of 200.
+#                                       see '--normalize_max_read_cov' under full usage info for tailored settings.
+#                                       (note, as of Sept 21, 2016, normalization is on by default)
+#     
+---
+Yes. Just forget about U-redas.
+---
+Ok! I'll start working on getting the Trinity run started. From the parameter instructions it looks like I might not need to combine the files, but just provide a comma-separated list of filenames. I'll test this out on a few small files first.
+---
+
+---
+PREPARING TO RUN TRINITY: 
+
+Trinity test run: 
+/home/centos/software/trinity/trinityrnaseq-Trinity-v2.8.5/Trinity --seqType fq --left ./test_1P.fq  --right ./test_1P.fq --max_memory 200G --CPU 60 --output trinityTestOut > run.log_test
+
+trinityTest2 multifile run:
+nohup /home/centos/software/trinity/trinityrnaseq-Trinity-v2.8.5/Trinity --seqType fq --left a/testB_1P.fq,a/testC_1P.fq,a/testD_1P.fq,b/testE_1P.fastq.gz,b/testF_1P.fastq.gz  --right a/testB_2P.fq,a/testC_2P.fq,a/testD_2P.fq,b/testE_2P.fastq.gz,b/testF_2P.fastq.gz --max_memory 200G --CPU 60 --output trinityTestOut 2>&1 1>run.log_test &
+
+a/testB_1P.fq,a/testC_1P.fq,a/testD_1P.fq,b/testE_1P.fastq.gz,b/testF_1P.fastq.gz
+a/testB_2P.fq,a/testC_2P.fq,a/testD_2P.fq,b/testE_2P.fastq.gz,b/testF_2P.fastq.gz
+
+
+trinityTest3 joined file run: 
+nohup /home/centos/software/trinity/trinityrnaseq-Trinity-v2.8.5/Trinity --seqType fq --left ./all_1P.fq  --right ./all_2P.fq --max_memory 200G --CPU 60 --output trinityTestOut 2>&1 1>run.log_test &
+
+---
+Original Folder names before shortening them:
+trimmomatic_scripts_logs
+trinityTests
+WBP_MJ9-2013-trim
+WBP_Organ9-2013-trim
+WBP-rust-Jan-2016-trim
+WBP_SA9-2013-trim
+---
+
+Filenames for the real run: 
+
+****** 1P files: ******
+
+ls MJ9/*1P* | cat
+MJ9/S001ABA_AGTCAA_L006_filtered_R_1P.fq
+MJ9/S001ABC_GGCTAC_L006_filtered_R_1P.fq
+MJ9/S001ABD_AGTTCC_L006_filtered_R_1P.fq
+MJ9/S001ABE_GTGAAA_L006_filtered_R_1P.fq
+MJ9/S001ABF_ATGTCA_L006_filtered_R_1P.fq
+MJ9/S001AC1_GTCCGC_L006_filtered_R_1P.fq
+MJ9/S001AC2_CCGTCC_L006_filtered_R_1P.fq
+MJ9/S001AC4_TAGCTT_L006_filtered_R_1P.fq
+MJ9/S001AC5_CTTGTA_L006_filtered_R_1P.fq
+
+ls Organ9/*1P* | cat
+Organ9/S001AA4_AGTCAA_L003_filtered_R_1P.fq
+Organ9/S001AA6_AGTTCC_L003_filtered_R_1P.fq
+Organ9/S001AAB_ATGTCA_L003_filtered_R_1P.fq
+Organ9/S001AAC_GTGAAA_L003_filtered_R_1P.fq
+Organ9/S001AAE_TAGCTT_L003_filtered_R_1P.fq
+Organ9/S001AB0_CTTGTA_L003_filtered_R_1P.fq
+Organ9/S001AB5_GTCCGC_L003_filtered_R_1P.fq
+Organ9/S001AB7_CCGTCC_L003_filtered_R_1P.fq
+Organ9/S001AB9_GGCTAC_L003_filtered_R_1P.fq
+
+ls SA9/*1P* | cat
+SA9/S001AA2_ACAGTG_L005_filtered_R_1P.fq
+SA9/S001AA7_GCCAAT_L005_filtered_R_1P.fq
+SA9/S001AA9_ATCACG_L005_filtered_R_1P.fq
+SA9/S001AB1_TGACCA_L005_filtered_R_1P.fq
+SA9/S001AB2_TTAGGC_L005_filtered_R_1P.fq
+SA9/S001AB8_CGATGT_L005_filtered_R_1P.fq
+SA9/S001ABB_ACTTGA_L005_filtered_R_1P.fq
+SA9/S001AC0_GATCAG_L005_filtered_R_1P.fq
+SA9/S001AC3_CAGATC_L005_filtered_R_1P.fq
+
+ls rust/*1P* | cat
+rust/HI.3428.006.Index_13.2_filtered_R_1P.fastq.gz
+rust/HI.3428.006.Index_15.4_filtered_R_1P.fastq.gz
+rust/HI.3428.006.Index_2.1_filtered_R_1P.fastq.gz
+rust/HI.3428.006.Index_6.3_filtered_R_1P.fastq.gz
+rust/HI.3428.006.Index_7.5_filtered_R_1P.fastq.gz
+rust/HI.3428.007.Index_14.7_filtered_R_1P.fastq.gz
+rust/HI.3428.007.Index_16.9_filtered_R_1P.fastq.gz
+rust/HI.3428.007.Index_18.6_filtered_R_1P.fastq.gz
+rust/HI.3428.007.Index_4.10_filtered_R_1P.fastq.gz
+rust/HI.3428.007.Index_5.11_filtered_R_1P.fastq.gz
+rust/HI.3428.008.Index_1.14_filtered_R_1P.fastq.gz
+rust/HI.3428.008.Index_12.12_filtered_R_1P.fastq.gz
+rust/HI.3428.008.Index_19.13_filtered_R_1P.fastq.gz
+rust/HI.3428.008.Index_3.15_filtered_R_1P.fastq.gz
+rust/HI.3428.008.Index_9.16_filtered_R_1P.fastq.gz
+rust/HI.3429.001.Index_10.18_filtered_R_1P.fastq.gz
+rust/HI.3429.001.Index_11.19_filtered_R_1P.fastq.gz
+rust/HI.3429.001.Index_20.20_filtered_R_1P.fastq.gz
+rust/HI.3429.001.Index_22.21_filtered_R_1P.fastq.gz
+rust/HI.3429.001.Index_8.17_filtered_R_1P.fastq.gz
+
+****** 2P files: ******
+
+ls MJ9/*2P* | cat
+MJ9/S001ABA_AGTCAA_L006_filtered_R_2P.fq
+MJ9/S001ABC_GGCTAC_L006_filtered_R_2P.fq
+MJ9/S001ABD_AGTTCC_L006_filtered_R_2P.fq
+MJ9/S001ABE_GTGAAA_L006_filtered_R_2P.fq
+MJ9/S001ABF_ATGTCA_L006_filtered_R_2P.fq
+MJ9/S001AC1_GTCCGC_L006_filtered_R_2P.fq
+MJ9/S001AC2_CCGTCC_L006_filtered_R_2P.fq
+MJ9/S001AC4_TAGCTT_L006_filtered_R_2P.fq
+MJ9/S001AC5_CTTGTA_L006_filtered_R_2P.fq
+
+ls Organ9/*2P* | cat
+Organ9/S001AA4_AGTCAA_L003_filtered_R_2P.fq
+Organ9/S001AA6_AGTTCC_L003_filtered_R_2P.fq
+Organ9/S001AAB_ATGTCA_L003_filtered_R_2P.fq
+Organ9/S001AAC_GTGAAA_L003_filtered_R_2P.fq
+Organ9/S001AAE_TAGCTT_L003_filtered_R_2P.fq
+Organ9/S001AB0_CTTGTA_L003_filtered_R_2P.fq
+Organ9/S001AB5_GTCCGC_L003_filtered_R_2P.fq
+Organ9/S001AB7_CCGTCC_L003_filtered_R_2P.fq
+Organ9/S001AB9_GGCTAC_L003_filtered_R_2P.fq
+
+ls SA9/*2P* | cat
+SA9/S001AA2_ACAGTG_L005_filtered_R_2P.fq
+SA9/S001AA7_GCCAAT_L005_filtered_R_2P.fq
+SA9/S001AA9_ATCACG_L005_filtered_R_2P.fq
+SA9/S001AB1_TGACCA_L005_filtered_R_2P.fq
+SA9/S001AB2_TTAGGC_L005_filtered_R_2P.fq
+SA9/S001AB8_CGATGT_L005_filtered_R_2P.fq
+SA9/S001ABB_ACTTGA_L005_filtered_R_2P.fq
+SA9/S001AC0_GATCAG_L005_filtered_R_2P.fq
+SA9/S001AC3_CAGATC_L005_filtered_R_2P.fq
+
+ls rust/*2P* | cat
+rust/HI.3428.006.Index_13.2_filtered_R_2P.fastq.gz
+rust/HI.3428.006.Index_15.4_filtered_R_2P.fastq.gz
+rust/HI.3428.006.Index_2.1_filtered_R_2P.fastq.gz
+rust/HI.3428.006.Index_6.3_filtered_R_2P.fastq.gz
+rust/HI.3428.006.Index_7.5_filtered_R_2P.fastq.gz
+rust/HI.3428.007.Index_14.7_filtered_R_2P.fastq.gz
+rust/HI.3428.007.Index_16.9_filtered_R_2P.fastq.gz
+rust/HI.3428.007.Index_18.6_filtered_R_2P.fastq.gz
+rust/HI.3428.007.Index_4.10_filtered_R_2P.fastq.gz
+rust/HI.3428.007.Index_5.11_filtered_R_2P.fastq.gz
+rust/HI.3428.008.Index_1.14_filtered_R_2P.fastq.gz
+rust/HI.3428.008.Index_12.12_filtered_R_2P.fastq.gz
+rust/HI.3428.008.Index_19.13_filtered_R_2P.fastq.gz
+rust/HI.3428.008.Index_3.15_filtered_R_2P.fastq.gz
+rust/HI.3428.008.Index_9.16_filtered_R_2P.fastq.gz
+rust/HI.3429.001.Index_10.18_filtered_R_2P.fastq.gz
+rust/HI.3429.001.Index_11.19_filtered_R_2P.fastq.gz
+rust/HI.3429.001.Index_20.20_filtered_R_2P.fastq.gz
+rust/HI.3429.001.Index_22.21_filtered_R_2P.fastq.gz
+rust/HI.3429.001.Index_8.17_filtered_R_2P.fastq.gz
+
+
+
+****** 1P files: ******
+
+MJ9/S001ABA_AGTCAA_L006_filtered_R_1P.fq,MJ9/S001ABC_GGCTAC_L006_filtered_R_1P.fq,MJ9/S001ABD_AGTTCC_L006_filtered_R_1P.fq,MJ9/S001ABE_GTGAAA_L006_filtered_R_1P.fq,MJ9/S001ABF_ATGTCA_L006_filtered_R_1P.fq,MJ9/S001AC1_GTCCGC_L006_filtered_R_1P.fq,MJ9/S001AC2_CCGTCC_L006_filtered_R_1P.fq,MJ9/S001AC4_TAGCTT_L006_filtered_R_1P.fq,MJ9/S001AC5_CTTGTA_L006_filtered_R_1P.fq,Organ9/S001AA4_AGTCAA_L003_filtered_R_1P.fq,Organ9/S001AA6_AGTTCC_L003_filtered_R_1P.fq,Organ9/S001AAB_ATGTCA_L003_filtered_R_1P.fq,Organ9/S001AAC_GTGAAA_L003_filtered_R_1P.fq,Organ9/S001AAE_TAGCTT_L003_filtered_R_1P.fq,Organ9/S001AB0_CTTGTA_L003_filtered_R_1P.fq,Organ9/S001AB5_GTCCGC_L003_filtered_R_1P.fq,Organ9/S001AB7_CCGTCC_L003_filtered_R_1P.fq,Organ9/S001AB9_GGCTAC_L003_filtered_R_1P.fq,SA9/S001AA2_ACAGTG_L005_filtered_R_1P.fq,SA9/S001AA7_GCCAAT_L005_filtered_R_1P.fq,SA9/S001AA9_ATCACG_L005_filtered_R_1P.fq,SA9/S001AB1_TGACCA_L005_filtered_R_1P.fq,SA9/S001AB2_TTAGGC_L005_filtered_R_1P.fq,SA9/S001AB8_CGATGT_L005_filtered_R_1P.fq,SA9/S001ABB_ACTTGA_L005_filtered_R_1P.fq,SA9/S001AC0_GATCAG_L005_filtered_R_1P.fq,SA9/S001AC3_CAGATC_L005_filtered_R_1P.fq,rust/HI.3428.006.Index_13.2_filtered_R_1P.fastq.gz,rust/HI.3428.006.Index_15.4_filtered_R_1P.fastq.gz,rust/HI.3428.006.Index_2.1_filtered_R_1P.fastq.gz,rust/HI.3428.006.Index_6.3_filtered_R_1P.fastq.gz,rust/HI.3428.006.Index_7.5_filtered_R_1P.fastq.gz,rust/HI.3428.007.Index_14.7_filtered_R_1P.fastq.gz,rust/HI.3428.007.Index_16.9_filtered_R_1P.fastq.gz,rust/HI.3428.007.Index_18.6_filtered_R_1P.fastq.gz,rust/HI.3428.007.Index_4.10_filtered_R_1P.fastq.gz,rust/HI.3428.007.Index_5.11_filtered_R_1P.fastq.gz,rust/HI.3428.008.Index_1.14_filtered_R_1P.fastq.gz,rust/HI.3428.008.Index_12.12_filtered_R_1P.fastq.gz,rust/HI.3428.008.Index_19.13_filtered_R_1P.fastq.gz,rust/HI.3428.008.Index_3.15_filtered_R_1P.fastq.gz,rust/HI.3428.008.Index_9.16_filtered_R_1P.fastq.gz,rust/HI.3429.001.Index_10.18_filtered_R_1P.fastq.gz,rust/HI.3429.001.Index_11.19_filtered_R_1P.fastq.gz,rust/HI.3429.001.Index_20.20_filtered_R_1P.fastq.gz,rust/HI.3429.001.Index_22.21_filtered_R_1P.fastq.gz,rust/HI.3429.001.Index_8.17_filtered_R_1P.fastq.gz
+
+****** 2P files: ******
+
+MJ9/S001ABA_AGTCAA_L006_filtered_R_2P.fq,MJ9/S001ABC_GGCTAC_L006_filtered_R_2P.fq,MJ9/S001ABD_AGTTCC_L006_filtered_R_2P.fq,MJ9/S001ABE_GTGAAA_L006_filtered_R_2P.fq,MJ9/S001ABF_ATGTCA_L006_filtered_R_2P.fq,MJ9/S001AC1_GTCCGC_L006_filtered_R_2P.fq,MJ9/S001AC2_CCGTCC_L006_filtered_R_2P.fq,MJ9/S001AC4_TAGCTT_L006_filtered_R_2P.fq,MJ9/S001AC5_CTTGTA_L006_filtered_R_2P.fq,Organ9/S001AA4_AGTCAA_L003_filtered_R_2P.fq,Organ9/S001AA6_AGTTCC_L003_filtered_R_2P.fq,Organ9/S001AAB_ATGTCA_L003_filtered_R_2P.fq,Organ9/S001AAC_GTGAAA_L003_filtered_R_2P.fq,Organ9/S001AAE_TAGCTT_L003_filtered_R_2P.fq,Organ9/S001AB0_CTTGTA_L003_filtered_R_2P.fq,Organ9/S001AB5_GTCCGC_L003_filtered_R_2P.fq,Organ9/S001AB7_CCGTCC_L003_filtered_R_2P.fq,Organ9/S001AB9_GGCTAC_L003_filtered_R_2P.fq,SA9/S001AA2_ACAGTG_L005_filtered_R_2P.fq,SA9/S001AA7_GCCAAT_L005_filtered_R_2P.fq,SA9/S001AA9_ATCACG_L005_filtered_R_2P.fq,SA9/S001AB1_TGACCA_L005_filtered_R_2P.fq,SA9/S001AB2_TTAGGC_L005_filtered_R_2P.fq,SA9/S001AB8_CGATGT_L005_filtered_R_2P.fq,SA9/S001ABB_ACTTGA_L005_filtered_R_2P.fq,SA9/S001AC0_GATCAG_L005_filtered_R_2P.fq,SA9/S001AC3_CAGATC_L005_filtered_R_2P.fq,rust/HI.3428.006.Index_13.2_filtered_R_2P.fastq.gz,rust/HI.3428.006.Index_15.4_filtered_R_2P.fastq.gz,rust/HI.3428.006.Index_2.1_filtered_R_2P.fastq.gz,rust/HI.3428.006.Index_6.3_filtered_R_2P.fastq.gz,rust/HI.3428.006.Index_7.5_filtered_R_2P.fastq.gz,rust/HI.3428.007.Index_14.7_filtered_R_2P.fastq.gz,rust/HI.3428.007.Index_16.9_filtered_R_2P.fastq.gz,rust/HI.3428.007.Index_18.6_filtered_R_2P.fastq.gz,rust/HI.3428.007.Index_4.10_filtered_R_2P.fastq.gz,rust/HI.3428.007.Index_5.11_filtered_R_2P.fastq.gz,rust/HI.3428.008.Index_1.14_filtered_R_2P.fastq.gz,rust/HI.3428.008.Index_12.12_filtered_R_2P.fastq.gz,rust/HI.3428.008.Index_19.13_filtered_R_2P.fastq.gz,rust/HI.3428.008.Index_3.15_filtered_R_2P.fastq.gz,rust/HI.3428.008.Index_9.16_filtered_R_2P.fastq.gz,rust/HI.3429.001.Index_10.18_filtered_R_2P.fastq.gz,rust/HI.3429.001.Index_11.19_filtered_R_2P.fastq.gz,rust/HI.3429.001.Index_20.20_filtered_R_2P.fastq.gz,rust/HI.3429.001.Index_22.21_filtered_R_2P.fastq.gz,rust/HI.3429.001.Index_8.17_filtered_R_2P.fastq.gz
+
+
+Real Trinity command, but without filename lists yet: 
+nohup /home/centos/software/trinity/trinityrnaseq-Trinity-v2.8.5/Trinity --seqType fq --left ./all_1P.fq  --right ./all_2P.fq --max_memory 944G --CPU 64 --output trinityOut 2>&1 1>run.log &
+
+
+Real Trinity command, with filename lists: 
+nohup /home/centos/software/trinity/trinityrnaseq-Trinity-v2.8.5/Trinity --seqType fq --left MJ9/S001ABA_AGTCAA_L006_filtered_R_1P.fq,MJ9/S001ABC_GGCTAC_L006_filtered_R_1P.fq,MJ9/S001ABD_AGTTCC_L006_filtered_R_1P.fq,MJ9/S001ABE_GTGAAA_L006_filtered_R_1P.fq,MJ9/S001ABF_ATGTCA_L006_filtered_R_1P.fq,MJ9/S001AC1_GTCCGC_L006_filtered_R_1P.fq,MJ9/S001AC2_CCGTCC_L006_filtered_R_1P.fq,MJ9/S001AC4_TAGCTT_L006_filtered_R_1P.fq,MJ9/S001AC5_CTTGTA_L006_filtered_R_1P.fq,Organ9/S001AA4_AGTCAA_L003_filtered_R_1P.fq,Organ9/S001AA6_AGTTCC_L003_filtered_R_1P.fq,Organ9/S001AAB_ATGTCA_L003_filtered_R_1P.fq,Organ9/S001AAC_GTGAAA_L003_filtered_R_1P.fq,Organ9/S001AAE_TAGCTT_L003_filtered_R_1P.fq,Organ9/S001AB0_CTTGTA_L003_filtered_R_1P.fq,Organ9/S001AB5_GTCCGC_L003_filtered_R_1P.fq,Organ9/S001AB7_CCGTCC_L003_filtered_R_1P.fq,Organ9/S001AB9_GGCTAC_L003_filtered_R_1P.fq,SA9/S001AA2_ACAGTG_L005_filtered_R_1P.fq,SA9/S001AA7_GCCAAT_L005_filtered_R_1P.fq,SA9/S001AA9_ATCACG_L005_filtered_R_1P.fq,SA9/S001AB1_TGACCA_L005_filtered_R_1P.fq,SA9/S001AB2_TTAGGC_L005_filtered_R_1P.fq,SA9/S001AB8_CGATGT_L005_filtered_R_1P.fq,SA9/S001ABB_ACTTGA_L005_filtered_R_1P.fq,SA9/S001AC0_GATCAG_L005_filtered_R_1P.fq,SA9/S001AC3_CAGATC_L005_filtered_R_1P.fq,rust/HI.3428.006.Index_13.2_filtered_R_1P.fastq.gz,rust/HI.3428.006.Index_15.4_filtered_R_1P.fastq.gz,rust/HI.3428.006.Index_2.1_filtered_R_1P.fastq.gz,rust/HI.3428.006.Index_6.3_filtered_R_1P.fastq.gz,rust/HI.3428.006.Index_7.5_filtered_R_1P.fastq.gz,rust/HI.3428.007.Index_14.7_filtered_R_1P.fastq.gz,rust/HI.3428.007.Index_16.9_filtered_R_1P.fastq.gz,rust/HI.3428.007.Index_18.6_filtered_R_1P.fastq.gz,rust/HI.3428.007.Index_4.10_filtered_R_1P.fastq.gz,rust/HI.3428.007.Index_5.11_filtered_R_1P.fastq.gz,rust/HI.3428.008.Index_1.14_filtered_R_1P.fastq.gz,rust/HI.3428.008.Index_12.12_filtered_R_1P.fastq.gz,rust/HI.3428.008.Index_19.13_filtered_R_1P.fastq.gz,rust/HI.3428.008.Index_3.15_filtered_R_1P.fastq.gz,rust/HI.3428.008.Index_9.16_filtered_R_1P.fastq.gz,rust/HI.3429.001.Index_10.18_filtered_R_1P.fastq.gz,rust/HI.3429.001.Index_11.19_filtered_R_1P.fastq.gz,rust/HI.3429.001.Index_20.20_filtered_R_1P.fastq.gz,rust/HI.3429.001.Index_22.21_filtered_R_1P.fastq.gz,rust/HI.3429.001.Index_8.17_filtered_R_1P.fastq.gz  --right MJ9/S001ABA_AGTCAA_L006_filtered_R_2P.fq,MJ9/S001ABC_GGCTAC_L006_filtered_R_2P.fq,MJ9/S001ABD_AGTTCC_L006_filtered_R_2P.fq,MJ9/S001ABE_GTGAAA_L006_filtered_R_2P.fq,MJ9/S001ABF_ATGTCA_L006_filtered_R_2P.fq,MJ9/S001AC1_GTCCGC_L006_filtered_R_2P.fq,MJ9/S001AC2_CCGTCC_L006_filtered_R_2P.fq,MJ9/S001AC4_TAGCTT_L006_filtered_R_2P.fq,MJ9/S001AC5_CTTGTA_L006_filtered_R_2P.fq,Organ9/S001AA4_AGTCAA_L003_filtered_R_2P.fq,Organ9/S001AA6_AGTTCC_L003_filtered_R_2P.fq,Organ9/S001AAB_ATGTCA_L003_filtered_R_2P.fq,Organ9/S001AAC_GTGAAA_L003_filtered_R_2P.fq,Organ9/S001AAE_TAGCTT_L003_filtered_R_2P.fq,Organ9/S001AB0_CTTGTA_L003_filtered_R_2P.fq,Organ9/S001AB5_GTCCGC_L003_filtered_R_2P.fq,Organ9/S001AB7_CCGTCC_L003_filtered_R_2P.fq,Organ9/S001AB9_GGCTAC_L003_filtered_R_2P.fq,SA9/S001AA2_ACAGTG_L005_filtered_R_2P.fq,SA9/S001AA7_GCCAAT_L005_filtered_R_2P.fq,SA9/S001AA9_ATCACG_L005_filtered_R_2P.fq,SA9/S001AB1_TGACCA_L005_filtered_R_2P.fq,SA9/S001AB2_TTAGGC_L005_filtered_R_2P.fq,SA9/S001AB8_CGATGT_L005_filtered_R_2P.fq,SA9/S001ABB_ACTTGA_L005_filtered_R_2P.fq,SA9/S001AC0_GATCAG_L005_filtered_R_2P.fq,SA9/S001AC3_CAGATC_L005_filtered_R_2P.fq,rust/HI.3428.006.Index_13.2_filtered_R_2P.fastq.gz,rust/HI.3428.006.Index_15.4_filtered_R_2P.fastq.gz,rust/HI.3428.006.Index_2.1_filtered_R_2P.fastq.gz,rust/HI.3428.006.Index_6.3_filtered_R_2P.fastq.gz,rust/HI.3428.006.Index_7.5_filtered_R_2P.fastq.gz,rust/HI.3428.007.Index_14.7_filtered_R_2P.fastq.gz,rust/HI.3428.007.Index_16.9_filtered_R_2P.fastq.gz,rust/HI.3428.007.Index_18.6_filtered_R_2P.fastq.gz,rust/HI.3428.007.Index_4.10_filtered_R_2P.fastq.gz,rust/HI.3428.007.Index_5.11_filtered_R_2P.fastq.gz,rust/HI.3428.008.Index_1.14_filtered_R_2P.fastq.gz,rust/HI.3428.008.Index_12.12_filtered_R_2P.fastq.gz,rust/HI.3428.008.Index_19.13_filtered_R_2P.fastq.gz,rust/HI.3428.008.Index_3.15_filtered_R_2P.fastq.gz,rust/HI.3428.008.Index_9.16_filtered_R_2P.fastq.gz,rust/HI.3429.001.Index_10.18_filtered_R_2P.fastq.gz,rust/HI.3429.001.Index_11.19_filtered_R_2P.fastq.gz,rust/HI.3429.001.Index_20.20_filtered_R_2P.fastq.gz,rust/HI.3429.001.Index_22.21_filtered_R_2P.fastq.gz,rust/HI.3429.001.Index_8.17_filtered_R_2P.fastq.gz --max_memory 944G --CPU 64 --output trinityOut 2>&1 1>run.log &
+
+--------
+
+SELECTED LOG OUTPUT OF THE FIRST FULL TRINITY RUN, WHICH USED NORMALIZATION TO SPEED UP THE PROCESS: 
+
+----------------------------------------------------------------------------------
+-------------- Trinity Phase 1: Clustering of RNA-Seq Reads  ---------------------
+----------------------------------------------------------------------------------
+
+---------------------------------------------------------------
+------------ In silico Read Normalization ---------------------
+-- (Removing Excess Reads Beyond 200 Coverage --
+---------------------------------------------------------------
+
+# running normalization on reads
+
+[*****]
+
+CMD: seqtk-trinity seq -A <(gunzip -c /work/rust/HI.3429.001.Index_8.17_filtered_R_1P.fastq.gz) >> left.fa
+CMD finished (788 seconds)
+CMD finished (733 seconds)
+CMD: touch left.fa.ok
+CMD finished (0 seconds)
+CMD: touch right.fa.ok
+CMD finished (0 seconds)
+Done converting input files.CMD: cat left.fa right.fa > both.fa
+CMD finished (17782 seconds)
+CMD: touch both.fa.ok
+CMD finished (0 seconds)
+-kmer counting.
+-------------------------------------------
+----------- Jellyfish  --------------------
+-- (building a k-mer catalog from reads) --
+-------------------------------------------
+
+CMD: jellyfish count -t 64 -m 25 -s 91309188912  --canonical  both.fa
+CMD finished (4693 seconds)
+CMD: jellyfish histo -t 64 -o jellyfish.K25.min2.kmers.fa.histo mer_counts.jf
+CMD finished (137 seconds)
+CMD: jellyfish dump -L 2 mer_counts.jf > jellyfish.K25.min2.kmers.fa
+CMD finished (786 seconds)
+CMD: touch jellyfish.K25.min2.kmers.fa.success
+CMD finished (0 seconds)
+-generating stats files
+CMD: /home/centos/software/trinity/trinityrnaseq-Trinity-v2.8.5/util/..//Inchworm/bin/fastaToKmerCoverageStats --reads left.fa --kmers jellyfish.K25.min2.kmers.fa --kmer_size 25  --num_threads 
+32  --DS  > left.fa.K25.stats
+CMD: /home/centos/software/trinity/trinityrnaseq-Trinity-v2.8.5/util/..//Inchworm/bin/fastaToKmerCoverageStats --reads right.fa --kmers jellyfish.K25.min2.kmers.fa --kmer_size 25  --num_threads
+ 32  --DS  > right.fa.K25.stats
+-reading Kmer occurrences...
+-reading Kmer occurrences...
+
+ done parsing 963654104 Kmers, 963654104 added, taking 3862 seconds.
+
+ done parsing 963654104 Kmers, 963654104 added, taking 3878 seconds.
+STATS_GENERATION_TIME: 40382 seconds.
+CMD finished (44854 seconds)
+STATS_GENERATION_TIME: 42387 seconds.
+CMD finished (47029 seconds)
+CMD: touch left.fa.K25.stats.ok
+CMD finished (0 seconds)
+CMD: touch right.fa.K25.stats.ok
+CMD finished (0 seconds)
+-sorting each stats file by read name.
+CMD: head -n1 left.fa.K25.stats > left.fa.K25.stats.sort && tail -n +2 left.fa.K25.stats | /usr/bin/sort --parallel=64 -k1,1 -T . -S 472G >> left.fa.K25.stats.sort
+CMD: head -n1 right.fa.K25.stats > right.fa.K25.stats.sort && tail -n +2 right.fa.K25.stats | /usr/bin/sort --parallel=64 -k1,1 -T . -S 472G >> right.fa.K25.stats.sort
+CMD finished (3167 seconds)
+CMD finished (3307 seconds)
+CMD: touch left.fa.K25.stats.sort.ok
+CMD finished (0 seconds)
+CMD: touch right.fa.K25.stats.sort.ok
+CMD finished (0 seconds)
+-defining normalized reads
+CMD: /home/centos/software/trinity/trinityrnaseq-Trinity-v2.8.5/util/..//util/support_scripts//nbkc_merge_left_right_stats.pl --left left.fa.K25.stats.sort --right right.fa.K25.stats.sort --sorted > pairs.K25.stats
+-opening left.fa.K25.stats.sort
+-opening right.fa.K25.stats.sort
+-done opening files.
+CMD finished (39990 seconds)
+CMD: touch pairs.K25.stats.ok
+CMD finished (0 seconds)
+CMD: /home/centos/software/trinity/trinityrnaseq-Trinity-v2.8.5/util/..//util/support_scripts//nbkc_normalize.pl --stats_file pairs.K25.stats --max_cov 200  --min_cov 1 --max_CV 10000 > pairs.K25.stats.C200.maxCV10000.accs
+108707961 / 1283653915 = 8.47% reads selected during normalization.
+0 / 1283653915 = 0.00% reads discarded as likely aberrant based on coverage profiles.
+0 / 1283653915 = 0.00% reads discarded as below minimum coverage threshold=1
+CMD finished (22581 seconds)
+CMD: touch pairs.K25.stats.C200.maxCV10000.accs.ok
+CMD finished (0 seconds)
+-search and capture.
+-preparing to extract selected reads from:
+
+[*****]
+
+[*****]
+
+
+
+Normalization complete. See outputs: 
+        /work/trinityOut/insilico_read_normalization/S001ABA_AGTCAA_L006_filtered_R_1P.fq_ext_all_reads.normalized_K25_maxC200_minC1_maxCV10000.fq
+        /work/trinityOut/insilico_read_normalization/S001ABA_AGTCAA_L006_filtered_R_2P.fq_ext_all_reads.normalized_K25_maxC200_minC1_maxCV10000.fq
+Saturday, March 20, 2021: 03:07:59      CMD: touch /work/trinityOut/insilico_read_normalization/normalization.ok
+Converting input files. (in parallel)Saturday, March 20, 2021: 03:07:59 CMD: cat /work/trinityOut/insilico_read_normalization/left.norm.fq | seqtk-trinity seq -A - >> left.fa
+Saturday, March 20, 2021: 03:07:59      CMD: cat /work/trinityOut/insilico_read_normalization/right.norm.fq | seqtk-trinity seq -A - >> right.fa
+Saturday, March 20, 2021: 03:14:39      CMD: touch left.fa.ok
+Saturday, March 20, 2021: 03:14:39      CMD: touch right.fa.ok
+Saturday, March 20, 2021: 03:14:39      CMD: touch left.fa.ok right.fa.ok
+Saturday, March 20, 2021: 03:14:39      CMD: cat left.fa right.fa > /work/trinityOut/both.fa
+Saturday, March 20, 2021: 03:26:20      CMD: touch /work/trinityOut/both.fa.ok
+
+
+-------------------------
+#  --no_normalize_reads            :Do *not* run in silico normalization of reads. Defaults to max. read coverage of 200.
+ #                                       see '--normalize_max_read_cov' under full usage info for tailored settings.
+ #                                       (note, as of Sept 21, 2016, normalization is on by default)
+
+-----------------------
+Hi Jun-Jun, 
+
+It looks like Trinity has finished running today, without any errors. 
+
+I thought it was supposed to take several weeks to run. I read through the log file, and it looks like the reason it finished so quickly was because at the beginning it did Insilico Normalization of reads by default (Removing Excess Reads Beyond 200 Coverage). 
+
+Here's some information I extracted from the log file about the percentage of reads selected during normalization:
+108707961 / 1283653915 = 8.47% reads selected during normalization.
+0 / 1283653915 = 0.00% reads discarded as likely aberrant based on coverage profiles.
+0 / 1283653915 = 0.00% reads discarded as below minimum coverage threshold=1
+
+Here are some statistics on the input data after normalization: 
+Paired mode
+ Input data
+  Left.fasta    15132 MByte (~ 15 GB)
+  Right.fasta   15102 MByte (~ 15 GB)
+  Number of unique KMERs: 1112256832
+  Number of reads:        217415922 Output data
+  Trinity.fasta 647 MByte  (final output file)
+
+I counted 813669 transcripts in the final Trinity.fasta output file, based on how many times ">" occured.
+
+
+I did some searching in the Trinity documentation about normalization:
+
+From: 
+https://github.com/trinityrnaseq/trinityrnaseq/wiki/Computing-and-Time-requirements
+"If you have a large data set, be sure to use the --normalize_reads parameter to greatly improve run times."
+
+Based on the following pages/sections, it looks like, since 2016, Trinity uses Insilico Normalization of reads by default, with the --normalize_max_read_cov parameter set to 200 by default:
+https://github.com/trinityrnaseq/trinityrnaseq/wiki/Running-Trinity#assembling-large-rna-seq-data-sets-hundreds-of-millions-to-billions-of-reads
+https://github.com/trinityrnaseq/trinityrnaseq/wiki/Trinity-Insilico-Normalization
+
+----------------------
+Have you included all 47 samples for the Trinity run? That means 1,283,653,915 paired reads as the input? If so, can you put 813,669 transcripts in S drive:Transfer. Then I can download from there to have brief look at the assembly.
+----------------------
+If Trinity run is so smooth, let us complete Trinity runs for other species  first. we still have data from western white pine and hemlock.
+----------------------
+Great!. We have downloaded the data. I’ll let know you once I have a brief looking
+
+For Trinity run of WWP RNA-seq reads, there are three subfolders (WWP_HC-HF-raw-data-2012, WWP_SB-HP-raw-data-2012, and WWP-PN6-raw data-2011), each has six samples, in a total of 18 samples, but their read different either 50-bp (PN6) or 100-bp (other two folders).
+
+Please have at look.
+----------------------
+
+...CONTINUED IN ass6-instructions-pt3.txt
+
 

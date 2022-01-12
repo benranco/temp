@@ -1,0 +1,82 @@
+==========
+Running BLASTx on WBP47: 
+
+Best vm's to use for BLASTx with the NR database (best to optimize for RAM per VM, not CPUs per VM): 
+mm2.4xlarge (avail 35)
+x1.2xlarge (max 8 without cpu sharing, 16 with)(probably, not tested, but based on the above results) 
+mm1.8xlarge (avail 48)
+
+Strategy:
+- get as many mm2.4xlarge (cpu16) as possible, then x1.2xlarge (cpu8), then mm1.8xlarge (cpu28)
+- split input fasta into sections, sized respectively by num seqs (ideally by file size, but too hard to predict): 
+      2x (mm2), 1x (x1), 3.5x (mm1)
+      So: 6 of 2x, 3 of 3.5x, 4 of 1x
+      Total number of units: 12 + 10.5 + 4 = 26.5 units
+      Basic unit is 22684 lines (11342 seqs)
+      (for efficiency, subtract 4000 from each of the mm1 and add 3000 to each of the x1: 
+      So: 6 of 45368, 3 of 79394-4000=75394, 4 of 22684+3000=25684
+      And after some jigging of the numbers for relative equal sizes, I ended up with:      
+      So: 2 of 56914,2 of 57914, 2 of 36368, 2 of 75394*0.8=60316, 1 of 79394-4000=75394, 4 of 22684+3000=25684
+
+- put each section into its own folder labelled sequentially, with .ncbirc file as well
+- create script to: combine all output files in proper order, convert format to desired format
+        
+awk 'NR > 0 && NR <= 25684' WBP47_longest300,575-TPM1ud.fasta > WBP47_longest300,575-TPM1ud-pt01-x1.fasta
+awk 'NR > 25684 && NR <= 51368' WBP47_longest300,575-TPM1ud.fasta > WBP47_longest300,575-TPM1ud-pt02-x1.fasta
+awk 'NR > 51368 && NR <= 77052' WBP47_longest300,575-TPM1ud.fasta > WBP47_longest300,575-TPM1ud-pt03-x1.fasta
+awk 'NR > 77052 && NR <= 102736' WBP47_longest300,575-TPM1ud.fasta > WBP47_longest300,575-TPM1ud-pt04-x1.fasta
+
+awk 'NR > 102736 && NR <= 163052' WBP47_longest300,575-TPM1ud.fasta > WBP47_longest300,575-TPM1ud-pt05-mm1.fasta
+awk 'NR > 163052 && NR <= 223368' WBP47_longest300,575-TPM1ud.fasta > WBP47_longest300,575-TPM1ud-pt06-mm1.fasta
+awk 'NR > 223368 && NR <= 298762' WBP47_longest300,575-TPM1ud.fasta > WBP47_longest300,575-TPM1ud-pt07-mm1.fasta
+
+awk 'NR > 298762 && NR <= 355676' WBP47_longest300,575-TPM1ud.fasta > WBP47_longest300,575-TPM1ud-pt08-mm2.fasta
+awk 'NR > 355676 && NR <= 412590' WBP47_longest300,575-TPM1ud.fasta > WBP47_longest300,575-TPM1ud-pt09-mm2.fasta
+awk 'NR > 412590 && NR <= 470504' WBP47_longest300,575-TPM1ud.fasta > WBP47_longest300,575-TPM1ud-pt10-mm2.fasta
+awk 'NR > 470504 && NR <= 528418' WBP47_longest300,575-TPM1ud.fasta > WBP47_longest300,575-TPM1ud-pt11-mm2.fasta
+awk 'NR > 528418 && NR <= 564786' WBP47_longest300,575-TPM1ud.fasta > WBP47_longest300,575-TPM1ud-pt12-mm2.fasta
+awk 'NR > 564786' WBP47_longest300,575-TPM1ud.fasta > WBP47_longest300,575-TPM1ud-pt13-mm2.fasta
+
+---
+Folders in: 
+/public/genomics/junjun/Data-Dec2020/Bens-Trinity-assembly/BLASTxRuns/BLASTx-WBP47
+
+WBP47_longest300,575-TPM1ud.fasta
+WBP47pt01-x1
+WBP47pt02-x1
+WBP47pt03-x1
+WBP47pt04-x1
+WBP47pt05-mm1
+WBP47pt06-mm1
+WBP47pt07-mm1
+WBP47pt08-mm2
+WBP47pt09-mm2
+WBP47pt10-mm2
+WBP47pt11-mm2
+WBP47pt12-mm2
+WBP47pt13-mm2
+
+---
+
+WBP47_longest300,575-TPM1ud-pt07-mm1.fasta
+
+Running the BLASTx commands (the input file is not fully specified here):
+
+x1:
+nohup time blastx -num_threads 8 -db nr -query WBP47 -max_target_seqs 20 -outfmt 11 -out WBP47_longest300575-blastx-11outfmt-pt0.out 2>&1 1> time-WBP47_longest300575-blastx-11outfmt-pt0-x1.log &
+
+mm2:
+nohup time blastx -num_threads 16 -db nr -query WBP47 -max_target_seqs 20 -outfmt 11 -out WBP47_longest300575-blastx-11outfmt-pt1.out 2>&1 1> time-WBP47_longest300575-blastx-11outfmt-pt1-mm2.log &
+
+mm1: 
+nohup time blastx -num_threads 28 -db nr -query WBP47 -max_target_seqs 20 -outfmt 11 -out WBP47_longest300575-blastx-11outfmt-pt0.out 2>&1 1> time-WBP47_longest300575-blastx-11outfmt-pt0-mm1.log &
+
+---
+Hi Jun-Jun,
+
+The final BLASTx processes for WBP47 have all completed this morning. Would you like me to start WWP18 or LP36 next?
+
+For the WBP47 data, I will combine the BLASTx output and open it in MEGAN6.
+--
+
+

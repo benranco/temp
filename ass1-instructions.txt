@@ -1,0 +1,15 @@
+Juju Liu
+Attachments
+Sep 22, 2020, 7:23 AM (7 days ago)
+to me, Jun-Jun
+
+Hello, Ben:
+
+Enclosed are two sets of data (Cr4CM5... and LG12...) for you to trim DNA sequence from the beginning and ending side using positions as shown by 'query start' and 'query end' in the table. Please write the trimmed seqs into two new output files using the seq-ID, no need to copy any other seqs  if their IDs are not listed in the tables.
+
+In the LG12 data set, each seq needs to be trimmed just once. In the Cr4CM5 data, three seqs need to be trimmed 2~3 times (list on the top of table). About 18 seqs have 'na' as 'query start' and 'query end' in the table, just copy them into the output file, no need to trim them. Others need to be trimmed just once.  If one seq needs to be trimmed more than one time, output list seqID as original ID-f1, f2, f3.
+
+Just have a discussion if you have any questions.
+
+Jun-Jun
+

@@ -1,0 +1,1151 @@
+==========
+-----
+My comparative speed tests with BLASTx using diff RAM/processors:
+
+--
+x1.16xlarge:
+nohup time blastx -num_threads 64 -db nr -query Hemlock30_actual_first100.fasta -max_target_seqs 20 -outfmt 11 -out first100-blastx-11outfmt-maxTargetSeqs20.out 2>&1 1> time-first100-cpu64-ram1TB-maxTargetSeqs20.log &
+
+nohup time blastx -num_threads 64 -db nr -query Hemlock30_actual_first100.fasta -outfmt 11 -out first100-blastx-11outfmt-maxTargetSeqsDefault.out 2>&1 1> time-first100-cpu64-ram1TB-maxTargetSeqsDefault.log &
+
+--
+mm2.8xlarge:
+nohup time blastx -num_threads 28 -db nr -query Hemlock30_actual_first100.fasta -max_target_seqs 20 -outfmt 11 -out first100-blastx-11outfmt-maxTargetSeqs20.out 2>&1 1> time-first100-cpu28-ram258GB-maxTargetSeqs20-mm2.8xlarge.log &
+
+mm1.8xlarge:
+nohup time blastx -num_threads 28 -db nr -query Hemlock30_actual_first100.fasta -max_target_seqs 20 -outfmt 11 -out first100-blastx-11outfmt-maxTargetSeqs20.out 2>&1 1> time-first100-cpu28-ram126GB-maxTargetSeqs20-mm1.8xlarge.log &
+
+mm1.16xlarge:
+nohup time blastx -num_threads 56 -db nr -query Hemlock30_actual_first100.fasta -max_target_seqs 20 -outfmt 11 -out first100-blastx-11outfmt-maxTargetSeqs20.out 2>&1 1> time-first100-cpu56-ram252GB-maxTargetSeqs20-mm1.16xlarge.log &
+
+mm1.4xlarge:
+nohup time blastx -num_threads 16 -db nr -query Hemlock30_actual_first100.fasta -max_target_seqs 20 -outfmt 11 -out first100-blastx-11outfmt-maxTargetSeqs20.out 2>&1 1> time-first100-cpu16-ram72GB-maxTargetSeqs20-mm1.4xlarge.log &
+
+mm1.4xlarge:
+nohup time blastx -num_threads 16 -db nr -query Hemlock30_actual_first100.fasta -max_target_seqs 20 -outfmt 11 -out first100-blastx-11outfmt-maxTargetSeqs20.out 2>&1 1> time-first100-cpu16-ram147GB-maxTargetSeqs20-mm2.4xlarge.log &
+
+Speed Test Results: 
+=====
+x1.16xlarge ben_vm1  freeTons   buff196  2:58:26elapsed  cpu64  ram946  6341%CPU:
+mm1.16xlarge  ben03  free108    buff126  4:20:27elapsed  cpu56  ram252  4920%CPU: 
+mm2.8xlarge   ben01  free113    buff126  5:21:37elapsed  cpu28  ram258  2772%CPU: 
+mm1.8xlarge   ben02  free0      buff116  5:49:06elapsed  cpu28  ram126  2731%CPU: 
+mm2.4xlarge   ben05  free10     buff126  6:42:45elapsed  cpu16  ram147  1589%CPU: 
+mm1.4xlarge   ben04  free0      buff66   9:25:06elapsed  cpu16  ram72   1298%CPU: 
+
+Best vm's to use for BLASTx with the NR database (best to optimize for RAM per VM, not CPUs per VM): 
+mm2.4xlarge (avail 35)
+x1.2xlarge (max 8 without cpu sharing, 16 with)(probably, not tested, but based on the above results) 
+mm1.8xlarge (avail 48)
+
+Strategy:
+- get as many mm2.4xlarge (cpu16) as possible, then x1.2xlarge (cpu8), then mm1.8xlarge (cpu28)
+- split input fasta into sections, sized respectively by num seqs (ideally by file size, but too hard to predict): 
+      2x (mm2), 1x (x1), 3.5x (mm1)
+      So: 9 of 2x, 7 of 3.5x, 4 of 1x
+      Basic unit is 3904
+      So: 9 of 7808, 7 of 13664, 4 of 3904
+- put each section into its own folder labelled sequentially, with .ncbirc file as well
+- create script to: combine all output files in proper order, convert format to desired format
+
+awk 'NR >= 1 && NR <= 3904' Hemlock30_longest-90,730-PTM1ud.fasta > Hemlock30_longest-90,730-PTM1ud-pt01-x1.fasta 
+awk 'NR >= 3905 && NR <= 7808' Hemlock30_longest-90,730-PTM1ud.fasta > Hemlock30_longest-90,730-PTM1ud-pt02-x1.fasta 
+awk 'NR >= 7809 && NR <= 11712' Hemlock30_longest-90,730-PTM1ud.fasta > Hemlock30_longest-90,730-PTM1ud-pt03-x1.fasta 
+awk 'NR >= 11713 && NR <= 15616' Hemlock30_longest-90,730-PTM1ud.fasta > Hemlock30_longest-90,730-PTM1ud-pt04-x1.fasta 
+
+awk 'NR >= 15617 && NR <= 23424' Hemlock30_longest-90,730-PTM1ud.fasta > Hemlock30_longest-90,730-PTM1ud-pt05-mm2.fasta
+awk 'NR >= 23425 && NR <= 31232' Hemlock30_longest-90,730-PTM1ud.fasta > Hemlock30_longest-90,730-PTM1ud-pt06-mm2.fasta 
+awk 'NR >= 31233 && NR <= 39040' Hemlock30_longest-90,730-PTM1ud.fasta > Hemlock30_longest-90,730-PTM1ud-pt07-mm2.fasta 
+awk 'NR >= 39041 && NR <= 47758' Hemlock30_longest-90,730-PTM1ud.fasta > Hemlock30_longest-90,730-PTM1ud-pt08-mm2.fasta 
+awk 'NR >= 47759 && NR <= 56476' Hemlock30_longest-90,730-PTM1ud.fasta > Hemlock30_longest-90,730-PTM1ud-pt09-mm2.fasta 
+awk 'NR >= 56477 && NR <= 65194' Hemlock30_longest-90,730-PTM1ud.fasta > Hemlock30_longest-90,730-PTM1ud-pt10-mm2.fasta 
+awk 'NR >= 65195 && NR <= 73912' Hemlock30_longest-90,730-PTM1ud.fasta > Hemlock30_longest-90,730-PTM1ud-pt11-mm2.fasta 
+awk 'NR >= 73913 && NR <= 82630' Hemlock30_longest-90,730-PTM1ud.fasta > Hemlock30_longest-90,730-PTM1ud-pt12-mm2.fasta 
+awk 'NR >= 82631 && NR <= 91354' Hemlock30_longest-90,730-PTM1ud.fasta > Hemlock30_longest-90,730-PTM1ud-pt13-mm2.fasta 
+
+awk 'NR >= 91355 && NR <= 102284' Hemlock30_longest-90,730-PTM1ud.fasta > Hemlock30_longest-90,730-PTM1ud-pt14-mm1.fasta 
+awk 'NR >= 102285 && NR <= 113216' Hemlock30_longest-90,730-PTM1ud.fasta > Hemlock30_longest-90,730-PTM1ud-pt15-mm1.fasta 
+awk 'NR >= 113217 && NR <= 126880' Hemlock30_longest-90,730-PTM1ud.fasta > Hemlock30_longest-90,730-PTM1ud-pt16-mm1.fasta 
+awk 'NR >= 126881 && NR <= 140544' Hemlock30_longest-90,730-PTM1ud.fasta > Hemlock30_longest-90,730-PTM1ud-pt17-mm1.fasta 
+awk 'NR >= 140545 && NR <= 154208' Hemlock30_longest-90,730-PTM1ud.fasta > Hemlock30_longest-90,730-PTM1ud-pt18-mm1.fasta 
+awk 'NR >= 154209 && NR <= 167872' Hemlock30_longest-90,730-PTM1ud.fasta > Hemlock30_longest-90,730-PTM1ud-pt19-mm1.fasta 
+awk 'NR >= 167873' Hemlock30_longest-90,730-PTM1ud.fasta > Hemlock30_longest-90,730-PTM1ud-pt20-mm1.fasta 
+
+mkdir Hem30pt01-x1
+mkdir Hem30pt02-x1
+mkdir Hem30pt03-x1
+mkdir Hem30pt04-x1
+
+mkdir Hem30pt05-mm2
+mkdir Hem30pt06-mm2
+mkdir Hem30pt07-mm2
+mkdir Hem30pt08-mm2
+mkdir Hem30pt09-mm2
+mkdir Hem30pt10-mm2
+mkdir Hem30pt11-mm2
+mkdir Hem30pt12-mm2
+mkdir Hem30pt13-mm2
+
+mkdir Hem30pt14-mm1
+mkdir Hem30pt15-mm1
+mkdir Hem30pt16-mm1
+mkdir Hem30pt17-mm1
+mkdir Hem30pt18-mm1
+mkdir Hem30pt19-mm1
+mkdir Hem30pt20-mm1
+
+---
+Assigned floatin ips: 
+1 benx1-01 10.20.0.183
+2 benx1-02 10.20.0.249
+3 benx1-03 10.20.0.245
+4 benx1-04 10.20.0.207
+
+5 benmm2-01 10.20.0.210
+6 benmm2-02 10.20.0.200
+7 benmm2-03 10.20.0.134
+8 benmm2-04 10.20.0.203
+9 benmm2-05 10.20.0.71
+10 benmm2-06 10.20.0.155
+11 benmm2-07 10.20.0.54
+12 benmm2-08 10.20.0.241
+13 benmm2-09 10.20.0.152
+
+14 benmm1-01 10.20.0.196
+15 benmm1-02 10.20.0.143
+16 benmm1-03 10.20.0.88
+17 benmm1-04 10.20.0.191
+18 benmm1-05 10.20.0.238
+19 benmm1-06 10.20.0.120
+20 benmm1-07 10.20.0.201
+
+Mounting the folders to each VM: 
+sudo mount -t nfs 10.20.0.6:/Public/genomics/NCBI-NR /work2
+sudo mount -t nfs 10.20.0.6:/Public/genomics/junjun/Data-Dec2020/Bens-Trinity-assembly/BLASTxRuns/BLASTx-Hemlock30/Hem30pt01-x1 /work
+
+---
+Had to delete these VMs in order to free up resources on the Boreal Cloud: 
+13 benmm2-09  pt13
+12 benmm2-08  pt12
+11 benmm2-07  pt11
+10 benmm2-06  pt10
+
+20 benmm1-07  pt20
+19 benmm1-06  pt19
+18 benmm1-05  pt18
+17 benmm1-04  pt17
+
+---
+Remaining servers after deleting the above: 
+1 benx1-01 10.20.0.183
+2 benx1-02 10.20.0.249
+3 benx1-03 10.20.0.245
+4 benx1-04 10.20.0.207
+
+5 benmm2-01 10.20.0.210
+6 benmm2-02 10.20.0.200
+7 benmm2-03 10.20.0.134
+8 benmm2-04 10.20.0.203
+9 benmm2-05 10.20.0.71
+
+14 benmm1-01 10.20.0.196
+15 benmm1-02 10.20.0.143
+16 benmm1-03 10.20.0.88
+
+---
+=====
+Folders to resume: 
+Hem30pt10-mm2  --> benmm2-01
+Hem30pt11-mm2  --> benmm2-02
+Hem30pt12-mm2  --> benmm2-03
+Hem30pt13-mm2  --> benmm2-04
+Hem30pt17-mm1  --> benmm1-01
+Hem30pt18-mm1  --> benmm1-03
+Hem30pt19-mm1  --> benmm2-05, benmm2-06  13664/2 = 1,6833
+Hem30pt20-mm1  --> benx1...  13588/4 = 1,3397,6793,10189
+
+awk 'NR >= 1 && NR <= 3396' Hemlock30_longest-90,730-PTM1ud-pt20-mm1.fasta > Hemlock30_longest-90,730-PTM1ud-pt20a-x1.fasta 
+awk 'NR >= 3397 && NR <= 6792' Hemlock30_longest-90,730-PTM1ud-pt20-mm1.fasta > Hemlock30_longest-90,730-PTM1ud-pt20b-x1.fasta 
+awk 'NR >= 6793 && NR <= 10188' Hemlock30_longest-90,730-PTM1ud-pt20-mm1.fasta > Hemlock30_longest-90,730-PTM1ud-pt20c-x1.fasta 
+awk 'NR >= 10189' Hemlock30_longest-90,730-PTM1ud-pt20-mm1.fasta > Hemlock30_longest-90,730-PTM1ud-pt20d-x1.fasta 
+
+
+awk 'NR >= 1 && NR <= 6832' Hemlock30_longest-90,730-PTM1ud-pt19-mm1.fasta > Hemlock30_longest-90,730-PTM1ud-pt19a-x1.fasta
+awk 'NR >= 6833' Hemlock30_longest-90,730-PTM1ud-pt19-mm1.fasta > Hemlock30_longest-90,730-PTM1ud-pt19b-x1.fasta
+
+
+Mount instructions: 
+sudo mount -t nfs 10.20.0.6:/Public/genomics/NCBI-NR /work2
+sudo mount -t nfs 10.20.0.6:/Public/genomics/junjun/Data-Dec2020/Bens-Trinity-assembly/BLASTxRuns/BLASTx-Hemlock30/resume/Hem30pt19b-mm2 /work
+
+---
+
+Hemlock30_longest-90,730-PTM1ud-pt01-x1.fasta
+
+Running the BLASTx commands (the input file is not fully specified here):
+
+x1:
+nohup time blastx -num_threads 8 -db nr -query Hemlock30 -max_target_seqs 20 -outfmt 11 -out Hemlock30_longest-blastx-11outfmt-pt01.out 2>&1 1> time-Hemlock30_longest-blastx-11outfmt-pt01-x1.log &
+
+mm2:
+nohup time blastx -num_threads 16 -db nr -query Hemlock30 -max_target_seqs 20 -outfmt 11 -out Hemlock30_longest-blastx-11outfmt-pt05.out 2>&1 1> time-Hemlock30_longest-blastx-11outfmt-pt05-mm2.log &
+
+(check pt07)
+
+mm1: 
+nohup time blastx -num_threads 28 -db nr -query Hemlock30 -max_target_seqs 20 -outfmt 11 -out Hemlock30_longest-blastx-11outfmt-pt14.out 2>&1 1> time-Hemlock30_longest-blastx-11outfmt-pt14-mm1.log &
+
+---
+
+=====
+
+---
+Hi Jun-Jun,
+
+I've just finished some speed tests of BLASTx on different VM configurations, and it looks like I will get significantly faster results by optimizing each VM for the correct amount of RAM rather than the maximum number of CPUs. So to do the BLASTx runs I hope to be able to use 30 or 40 instances of lower CPU count with the optimal amount of RAM rather than 10 instances of high CPU count. This will mean it will take me a bit longer to divide up the input .fasta file and begin running BLASTx on all the instances, but the total run time will be much improved over what it would have been.
+
+I've begun allocating resources, and tomorrow I'll split the Hemlock30_longest-90,730-PTM1ud.fasta file into the appropriate number of pieces based on the number of VMs I have, then I'll begin running BLASTx on each piece.
+
+I'm also doing one last BLASTx test to check if there is a speed improvement by using -max_target_seqs 20 instead of using the default of 500. All my speed tests so far have been with -max_target_seqs 20. If there is no speed improvement, would you like me to still use "-max_target_seqs 20" or just use the default of 500?
+
+---
+Hello: Ben:
+Great progress.
+
+“max_target_seqs’ is ‘Number of aligned sequences to keep’. At NBCI Blast website, its “max_target_seqs’ default set is 20. I believe that 20 would meet our requirement to assign seq to a taxonomy. It is interesting to the running time difference between ‘max_target_seqs-20’ max_target_seqs-500’.
+---
+
+Hi Jun-Jun, 
+
+I've started the BLASTx process on all 20 VMs. I'll keep checking their status regularly in the days ahead.
+
+Thanks for checking with Thomas about my extension. At least the BLASTx processes are started now, even if there are HR delays.
+
+Ben
+
+---
+Hi Jun-Jun, 
+
+All instances of BLASTx have finished processing the Hemlock30 dataset. I need to combine the outputs from all BLASTx instances before run MEGAN6 on it. 
+
+Would you like me to begin running BLASTx on the WWP18 dataset now as well?
+
+Ben
+--
+Next one is WBP47, not WWP. I remember that the WBP one is biggest among all four sets of data.
+--
+Actually it would be best for MEGA6 outcomes as tab with sequence IDs in one column and taxonomical assignments in a few other column with different levels (from the highest level of kingdom to the lowest level down to species, depending which level is the lowest for a clear assignment).
+--
+Hi Jun-Jun, 
+
+I've attached a screenshot from MEGAN6 after loading the BLASTx output for Hemlock30 (not in tabular format yet) and using the LCA algorithm's default parameters except I changed the Min Support Percent from 0.05 to 0.01 (based on what we did last time we ran MEGAN6).
+
+Here are the LCA parameters: 
+Min Score: 50.0
+Max Expected: 0.01 
+Min Percent Identity: 0.0
+Top Percent: 10.0
+Min Support Percent: (custom) 0.01
+Min Support: 0
+Use Min-Complexity Filter: off
+LCA Algorithm: naive
+Percent to cover: 100%
+Read assignment mode: readCount
+Use 16S Percent Identity Filter: off
+
+These LCA parameters are described in section 28 Parameters Dialog of the manual (page 46):
+https://software-ab.informatik.uni-tuebingen.de/download/megan6/manual.pdf#page=46
+
+Would you like to look at the MEGAN6 output more closely with me over Zoom after the co-op interview? 
+
+
+Also, I don't know what to do about your latest instructions: 
+"Actually it would be best for MEGA6 outcomes as tab with sequence IDs in one column and taxonomical assignments in a few other column with different levels (from the highest level of kingdom to the lowest level down to species, depending which level is the lowest for a clear assignment)."
+
+The MEGAN6 manual talks about tabular input from BLAST in sections 5.1 (page 7) and 34.3 (page 50):
+https://software-ab.informatik.uni-tuebingen.de/download/megan6/manual.pdf#page=7
+https://software-ab.informatik.uni-tuebingen.de/download/megan6/manual.pdf#page=50
+
+Here's what it says in section 5.1 about tabular form:
+"MEGAN can also parse tabular BLAST output (generated using BLAST option -m 8, however as this form of output does not contain the subject line for sequences matched, it is unsuitable for MEGAN because MEGAN cannot determine the taxon or gene associated with the database sequence. However, if you add an additional column to this format containing the associated taxon name or numerical NCBI taxon-id for each line then MEGAN will parse these and use them as input. For unknown taxa, write either unknown or -1 in the column."
+
+Here's what section 34.3 says about tabular format: 
+"MEGAN can also parse tabular format (BLAST output option -m 8). For this to work, the subject field must either contain taxon names or GI accession numbers. In the latter case, please use the Load GI-Lookup File button to load a GI lookup file. Alternatively, a ninth column may be supplied that contains either the taxon name or taxon Id associated with the database sequence. The program also scans the subject field for RefSeq identifiers to determine the associated gene." 
+
+If you would like me to convert the BLAST output to tabular form and then modify it to use with MEGAN6 I will need to talk with you to understand it better. 
+
+Thanks,
+
+Ben
+--
+Hello, Ben:
+
+Looks great! As we discussed, I like to have table to show this MEGA6 results in combination with Blastx results with column such as:
+
+Seq ID, Seq description, Top Blastx E-vaules, Top Blstx species, Top Blastx seq NBCI accc. (these from Blastx)
+
+At leas fix column for fix levels as assigned in the attached pic. (1) Level-1: NCBI (assigned/assumed); (2) Level-2: Cellular organisms/viruses/no-hints/summed/assigned, (3) Level-2: Eikayota vs. Bacteria, (4) Level-4: tree types of bacteria vs. Amoebozoa/Discoba/Opisshonta/Scar/Viridiplnts, (5) Levele-5: fungi/Metazoa/chlorophyte/Steptophyta, (6) Level-6: Fungi-assigned/summed , etc.
+
+If the file is two big, then split it into two: one for Blastx, and another for MEGA6, with shared SeqID.
+
+Please to see this potential.
+--
+Hello, Ben:
+
+I have a look at the MEGA Manual, our interest ‘7 Taxonomic Binning’.
+
+“The individual species are hierarchically grouped into clades at the levels of: Superkingdom, Kingdom, Phylum, Class, Order, Family, Genus, and Species (and some unofficial clades in between).”
+
+“7.3 Assigning Reads to Taxa”:
+
+“We call this the naive LCA-assignment algorithm (LCA = “lowest common ancestor”). In this approach, every read is assigned to some taxon. If the read aligns very specifically only to a single taxon, then it is assigned to that taxon. The less specifically a read hits taxa, the higher up in the taxonomy it is placed. Reads that hit ubiquitously may even be assigned to the root node of the NCBI taxonomy.”
+
+Then, for our case, is there a way to assign each seq to somewhere in the hierarchical groups as said in the previous email?
+--
+Can try to try running parameter in case difference?  Min Support Percent: (custom) 0.01 down to 0.
+I can not find: Read assignment mode: readCount. We have NOT used raw NGS reads for BLAST, what we used is assembled seq from raw reads.
+--
+Here's a screenshot after changing Min Support Percent down to 0. There are still lots assigned to No Hits or Not Assigned.
+The Read assignment mode parameter has these options: readCount, readLength, alignedBases, readMagnitude.
+There is also a parameter which I didn't list before called "Use Paired Reads", which is currently unchecked.
+--
+Hello, Ben:
+Please extract information from BLASTx as below. Thanks!  Jun-Jun 
+
+Sequence Name, Sequence Description, Blast Top Hit Taxonomy Name, Blast Top Hit E-Value, Blast Top Hit Accession
+
+--
+[I didn't send this email because I discovered a way to customize the BLASTx tabular output, see next email].
+Hi Jun-Jun, here are the fields obtained from converting the BLASTx output to tabular csv format:
+
+query acc.ver, subject acc.ver, % identity, alignment length, mismatches, gap opens, q. start, q. end, s. start, s. end, evalue, bit score  
+Hemlock30_DN0_c0_g1_i3,ABR18204.1,80.263,76,15,0,509,736,305,380,4.33e-32,134
+Hemlock30_DN0_c0_g1_i3,TEY34556.1,67.045,88,29,0,1,264,167,254,1.60e-29,130
+Hemlock30_DN0_c0_g1_i3,TEY92970.1,59.048,105,40,1,1,306,164,268,1.70e-29,130
+
+So it looks like I can get the Sequence Name, E-Value and Accession from the BLASTx table. Then my first task will be to extract only the top hit for each sequence. 
+Question 1: Do I determine the top hit by the E-Value or Accession?
+
+
+It looks like I will need to obtain the following fields from MEGAN6: 
+Blast Top Hit Taxonomy Name
+Question 2: To get the "Blast Top Hit Taxonomy Name" from MEGAN6, I think I would first extract the reads for each Node, and then assign the name of the Node to the corresponding sequence ids in the BLASTx output table, right?
+
+
+I am not sure how to get the "Sequence Description" either from BLASTx or MEGAN6. 
+Question 3: Would I find the description elsewhere in full BLASTx output? For example, when I search for "ABR18204" in the BLASTx file I get these results (with line numbers): 
+
+23:ABR18204.1 unknown [Picea sitchensis]                                 134     4e-32
+45:>ABR18204.1 unknown [Picea sitchensis]
+16254751:ABR18204.1 unknown [Picea sitchensis]                                 759     0.0  
+16254773:>ABR18204.1 unknown [Picea sitchensis]
+
+Would the description be "unknown [Picea sitchensis]"?
+ 
+Let me know if I understand this right. Thanks,
+
+Ben
+--
+
+================
+blast_formatter experimentation: 
+
+# BLASTX 2.11.0+
+# Query: Hemlock30_DN0_c0_g1_i3
+# Database: nr
+# Fields: query id, query acc., subject id, subject acc., subject tax id, subject sci name, subject com names, subject blast name, subject super kingdom, subject title, subject strand
+# 20 hits found
+Hemlock30_DN0_c0_g1_i3  Hemlock30_DN0_c0_g1_i3  gb|ABR18204.1|  ABR18204        3332    Picea sitchensis        Sitka spruce    seed plants     Eukaryota       unknown [Picea sitchensis]      N/A
+
+Hemlock30_DN0_c0_g1_i3  Hemlock30_DN0_c0_g1_i3  gb|TEY34556.1|  TEY34556        180675  Salvia splendens        Salvia splendens        eudicots        Eukaryota       hypothetical protein Saspl_035061 [Salvia splendens]    N/A
+
+Hemlock30_DN0_c0_g1_i3  Hemlock30_DN0_c0_g1_i3  gb|TEY92970.1|  TEY92970        180675  Salvia splendens        Salvia splendens        eudicots        Eukaryota       hypothetical protein Saspl_016236 [Salvia splendens]    N/A
+
+
+
+nohup blast_formatter -archive Hemlock30_longest-blastx-11outfmt-pt01.out -outfmt "7 qseqid stitle ssciname staxid evalue sacc" -out Hemlock30_longest-blastx-11outfmt-pt01.out-convertedTo7tabularWithComments.v3 2>&1 > blast_formatter.log &
+
+Sequence Name, Sequence Description, Blast Top Hit Taxonomy Name, Blast Top Hit E-Value, Blast Top Hit Accession
+qseqid    query id                  Hemlock30_DN0_c0_g1_i3
+stitle    subject title             unknown [Picea sitchensis] 
+ssciname  subject sci name          Picea sitchensis
+staxid    subject tax id            3332
+evalue    e-val
+sacc      subject acc.              ABR18204
+
+
+nohup blast_formatter -archive Hemlock30_longest-blastx-11outfmt-pt01.out -outfmt "7 qseqid qacc sseqid sacc staxid ssciname scomname sblastname sskingdom stitle sstrand" -out Hemlock30_longest-blastx-11outfmt-pt01.out-convertedTo7tabularWithComments.v2 2>&1 > blast_formatter.log &
+
+query id                  Hemlock30_DN0_c0_g1_i3  
+query acc.                Hemlock30_DN0_c0_g1_i3  
+subject id                gb|ABR18204.1|  
+subject acc.              ABR18204        
+subject tax id            3332    
+subject sci name          Picea sitchensis        
+subject com names         Sitka spruce    
+subject blast name        seed plants     
+subject super kingdom     Eukaryota       
+subject title             unknown [Picea sitchensis]      
+subject strand            N/A
+
+================
+
+--
+I was able to experiment with tabular outputs 6, 7 and 10. I found outputting to 10 (csv) problematic because some of the stitle information had commas in it, so I outputted to 6 instead (tab delimited) and replaced the commas with semicolons and then replaced the tabs with commas. Outputting to 7 was helpful to confirm the Field titles.
+
+nohup blast_formatter -archive Hemlock30_longest-blastx-11outfmt-pt01.out -outfmt "7 qseqid stitle ssciname staxid evalue sacc" -out Hemlock30_longest-blastx-11outfmt-pt01.out-convertedTo7tabularWithComments.v3 2>&1 > blast_formatter.log &
+
+Sequence Name, Sequence Description, Blast Top Hit Taxonomy Name, Blast Top Hit E-Value, Blast Top Hit Accession
+qseqid    query id                  Hemlock30_DN0_c0_g1_i3
+stitle    subject title             unknown [Picea sitchensis] 
+ssciname  subject sci name          Picea sitchensis
+staxid    subject tax id            3332
+evalue    e-val
+sacc      subject acc.              ABR18204
+
+--
+Hi Jun-Jun, 
+
+I've experimented with the BLASTx tabular output options, and I've attached a sample that matches your requested fields quite closely. This is just from BLASTx, let me know if I need to add anything from MEGAN6. Also, let me know if I need to customize it in anyway.
+
+Also, how shall I select the Blast Top Hit for each sequence? Is it by e-value, or accession, or sequence length?
+
+Thanks,
+
+Ben
+
+Hemlock30-blastx-tabular-100lines.csv
+--
+Hello, Ben:
+Looks that you have got the right items. Blast Top Hit for each sequence is based on the lowest e-value, then extract the corresponding other three items.
+
+As for MEGAN6 data extraction, maybe you just listed the specification (taxonomic-terms) under Node-1 to Node-6 based on the image you sent.
+--
+Ran this blast_blastformatter command to get tabular data on the whole Hemlock30 dataset: 
+
+nohup blast_formatter -archive Hemlock30_longest-blastx-11outfmt.MASTER -outfmt "6 qseqid stitle ssciname staxid evalue sacc" -out Hemlock30_longest-blastx-6outfmt.MASTER.tab 2>&1 > blast_formatter.log &
+
+- then replace all instances of comma with semicolon:  
+    sed -i 's/,/;/g' Hemlock30_longest-blastx-6outfmt.MASTER.tab 
+- then replace all tab with comma:  
+    sed 's/\t/,/g' Hemlock30_longest-blastx-6outfmt.MASTER.tab > Hemlock30_longest-blastx-6outfmt.MASTER.csv 
+- then add header line: 
+query id,subject title,subject sci name,subject tax id,evalue,subject acc.
+
+--
+For the MEGAN6 part, "maybe you just listed the specification (taxonomic-terms) under Node-1 to Node-6 based on the image you sent.":
+x- for non-leaf nodes, export only the assigned
+x- for leaf nodes, export both the assigned and the summarized
+x- the taxonomic term is in the filename
+x- for each file, update the filename to include its sequence of parents separated by a comma
+- create a table of seq ids with taxonomic term
+    - for each file, export only the > rows, and replace the > with the filename plus comma
+          grep ">" filename > filename
+          sed -i 's/^>/filename,/g filename
+    - do I need to add commas at end of rows for non-leaf nodes? probably: 
+          sed -i 's/.*$/&,,,/g' tmp.txt
+          or: 
+          sed -i 's/$/,,,/g' tmp.txt
+    - join all files and add a header line
+
+For the above, see script: extractOnlySeqIdsFromFastaFilesAndPasteFilename.sh
+Then:
+nano MEGAN6_seqCategories_all.txt, and add this header line:
+seq_id,level_01,level_02,level_03,level_04,level_05,level_06,level_07,level_08
+Then, contatenate all to it:
+cat `ls *.csv` >> MEGAN6_seqCategories_all.txt
+
+- then merge that table with my blastx table based on seq id: 
+mergeCsvFilesByColumn.R
+
+
+For leaves:
+cellular_organisms,Eukaryota,Opisthokonta,Fungi,Dikarya,Ascomycota,
+cellular_organisms,Eukaryota,Opisthokonta,Fungi,Dikarya,Basidiomycota,
+cellular_organisms,Eukaryota,Opisthokonta,Fungi,
+cellular_organisms,Eukaryota,Opisthokonta,Eumetazo,  <--- HERE
+cellular_organisms,Eukaryota,Opisthokonta,
+cellular_organisms,Eukaryota,
+cellular_organisms,
+cellular_organisms,Eukaryota,Viridiplantae,Streptophyta,Streptophytina,Embryophyta,
+cellular_organisms,Eukaryota,Viridiplantae,Streptophyta,Streptophytina,
+cellular_organisms,Eukaryota,Viridiplantae,Streptophyta,
+cellular_organisms,Eukaryota,Viridiplantae,
+
+For inner nodes: 
+cellular_organisms,Eukaryota,Opisthokonta,Fungi,Dikarya,
+cellular_organisms,Eukaryota,Opisthokonta,Fungi,
+cellular_organisms,Eukaryota,Opisthokonta,
+
+--
+Hi Jun-Jun, 
+
+I've attached the results of filtering the BLASTx table by the lowest e-value for each sequence. 
+
+I'll extract the MEGAN6 taxonomic terms for the first six levels of the tree next. Do you mind if I don't go further down the tree if a node only has <=20 seqs assigned to it? 
+
+Also, are there any larger categories that you don't need the sub-taxonomic information for? Such as Bacteria, etc? I've attached a pdf of what the tree looks like when I uncollapse all nodes to the sixth level except those which have <=20 seqs.
+
+Thanks, 
+
+Ben
+Hemlock30_longest-90,730-blastx.MASTER-topPicks.csv
+Hemlock30_longest-90,730-blastx.MASTER.MEGAN6.pdf
+--
+Hi, Ben:
+Thanks for fast progress.
+Yes! No need to go to node-6 for all of groups. But two big groups “fungi” and “streptophyta” (plants) may go deeper to more levels with a node assignment at cut-off of 20, 100, or more  seqs?
+--
+Hello, Ben:
+I noticed the BLASTx tab has only 77,543 rows/seqs, not 90,730 seq as the input. I wonder if the cut-off of the lowest E-values at 10 has caused the difference of the seq numbers. That means (90,730-77,543) seqs have the lowest E-values larger than 10, right?
+--
+Hello, Ben:
+Tab below come from NCBI. All organisms divide into 4 groups (Archaea, Bacteria, Viruses, and Eukaryota), and Eukaryota into three sub-groups (Fungi, Metazoa, and Viridiplantae). Our MEGAN6 grouping can be shown in this frame, with more details under Fungi, Viridiplantae (plants), and Metazoa (animals).
+--
+Hi Jun-Jun, 
+
+The BLASTx documentation for evalue says this:
+ -evalue <Real>
+   Expectation value (E) threshold for saving hits 
+   Default = `10'
+
+So it looks like the default is 10, and it doesn't save hits whose evalue is greater than that. Would you like me to use a different evalue in future BLASTx runs?
+
+I've confirmed this by looking at the number of reads in each main category in MEGAN6:
+NCBI 90730
+Cellular Orgnisms 63686
+Viruses 14
+No Hits 13187
+Not Assigned 13626
+
+If I take NCBI - No Hits: 90730-13187 = 77543, which is the number we have in our tabular output.
+
+
+For exporting the information from MEGAN6, based on what you've sent me, does the attached image look like a good hierarchy to use? There does not seem to be anything for Metazoa. Let me know if you'd like me to go further down in any of the nodes.
+
+Ben
+Hemlock30_longest-blastx-11outfmt.MASTER.MEGAN6-v2.png
+--
+Hello, Ben:
+It looks fine to assign taxonomy groups based on the attached image. From it, node-1 has 4 items, node-2 with cellular organisms  divided into three groups, node-3 of Eukaryota is subdivided into 7 sub-groups, node-4 with Opisthokonta and viriplantae, with 3 and 2 sub-sub-groups, respectively. At Node-5 , Fungi has 3, Eumetzoa has 2, Streptophyta has 2,  sub sub-sub-groups, and then to Node-6 where Dikaya has 2 and Streptophytina has 2 items. If you go deeper, to Node-7, you may see more divisions inside Ascomycota and Embryophyta
+Your image is clear to my understanding.
+--
+Hi Jun-Jun,
+
+Just to confirm, would you like me to keep using evalue threshold 10 for future BLASTx runs?
+
+Also, here is what the tree looks like after going deeper to node 7 for Ascomycota, Basidiomycota and Embryophyta. I'll use this as the basis for extracting the data from MEGAN6.
+Hemlock30_longest-blastx-11outfmt.MASTER.MEGAN6-v3.png
+--
+Yes. keep using evalue threshold 10 for future BLASTx runs.
+OK. Just go to Node-7.
+--
+Our targeted fungi is Heterobasidion, you can take at look inside “Agaricomycetes” to see how many seq can be signed to Heterobasidion inMEGAN6, and get the list.
+--
+Hi Jun-Jun, there aren't very many in Heterobasidion. I've attached the reads file and the image of the tree.
+Hemlock30_longest-blastx-11outfmt.MASTER.MEGAN6-v4.png
+--
+OK. Just go to have 7 column for Npde-1 to Node-7.
+--
+Hi Jun-Jun, 
+
+I've finished extracting the taxonomic information from MEGAN6, and I've merged it to the Hemlock30_longest-90,730-blastx.MASTER-topPicks.csv file I previously sent you. I've attached a zip file containing all these files, as well as an image of the taxonomic tree I used in MEGAN6.
+Hemlock30_blastx_MEGAN6_csvOutput.zip
+--
+Hi, Ben:
+Great progress. This is what we want. I’ll call you for the next. Thanks.
+--
+Hi Jun-Jun, just checking if there's something you'd like me to be working on next. I've checked the progress of BLASTx on the WBP47 data, and it is still running. 
+
+I can continue trying to understand that Linkage Disequilibrium research paper if you are not ready for me to do the next step on the Hemlock30 data yet.
+--
+Thanks for updating.
+
+For Hemlock at next, we need to register data (RNA-seq raw data and assembly) in GenBank. If assembly is submitted, it would be challenging for removal of all contaminants rather the seqs from Hemlock itself. This is why you run MAGAN6.
+
+Of course, Linkage Disequilibrium research paper is the most of our interest!
+--
+https://www.ncbi.nlm.nih.gov/account/?back_url=https%3A%2F%2Fwww.ncbi.nlm.nih.gov%2Fgenbank%2F
+
+Username: jun-jun.liu@nrcan-rncan.gc.ca
+
+Ps: (see original)
+
+the Sequence Read Archive (SRA).
+
+Go to: My submissions
+>> BioProject
+>>BioProject: Processed
+
+PRJNA315892 : Pinus flexilis Raw sequence reads (TaxID: 151559)
+>>New submission
+>>Raw sequence reads
+>>multiisolate
+>>Species name: Pinus flexilis
+
+We need to register a  new Bioproject for hemlock in Genbenk, and submit all Hemlock 30 samples, RNA-seq raw data, and transcriptome assembly.
+--
+Hi Jun-Jun,
+
+Should I submit the raw samples before we ran Trimmomatic on them, or after the Trimmomatic processing?
+
+Also, I'm not sure what a transcriptome assembly is. Which file is this?
+
+Thanks,
+
+Ben
+--
+A general procedure for submission:
+1.       register a bioproject
+2.       register biosamples
+3.       register and upload RNA-seq data (usually before the Trimmomatic processing, as software may be updated in the future)
+4.       register and upload the assembly. We need to figure out what seqs are included in the assembly.
+--
+Please have a look at GenBank website for Data registration. I have an account over there and given you the username and ps
+--
+Me: Possible folders to mount containing data which may need to be uploaded to GenBank: 
+/public/genomics/junjun/Data-Dec2020/Hemlock-Heterobasidion-2017-raw
+/public/genomics/junjun/Data-Dec2020/Hemlock-Heterobasidion-2017-trimmomatic   (because it has Trinity output files)
+/public/genomics/junjun/Data-Dec2020/Bens-Trinity-assembly/trin-assemblies
+/public/genomics/junjun/Data-Dec2020/Bens-Trinity-assembly/trin-assemblies-renamedSeqIds
+/public/genomics/junjun/Data-Dec2020/Bens-Trinity-assembly/trin-assemblies-renamedSeqIds-longest
+
+sudo mount -t nfs 10.20.0.6:/Public/genomics/junjun/Data-Dec2020/Hemlock-Heterobasidion-2017-raw /mnt/HemlockRaw
+sudo mount -t nfs 10.20.0.6:/Public/genomics/junjun/Data-Dec2020/Hemlock-Heterobasidion-2017-trimmomatic /mnt/HemlockTrim
+
+SRA Home Page (where I'll be submitting the raw reads to):
+https://www.ncbi.nlm.nih.gov/Traces/sra_sub/sub.cgi?&m=submissions&s=defaults
+
+From the Intro of this format guide: 
+https://www.ncbi.nlm.nih.gov/sra/docs/submitformats/
+- The SRA is a raw data archive, and requires per-base quality scores for all submitted data. Therefore, FASTA and other sequence-only formats are not sufficient for submission! FASTA can, however, be submitted as a reference sequence(s) for BAM files or as part of a FASTA/QUAL pair (see below).
+- SRA accepts binary files such as BAM, SFF, and HDF5 formats and text formats such as FASTQ.
+
+
+https://www.ncbi.nlm.nih.gov/sra/docs/submit/
+Here's guidelines on first creating the project and sample info: https://www.ncbi.nlm.nih.gov/sra/docs/submitbio/
+Here's guidelines on uploading the actual data: https://www.ncbi.nlm.nih.gov/sra/docs/submitportal/
+Updating SRA data: https://www.ncbi.nlm.nih.gov/sra/docs/submitupdate/
+
+
+genbank links:
+https://www.ncbi.nlm.nih.gov/genbank/
+https://www.ncbi.nlm.nih.gov/genbank/submit/
+
+
+BioProject submission describes the goal of the sequencing study:
+Pinus flexilis Raw sequence reads (TaxID: 151559)
+Register BioSamples: 
+
+
+Hi Jun-Jun, 
+
+I've been reading carefully through the guidelines for the SRA project submission to make sure I understand it before I begin the process, to avoid accidentally creating a mess. 
+On this page: https://www.ncbi.nlm.nih.gov/sra/docs/submitportal/
+under Step 2, General Info, it says: 
+"Select Yes in the first two sections of this step if you already registered your project and samples at the BioProject and BioSample Submission Portal Wizards. If you select No, the SRA Submission Wizard will ask you to create them, which may result in creating duplicates of your existing project and/or samples and this will lead to submission errors."
+
+I'm not sure whether you've already registered the project and samples at the BioProject and BioSample Submission Portal Wizards (instructions for that are here: https://www.ncbi.nlm.nih.gov/sra/docs/submitbio/ ). I would assume you haven't, but in your first email where you gave me the login information and instructions, you included under the BioProject step: 
+PRJNA315892 : Pinus flexilis Raw sequence reads (TaxID: 151559)
+which suggests to me you have already registered the project and samples because it has a PRJNA#, which I think is assigned after using that wizard.
+
+So my first question is: have you begun the process already, or was that just an example and I should begin from scratch? I'll probably have more questions for you as they come up.
+
+Ben
+
+Western Hemlock
+Bioproject title: Western hemlock (Tsuga heterophylla) transcriptome analysis.
+Methods: RNA-seq of 30 samples was performed in Feb. 2017, Illumina TruSeq mRNA stranded library was prepared, which generating a total of 813 millions of Illumina HiSeq 100-bp PE reads. 
+Example sample name: Hm8B
+--
+Hi Jun-Jun, 
+I've attached the Excel file for the Western Hemlock samples, with sample names filled in. I've noticed there are 32 samples, maybe because there are Hm15WB and Hm15WC as well as Hm15B and Hm15C. It looks like I used all 32 samples in the Trinity command. I hope that is okay.
+
+Here's the documentation about filling out the samples file, from the submission wizard.
+For column explanations and examples, please see the sample attributes page:
+https://submit.ncbi.nlm.nih.gov/biosample/template/?package-0=Plant.1.0&action=definition
+For more information, please see creating sample attribute file:
+https://www.ncbi.nlm.nih.gov/biosample/docs/submission/batch/
+
+I'm currently still logged into NCBI and will keep this page open until I receive the completed file from you.
+
+Thanks,
+
+Ben
+--
+Thanks Jun-Jun, I've submitted the SRA metadata successfully. The next step is to upload the files, but it is saying there will be system maintenance tomorrow, so I will wait until Friday to begin the upload.
+--
+
+https://submit.ncbi.nlm.nih.gov/subs/sra/SUB10806313/files
+
+
+First, trying to upload files to the preload folder using the ftp option.
+
+
+https://www.howtogeek.com/412626/how-to-use-the-ftp-command-on-linux/
+https://techjourney.net/ftp-mget-mput-without-prompt-for-confirmation/
+Method 1: "Before starting mget or mput command, run:
+prompt
+FTP Interactive Mode Off
+The command should return “Interactive mode Off”. Prompt command toggle interactive mode on and off."
+Method 2: "Before using FTP to open connection to remote server, use the following command to start FTP connection instead:
+ftp -i hostname
+Replace hostname with actual host name or IP address of remote server. -i flag turns off the interactive mode which prompts for confirmation for every files."
+
+
+
+https://www.ncbi.nlm.nih.gov/sra/docs/submitfiles/
+****
+FTP upload instructions
+Navigate to the source folder where the files for submission are;
+Establish an FTP connection using the credentials below:
+Address: ftp-private.ncbi.nlm.nih.gov
+Username: subftp
+Password: w4pYB9VQ
+Navigate to your account folder:
+From the command line use the 'cd' command:
+cd uploads/jun-jun.liu_nrcan-rncan.gc.ca_WxRPBkv0
+
+When using a GUI FTP client (eg: Filezilla, NcFTP, Cyberduck, etc.), after you’ve connected to the FTP server, paste your account folder (uploads/jun-jun.liu_nrcan-rncan.gc.ca_WxRPBkv0) into the “Remote Site” or “Remote Directory” box on the interface and press “Enter”.
+
+Then you will be able to create the data sub-directory for your submission. Until you do this, you will see a message stating "550 /: Permission denied" or "Failed to read the directory listing". We prevent directory listing in the default sign in folder for security reasons.
+
+Create a subfolder (required!) with a meaningful name:
+mkdir new_folder
+Navigate to the target folder you just created:
+cd new_folder
+Copy your files into the target folder:
+put file_name
+If you upload your files in your root directory, you will not be able to see them or to select the folder during the submission.
+Make a new subdirectory for each new submission. Your submission subfolder is a temporary holding area and it will be removed once the whole submission is complete.
+Do not upload complex directory structures or files that do not contain sequence data.
+
+Return back to this page and select preload folder, then continue submission.
+Please note: it takes at least 10 minutes for uploaded files to become available for selection.
+Please complete your submission within 30 days of creating a preload folder. If you upload files and do not submit them, they will be automatically deleted 30 days after folder creation.
+****
+
+
+--
+Connecting and uploading the Hemlock30 raw files to the ncbi/genbank ftp server, following the instructions they gave:
+- first, I moved all the raw files into one folder, then from within that folder tried to connect via ftp
+- I decided to run the ftp session from a Terminal window within a VNC desktop session of one of my VMs so I wouldn't have to worry about an ssh session timing out, since it's always open and running even if I'm not connected via VNC. 
+- I first tried to connect via sftp, but that didn't work, so I installed ftp, which worked, but it was finicky because there was a 60 second inactivity timeout. Also in order to upload all files without a prompt for each file I had to connect via the -i option. Using the "prompt" command afterwards to toggle interactive mode caused it to reject Passive Mode when trying to use mput to upload all files:
+sudo yum install ftp.x86_64
+ftp -i ftp-private.ncbi.nlm.nih.gov
+name: subftp
+pw: w4pYB9VQ
+cd uploads/jun-jun.liu_nrcan-rncan.gc.ca_WxRPBkv0
+mkdir hemlock30
+cd hemlock30
+pwd
+mput *.fastq.gz
+
+- this all worked, but it only seemed to upload one file and then stopped, so I decided to figure out how to install and use the Aspera CLI / ascp, see below.
+
+--
+Second, trying via the Aspera command line option:
+
+http://download.asperasoft.com/download/docs/cli/3.9.6/user_linux/webhelp/index.html
+https://download.asperasoft.com/download/docs/cli/3.7.7/user_linux/webhelp/index.html
+
+I downloaded the IBM Aspera CLI from the IBM Aspera CLI link in the Developer Resources section here (needed to create an IBM account first using brightyellowlights@gmail.com): 
+https://www.ibm.com/products/aspera/downloads?list
+
+
+https://www.ncbi.nlm.nih.gov/sra/docs/submitfiles/
+****
+Aspera command line upload instructions
+You may use the following command to upload files via Aspera Command-Line:
+ascp -i <path/to/key_file> -QT -l100m -k1 -d <path/to/folder/containing files> subasp@upload.ncbi.nlm.nih.gov:uploads/jun-jun.liu_nrcan-rncan.gc.ca_VRyeaKMj
+
+Where:
+<path/to/key_file> must be an absolute path, e.g.: /home/keys/aspera.openssh
+<path/to/folder/containing files> needs to specify the local folder that contains all of the files to upload.
+
+Get the key file.
+
+If you upload your files in your root directory, you will not be able to see them or to select the folder during the submission.
+Make a new subdirectory for each new submission. Your submission subfolder is a temporary holding area and it will be removed once the whole submission is complete.
+Do not upload complex directory structures or files that do not contain sequence data.
+
+Please complete your submission within 30 days of creating a preload folder. If you upload files and do not submit them, they will be automatically deleted 30 days after folder creation.
+
+Return back to this page and select preload folder, then continue submission.
+Please note: it takes at least 10 minutes for uploaded files to become available for selection.
+****
+
+My ascp command: 
+ascp -i /mnt/HemlockRaw/aspera/aspera.openssh -QT -l100m -k1 -d /mnt/HemlockRaw/ToUpload subasp@upload.ncbi.nlm.nih.gov:uploads/jun-jun.liu_nrcan-rncan.gc.ca_VRyeaKMj/hemlock30a
+
+- this seems to be working, note I created a unique subfolder to upload the files to.
+--
+Hi Jun-Jun, 
+
+The FTP option to upload the Hemlock30 files to the SRA seems to be only working for one file at a time, and it was not letting me know when a file was finished uploading. So instead I've installed the IBM Aspera command line tool to upload the files, which is the second option. It seems to be doing better, and is uploading them very quickly. I expect it to be finished today.
+
+I've also checked on the status of the WBP47 BLASTx runs, and they are still running. 
+
+This week I plan to also spend time trying to understand the LD paper and other information you sent me about it.
+
+Ben
+--
+Hello, Ben:
+I have a file ‘Hw-33,551nt’ in Dropbox. Please try upload to GenBank as the Hemlock30 RNA-seq assembly. Thanks.
+--
+Hi Jun-Jun, I've downloaded your Hw-33,551nt.fasta assembly file, but before I proceed I want to make sure I understand what I'm supposed to be submitting this to. 
+
+All the raw data samples have been uploaded to the SRA, but I'll wait to hear back from you before finishing that submssion process in case the new file needs to be added to it. From the documentation, I'm getting the impression the assembly should be submitted to a different database.
+
+From the Intro of this format guide for the SRA : 
+https://www.ncbi.nlm.nih.gov/sra/docs/submitformats/
+"The SRA is a raw data archive, and requires per-base quality scores for all submitted data. Therefore, FASTA and other sequence-only formats are not sufficient for submission! FASTA can, however, be submitted as a reference sequence(s) for BAM files or as part of a FASTA/QUAL pair (see below)."
+"SRA accepts binary files such as BAM, SFF, and HDF5 formats and text formats such as FASTQ."
+
+From this page describing the GenBank submission types, it seems like I should submit the assembly to the Transcriptome Shotgun Assembly (TSA) Sequence Database after completing the SRA submission, am I right?:
+https://www.ncbi.nlm.nih.gov/genbank/submit_types/
+
+I'm currently still logged into GenBank/NCBI. Let me know if you'd like me to log out so you can log in.
+
+Thanks,
+
+Ben
+--
+Yes. submit the assembly to the Transcriptome Shotgun Assembly (TSA) Sequence Database after completing the SRA submission.
+--
+Ok, I've finished submitting the SRA data, and clicked the option to try to complete the submission automatically and email you when it's done. Here's some information from the submission page, including its submission number. I wasn't sure if you wanted the data to be released publicly right away, so I set the public release date for Jan 5, 2022, and we can always change that if you prefer.
+
+
+"Sequence Read Archive (SRA) submission: SUB10806313
+Western hemlock (Tsuga heterophylla) transcriptome analysis, Dec 15 '21
+  Submitted
+  Awaiting processing.
+
+This Sequence Read Archive (SRA) submission will be released on 2022-01-05 or upon publication, whichever is first.
+Note: Release of BioProject or BioSample is also triggered by the release of linked data."
+
+
+I'll let you know if I have any questions about submitting the transcriptome assembly to the TSA.
+
+Ben
+--
+Dear Jun-Jun Liu,
+
+This is an automatic acknowledgment that your recent submission to the SRA database has been successfully processed and will be released on the date specified.
+
+Please reference PRJNA791410 in your publication.
+--
+Submitting to the TSA: 
+https://www.ncbi.nlm.nih.gov/genbank/tsa/
+https://www.ncbi.nlm.nih.gov/genbank/tsaguide/
+https://submit.ncbi.nlm.nih.gov/subs/tsa/
+
+Questions: 
+- Need to fill out and download Structured Comment table: https://submit.ncbi.nlm.nih.gov/structcomment/nongenomes/
+- Description of the assembly process if a multi-step assembly was performed should be provided in the COMMENT section.
+- Targeted vs Non-targeted
+- fasta defline component: [moltype=transcribed_RNA]
+- from: https://www.ncbi.nlm.nih.gov/genbank/tbl2asn2/#fsa 
+    - the fasta defline needs to include Organism and related information (unless organism information is included with -j at the command line or in a .src file ), eg: >Sc_16 [organism=Saccharomyces cerevisiae]
+    - any other optional source modifiers to include in the defline?
+
+--
+Hi Jun-Jun,
+
+I've been reading the guidelines for the TSA submission, and I have some questions for you before I begin.
+https://www.ncbi.nlm.nih.gov/genbank/tsaguide/
+
+(1) Can you fill out this Structured Comment table, and email me the generated file after you've downloaded it?: 
+https://submit.ncbi.nlm.nih.gov/structcomment/nongenomes/
+The guide says: "The Assembly Structured Comment table is a single tab-delimited table that includes the tag-value pairs that are to be applied to all of the sequences in your submission. For TSA records the Assembly Method (with version and/or year if available) and Sequencing technology must be included. Coverage and Assembly name are optional."
+
+(2) The guide says "Description of the assembly process if a multi-step assembly was performed should be provided in the COMMENT section." I'm not sure if this is different from the "Assembly method" in the above Structured Comment table. Maybe if more than one assembly method was used we will need to provide a description in a Comment section of the submission portal. Can you provide me with such a description if you think we'll need it? 
+
+(3) There are specific requirements for Targeted subsets of transcriptome data vs Non-targeted. Is ours Targeted or Non-targeted? 
+
+(4) It looks like I'll need to add these two components for organism and molecule type to the definition lines for each sequence in the fasta file, do I have these correct?: 
+[organism=Tsuga heterophylla] [moltype=DNA]
+
+The requirement for moltype in the guide just showed this: [moltype=transcribed_RNA]
+ 
+Thanks,
+
+Ben
+--
+*Assembly method: Trinity
+
+* Version or date program was run: trinityrnaseq-Trinity-v2.8.5
+(version: v2.8.5, released on May 24, 2019)
+
+Assembly name: Western hemlock transcriptome
+
+Coverage: you have data when you calculate TPM by read mapping  , but no need to fill
+
+* Sequencing technology: Illumina HiSeq
+
+(3) There are specific requirements for Targeted subsets of transcriptome data vs Non-targeted. Ours is Non-targeted !
+
+(4) It looks like I'll need to add these two components for organism and molecule type to the definition lines for each sequence in the fasta file, do I have these correct?:
+[organism=Tsuga heterophylla] [moltype=DNA]. Correct!
+
+The requirement for moltype in the guide just showed this: [moltype=transcribed_RNA]. Correct ! or, moltype = complementary DNA (cDNA)
+--
+Thanks Jun-Jun,
+
+Just so I'm clear, which of these should I be using for moltype?:
+[moltype=DNA]
+[moltype=transcribed_RNA]
+[moltype=cDNA]  (is complementary DNA the same thing as transcribed RNA?)
+--
+[moltype=cDNA]
+cDNA = DNA complementary to the transcribed RNA
+Also, please add five seqs into the fasta file for upload, with a total of 33,556 seqs.
+Hw_DN72_c0_g2_i7 ...
+--
+(actually, because cDNA not accepted, had to Use 'Transcribed RNA')
+--
+Done.
+Also created the Hw-assembly.cmt file using Jun-Jun's provided info and: 
+https://submit.ncbi.nlm.nih.gov/structcomment/nongenomes/
+--
+Hi Jun-Jun, I've added those extra 5 sequences to the end of the fasta file, and I've begun the TSA submission. When I uploaded the Hw-33,556nt.fsa file, it gave me this error for the moltype: 
+Invalid value 'cDNA' for modifier 'moltype'. Allowed values are ['Genomic DNA', 'Genomic RNA', 'Other-Genetic', 'Precursor RNA', 'Ribosomal RNA', 'Transcribed RNA', 'Transfer RNA', 'Transfer-messenger RNA', 'cRNA', 'mRNA', 'non-coding RNA']
+
+Which of these allowed moltypes should I use?
+--
+Use 'Transcribed RNA'
+--
+Hi Jun-Jun, I've updated the moltype to 'Transcribed RNA', then reuploaded the Hw-33,556nt.fsa file, and then got this error: 
+"Error:File: hw-33,556nt.fsa, Code(VECTOR_MATCH), Sequence-id: Hw_DN9775_c0_g1_i4, Interval: 607..631, This sequence has a Moderate match on the following UniVec vector: gnl|uv|NGB00727.1:1-51 Illumina Nextera PCR primer i5 index N501 (Oligonucleotide sequence copyright 2007-2012 Illumina, Inc. All rights reserved.)"
+
+Here is the sequence in our submission that it refers to:
+>Hw_DN9775_c0_g1_i4 [organism=Tsuga heterophylla] [moltype=Transcribed RNA]
+TATGCTTGTATAGGGTGAAGCCAGAGGAAACTCTGGTGGAGGCTCGCAGCGGTTCTGACGTGCAAATCGATCGTCAAATATGAGCATGGGGGCGAAAGACTAATCGAACCATTTAGTAGCTGGTTCCTGCCGAAGTTTCCCTCAGGATAGCAGTAACGTCTTCAGTTTTATGAGGTAAAGCGAACGATTAGGGAGCTAGGGGTTGAAACAACCTTTATCCATTCTCGAACTTTAAATATGTAAGAAGTCCTTGTTGCTTTGTTGAACGTGGACACTCGAATGCGGCGTTACTAGTGGGCCATTTTTGGTAAGCAGAACTGGCGATGCGGGATGAACCGAACGTGGGGTTAAGGTGCCGGAATGCACGCTCATCAGACACCACAAAAGGTGTTAGTTCATCTAGACAGCCCGACGGTGGCCATGGAAGTCGGAATCCGCTAAGGAGTGTGTAACAACTCACGGGCCGAATGAACTAGCCCTGAAAATGGATGGCGCTCAAGCGTGCTACCCATACCTCGCCGTCGGGGTAGAAACGATGCCCCGACGAGTAGGCAGGCGTGGGGGGCCGTGACGAAGCCTTGGGAGTGATCCCGGGTCGAACGGCCCCTAGTGCAGATCTCGGTGGTCGCCGCAAATATACAA
+
+Here is what the TSA submission guide says about the kinds errors it might give: 
+https://www.ncbi.nlm.nih.gov/genbank/tsaguide/
+"When the file is uploaded it will undergo a series of validation checks. The following will stop your submission in portal:
+Sequences less than 200 bp
+Sequences with univec hits that are for Next-Gen sequencing primers
+Sequences that are more than 10% n's or have more than 14n's in a row
+Files that are incorrectly formatted or have biologically invalid annotation"
+
+How would you like me to address this?
+--
+This type of errors is very common as their software is different from those we and NGS-service provider used.
+Just trim seqs to remove the contaminated part inside the seq as indicated by Genbank.
+For example:
+Hw_DN9775_c0_g1_i4, trim 607..631 ( it is consider as contamination from 1-51 Illumina Nextera PCR primer), and keep 1~606.
+
+As GenBank does not point out all errors in one time. After fixing this error, and resubmit again, it may point out additional errors as that. The contaminated seq are usually localize at end of the seq (either at beginning or ending site).  In rare case, the contaminated seq are localized in the middle of the submitted seqs, for this, the wrong seq need to split into two after removal of errors. If both longer than 201-bp, keep two with two unique IDs
+
+[see also example in email]
+--
+Hi Jun-Jun, I've now done that, and it has moved on to the next step of the submission process without any more errors. It looks like a Description of the Assembly method (Trinity 2.8.5) is required. Can you provide me with a description to paste into the field?Thanks,
+
+Ben
+--
+What you did:
+
+RNA-seq reads were first filtered by Trimmomatic with default setting. The clean PE reads were used for de-novo assembly using Trinity (version: v2.8.5, released on May 24, 2019). Trace transcripts were removed by filtering the preliminary assembly at TPM greater than or equal to 1 .
+
+More errors come back a while later after their detailed processing.
+--
+Ok, thanks. 
+
+It is now asking me who should be credited as the submitter of this data. I've put your name, Jun-Jun Liu. Am I supposed to add anyone else's?
+It's also asking for:
+Publication status: (unpublished)
+Reference title: ?
+Reference authors: (same as sequence authors, or: specify authors)
+
+Thanks,
+
+Ben
+--
+
+
+
+ATTN:
+to fix or update a recent submission whose status is Queued, Processed-error or Processing, please use
+the FIX button on the existing submission
+or email your request to have the FIX button enabled for that submission.
+Be sure to include the Submission ID and the reason that you need to send new files.
+Do not create a new submission to fix or update an existing submission whose status is Queued, Processed-error or Processing!
+
+
+To provide any necessary changes to submission at this stage, please email us with 'TSA Submission SUB10855493' in the subject line.
+
+View all your submissions in a separate window
+
+-
+
+https://submit.ncbi.nlm.nih.gov/subs/tsa/SUB10855493/general_info
+
+
+For the TSA submission: 
+
+BioProject: PRJNA791410
+
+BioSample accessions: 
+biosample_accession
+SAMN24289311
+SAMN24289312
+SAMN24289313
+SAMN24289314
+SAMN24289315
+SAMN24289316
+SAMN24289317
+SAMN24289318
+SAMN24289319
+SAMN24289320
+SAMN24289321
+SAMN24289322
+SAMN24289323
+SAMN24289324
+SAMN24289325
+SAMN24289326
+SAMN24289327
+SAMN24289328
+SAMN24289329
+SAMN24289330
+SAMN24289331
+SAMN24289332
+SAMN24289333
+SAMN24289334
+SAMN24289335
+SAMN24289336
+SAMN24289337
+SAMN24289338
+SAMN24289339
+SAMN24289340
+
+BioSample SRR accessions:
+Retrieved from the "Download metadata file with SRA accessions" link for PRJNA791410 at: 
+https://submit.ncbi.nlm.nih.gov/subs/sra/
+accession
+SRR17299277
+SRR17299276
+SRR17299265
+SRR17299254
+SRR17299253
+SRR17299252
+SRR17299251
+SRR17299250
+SRR17299249
+SRR17299248
+SRR17299275
+SRR17299274
+SRR17299273
+SRR17299272
+SRR17299271
+SRR17299270
+SRR17299269
+SRR17299268
+SRR17299267
+SRR17299266
+SRR17299264
+SRR17299263
+SRR17299262
+SRR17299261
+SRR17299260
+SRR17299259
+SRR17299258
+SRR17299257
+SRR17299256
+SRR17299255
+
+Assembly Data Structured Comment: in Hw-assembly.cmt:
+StructuredCommentPrefix	##Assembly-Data-START##
+Assembly Method	Trinity 2.8.5
+Assembly Name	Western hemlock transcriptome
+Sequencing Technology	Illumina HiSeq
+StructuredCommentSuffix	##Assembly-Data-END##
+
+Fasta .fsa submission file has been modified to include [organism=Tsuga heterophylla] [moltype=cDNA] in all the sequence definition lines.
+Hw-33,556nt.fsa 
+
+[
+How I did this:
+First, had to replace the Windows carriage returns (^M) in the fasta file Jun-Jun gave me: 
+cat -A file.txt > test.txt  # check to see if it has carriage returns)
+sed -i -e 's/\r$//' file.txt
+cat -A file.txt > test.txt  # check to see if it has carriage returns)
+Then, updated the sequence definition lines (the & means include the whole original match): 
+sed -i 's/^>.*/& \[organism=Tsuga heterophylla\] \[moltype=cDNA\]/g' file.fsa
+]
+
+
+
+-----------
+[centos@ben-vnc HemlockRaw]$ ls -1 Control/
+HI.4195.005.Index_10.16B_R1.fastq.gz
+HI.4195.005.Index_10.16B_R2.fastq.gz
+HI.4195.005.Index_11.16C_R1.fastq.gz
+HI.4195.005.Index_11.16C_R2.fastq.gz
+HI.4195.005.Index_20.17B_R1.fastq.gz
+HI.4195.005.Index_20.17B_R2.fastq.gz
+HI.4195.005.Index_22.17C_R1.fastq.gz
+HI.4195.005.Index_22.17C_R2.fastq.gz
+HI.4195.006.Index_1.29B_R1.fastq.gz
+HI.4195.006.Index_1.29B_R2.fastq.gz
+HI.4195.006.Index_23.21B_R1.fastq.gz
+HI.4195.006.Index_23.21B_R2.fastq.gz
+HI.4195.006.Index_27.21C_R1.fastq.gz
+HI.4195.006.Index_27.21C_R2.fastq.gz
+HI.4195.006.Index_3.29C_R1.fastq.gz
+HI.4195.006.Index_3.29C_R2.fastq.gz
+HI.4195.006.Index_4.22B_R1.fastq.gz
+HI.4195.006.Index_4.22B_R2.fastq.gz
+HI.4195.006.Index_5.22C_R1.fastq.gz
+HI.4195.006.Index_5.22C_R2.fastq.gz
+[centos@ben-vnc HemlockRaw]$ ls -1 Cured/
+HI.4195.004.Index_12.10B_R1.fastq.gz
+HI.4195.004.Index_12.10B_R2.fastq.gz
+HI.4195.004.Index_13.13C_R1.fastq.gz
+HI.4195.004.Index_13.13C_R2.fastq.gz
+HI.4195.004.Index_19.10C_R1.fastq.gz
+HI.4195.004.Index_19.10C_R2.fastq.gz
+HI.4195.004.Index_2.13B_R1.fastq.gz
+HI.4195.004.Index_2.13B_R2.fastq.gz
+HI.4195.004.Index_8.12C_R1.fastq.gz
+HI.4195.004.Index_8.12C_R2.fastq.gz
+HI.4195.004.Index_9.12B_R1.fastq.gz
+HI.4195.004.Index_9.12B_R2.fastq.gz
+HI.4195.005.Index_15.14C_R1.fastq.gz
+HI.4195.005.Index_15.14C_R2.fastq.gz
+HI.4195.005.Index_6.14B_R1.fastq.gz
+HI.4195.005.Index_6.14B_R2.fastq.gz
+[centos@ben-vnc HemlockRaw]$ ls -1 Pot-15/
+HI.4195.005.Index_14.15WB_R1.fastq.gz
+HI.4195.005.Index_14.15WB_R2.fastq.gz
+HI.4195.005.Index_16.15WC_R1.fastq.gz
+HI.4195.005.Index_16.15WC_R2.fastq.gz
+HI.4195.005.Index_18.15C_R1.fastq.gz
+HI.4195.005.Index_18.15C_R2.fastq.gz
+HI.4195.005.Index_7.15B_R1.fastq.gz
+HI.4195.005.Index_7.15B_R2.fastq.gz
+[centos@ben-vnc HemlockRaw]$ ls -1 Wild/
+HI.4195.004.Index_1.11B_R1.fastq.gz
+HI.4195.004.Index_1.11B_R2.fastq.gz
+HI.4195.004.Index_3.11C_R1.fastq.gz
+HI.4195.004.Index_3.11C_R2.fastq.gz
+HI.4195.004.Index_4.8B_R1.fastq.gz
+HI.4195.004.Index_4.8B_R2.fastq.gz
+HI.4195.004.Index_5.8C_R1.fastq.gz
+HI.4195.004.Index_5.8C_R2.fastq.gz
+HI.4195.006.Index_12.27B_R1.fastq.gz
+HI.4195.006.Index_12.27B_R2.fastq.gz
+HI.4195.006.Index_19.27C_R1.fastq.gz
+HI.4195.006.Index_19.27C_R2.fastq.gz
+HI.4195.006.Index_21.20C_R1.fastq.gz
+HI.4195.006.Index_21.20C_R2.fastq.gz
+HI.4195.006.Index_25.20B_R1.fastq.gz
+HI.4195.006.Index_25.20B_R2.fastq.gz
+[centos@ben-vnc HemlockRaw]$ 
+
+
+
+
+
+

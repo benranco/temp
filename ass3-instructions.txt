@@ -1,0 +1,17 @@
+Hello, Ben:
+
+Enclosed is data for  figure-1. In addition to presentation details of our published figure-1. This figure will have more details:
+The symbols to show marker positions (column C) along the thick lines of LGs (column E) are included in tab (column M). 
+(1) The square '□' will be shown in three colors,  red, green, and blue below the thick lines of LGs. 
+(2) The triangle '∆' will be shown in two colors (green and blue) below the thick lines of LGs. 
+(3) I like to show Cr4 position using a red '◊' with size over all other symbols, maybe put above the LG8 line.
+(4) as for positions of all other markers, it is the same as previously, shown by '│'  in black above LG lines.
+
+Thanks for your consideration and let us have discussion if you have questions or other ideas.
+
+Jun-Jun
+
+--
+As for fig-1, please change the symbol ‘square’ into ‘diamond’, but keep the color as filled. This will make individual symbol more distinguishable from each other. How about your idea?
+
+Jun-Jun

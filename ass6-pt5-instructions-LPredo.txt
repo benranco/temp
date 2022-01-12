@@ -1,0 +1,145 @@
+
+
+scp -J inf2 ./*.* brancourt@borealpfc.nfis.org:/public/genomics/Data-Dec2020/LP-NGS-RawData/LP-RNAseq-2015-raw/trimmomatic_scripts/
+
+--------------------------
+
+nohup ./trimmomatic_run_multiple.sh 2>&1 1>trim_master_log.txt &
+
+scp -J inf2 brancourt@borealpfc.nfis.org:/public/genomics/Data-Dec2020/LP-NGS-RawData/LP-RNAseq-2015-raw/trimmomatic_scripts/trim_master_log.txt .
+
+To create: trim_master_log-highlights.txt 
+grep -E "^==.*|--.*|running.*|r1.*|Input.*" trim_master_log.txt > trim_master_log-highlights.txt
+
+--------------------------
+
+Real Trinity command, but without filename lists yet: 
+nohup /home/centos/software/trinity/trinityrnaseq-Trinity-v2.8.5/Trinity --seqType fq --left ./all_1P.fq  --right ./all_2P.fq --max_memory 944G --CPU 64 --output trinityOut 2>&1 1>trinity_run.log &
+
+Real Trinity command, with filename lists: 
+nohup /home/centos/software/trinity/trinityrnaseq-Trinity-v2.8.5/Trinity --seqType fq --left Cankered/C10_filtered_R_1P.fq.gz,Cankered/C11_filtered_R_1P.fq.gz,Cankered/C12_filtered_R_1P.fq.gz,Cankered/C13_filtered_R_1P.fq.gz,Cankered/C1_filtered_R_1P.fq.gz,Cankered/C3_filtered_R_1P.fq.gz,Cankered/C4_filtered_R_1P.fq.gz,Cankered/C5_filtered_R_1P.fq.gz,Cankered/C6_filtered_R_1P.fq.gz,Cankered/C7_filtered_R_1P.fq.gz,Cankered/C8_filtered_R_1P.fq.gz,Cankered/C9_filtered_R_1P.fq.gz,Cankered/LP-C2_filtered_R_1P.fq.gz,Res/RS10_filtered_R_1P.fq.gz,Res/RS1_filtered_R_1P.fq.gz,Res/RS2_rep_filtered_R_1P.fq.gz,Res/RS3_filtered_R_1P.fq.gz,Res/RS4_filtered_R_1P.fq.gz,Res/RS5_filtered_R_1P.fq.gz,Res/RS6_filtered_R_1P.fq.gz,Res/RS7_filtered_R_1P.fq.gz,Res/RS8_filtered_R_1P.fq.gz,Res/RS9_filtered_R_1P.fq.gz,Sus/SS10_filtered_R_1P.fq.gz,Sus/SS1_filtered_R_1P.fq.gz,Sus/SS2_filtered_R_1P.fq.gz,Sus/SS3_filtered_R_1P.fq.gz,Sus/SS4_filtered_R_1P.fq.gz,Sus/SS5_filtered_R_1P.fq.gz,Sus/SS6_filtered_R_1P.fq.gz,Sus/SS7_filtered_R_1P.fq.gz,Sus/SS8_filtered_R_1P.fq.gz,Sus/SS9_filtered_R_1P.fq.gz,Needle/RN1_filtered_R_1P.fq.gz,Needle/SN1_filtered_R_1P.fq.gz,Needle/SN2_filtered_R_1P.fq.gz  --right Cankered/C10_filtered_R_2P.fq.gz,Cankered/C11_filtered_R_2P.fq.gz,Cankered/C12_filtered_R_2P.fq.gz,Cankered/C13_filtered_R_2P.fq.gz,Cankered/C1_filtered_R_2P.fq.gz,Cankered/C3_filtered_R_2P.fq.gz,Cankered/C4_filtered_R_2P.fq.gz,Cankered/C5_filtered_R_2P.fq.gz,Cankered/C6_filtered_R_2P.fq.gz,Cankered/C7_filtered_R_2P.fq.gz,Cankered/C8_filtered_R_2P.fq.gz,Cankered/C9_filtered_R_2P.fq.gz,Cankered/LP-C2_filtered_R_2P.fq.gz,Res/RS10_filtered_R_2P.fq.gz,Res/RS1_filtered_R_2P.fq.gz,Res/RS2_rep_filtered_R_2P.fq.gz,Res/RS3_filtered_R_2P.fq.gz,Res/RS4_filtered_R_2P.fq.gz,Res/RS5_filtered_R_2P.fq.gz,Res/RS6_filtered_R_2P.fq.gz,Res/RS7_filtered_R_2P.fq.gz,Res/RS8_filtered_R_2P.fq.gz,Res/RS9_filtered_R_2P.fq.gz,Sus/SS10_filtered_R_2P.fq.gz,Sus/SS1_filtered_R_2P.fq.gz,Sus/SS2_filtered_R_2P.fq.gz,Sus/SS3_filtered_R_2P.fq.gz,Sus/SS4_filtered_R_2P.fq.gz,Sus/SS5_filtered_R_2P.fq.gz,Sus/SS6_filtered_R_2P.fq.gz,Sus/SS7_filtered_R_2P.fq.gz,Sus/SS8_filtered_R_2P.fq.gz,Sus/SS9_filtered_R_2P.fq.gz,Needle/RN1_filtered_R_2P.fq.gz,Needle/SN1_filtered_R_2P.fq.gz,Needle/SN2_filtered_R_2P.fq.gz --max_memory 944G --CPU 64 --output trinityOut 2>&1 1>trinity_run.log &
+
+---
+Files in --left: 
+
+Cankered/C10_filtered_R_1P.fq.gz,Cankered/C11_filtered_R_1P.fq.gz,Cankered/C12_filtered_R_1P.fq.gz,Cankered/C13_filtered_R_1P.fq.gz,Cankered/C1_filtered_R_1P.fq.gz,Cankered/C3_filtered_R_1P.fq.gz,Cankered/C4_filtered_R_1P.fq.gz,Cankered/C5_filtered_R_1P.fq.gz,Cankered/C6_filtered_R_1P.fq.gz,Cankered/C7_filtered_R_1P.fq.gz,Cankered/C8_filtered_R_1P.fq.gz,Cankered/C9_filtered_R_1P.fq.gz,Cankered/LP-C2_filtered_R_1P.fq.gz,Res/RS10_filtered_R_1P.fq.gz,Res/RS1_filtered_R_1P.fq.gz,Res/RS2_rep_filtered_R_1P.fq.gz,Res/RS3_filtered_R_1P.fq.gz,Res/RS4_filtered_R_1P.fq.gz,Res/RS5_filtered_R_1P.fq.gz,Res/RS6_filtered_R_1P.fq.gz,Res/RS7_filtered_R_1P.fq.gz,Res/RS8_filtered_R_1P.fq.gz,Res/RS9_filtered_R_1P.fq.gz,Sus/SS10_filtered_R_1P.fq.gz,Sus/SS1_filtered_R_1P.fq.gz,Sus/SS2_filtered_R_1P.fq.gz,Sus/SS3_filtered_R_1P.fq.gz,Sus/SS4_filtered_R_1P.fq.gz,Sus/SS5_filtered_R_1P.fq.gz,Sus/SS6_filtered_R_1P.fq.gz,Sus/SS7_filtered_R_1P.fq.gz,Sus/SS8_filtered_R_1P.fq.gz,Sus/SS9_filtered_R_1P.fq.gz,Needle/RN1_filtered_R_1P.fq.gz,Needle/SN1_filtered_R_1P.fq.gz,Needle/SN2_filtered_R_1P.fq.gz
+
+---
+Files in --right: 
+
+Cankered/C10_filtered_R_2P.fq.gz,Cankered/C11_filtered_R_2P.fq.gz,Cankered/C12_filtered_R_2P.fq.gz,Cankered/C13_filtered_R_2P.fq.gz,Cankered/C1_filtered_R_2P.fq.gz,Cankered/C3_filtered_R_2P.fq.gz,Cankered/C4_filtered_R_2P.fq.gz,Cankered/C5_filtered_R_2P.fq.gz,Cankered/C6_filtered_R_2P.fq.gz,Cankered/C7_filtered_R_2P.fq.gz,Cankered/C8_filtered_R_2P.fq.gz,Cankered/C9_filtered_R_2P.fq.gz,Cankered/LP-C2_filtered_R_2P.fq.gz,Res/RS10_filtered_R_2P.fq.gz,Res/RS1_filtered_R_2P.fq.gz,Res/RS2_rep_filtered_R_2P.fq.gz,Res/RS3_filtered_R_2P.fq.gz,Res/RS4_filtered_R_2P.fq.gz,Res/RS5_filtered_R_2P.fq.gz,Res/RS6_filtered_R_2P.fq.gz,Res/RS7_filtered_R_2P.fq.gz,Res/RS8_filtered_R_2P.fq.gz,Res/RS9_filtered_R_2P.fq.gz,Sus/SS10_filtered_R_2P.fq.gz,Sus/SS1_filtered_R_2P.fq.gz,Sus/SS2_filtered_R_2P.fq.gz,Sus/SS3_filtered_R_2P.fq.gz,Sus/SS4_filtered_R_2P.fq.gz,Sus/SS5_filtered_R_2P.fq.gz,Sus/SS6_filtered_R_2P.fq.gz,Sus/SS7_filtered_R_2P.fq.gz,Sus/SS8_filtered_R_2P.fq.gz,Sus/SS9_filtered_R_2P.fq.gz,Needle/RN1_filtered_R_2P.fq.gz,Needle/SN1_filtered_R_2P.fq.gz,Needle/SN2_filtered_R_2P.fq.gz
+
+---
+Files in --left: 
+
+ls Cankered/*R_1P.* | cat
+Cankered/C10_filtered_R_1P.fq.gz
+Cankered/C11_filtered_R_1P.fq.gz
+Cankered/C12_filtered_R_1P.fq.gz
+Cankered/C13_filtered_R_1P.fq.gz
+Cankered/C1_filtered_R_1P.fq.gz
+Cankered/C3_filtered_R_1P.fq.gz
+Cankered/C4_filtered_R_1P.fq.gz
+Cankered/C5_filtered_R_1P.fq.gz
+Cankered/C6_filtered_R_1P.fq.gz
+Cankered/C7_filtered_R_1P.fq.gz
+Cankered/C8_filtered_R_1P.fq.gz
+Cankered/C9_filtered_R_1P.fq.gz
+Cankered/LP-C2_filtered_R_1P.fq.gz
+
+ls Res/*R_1P.* | cat
+Res/RS10_filtered_R_1P.fq.gz
+Res/RS1_filtered_R_1P.fq.gz
+Res/RS2_rep_filtered_R_1P.fq.gz
+Res/RS3_filtered_R_1P.fq.gz
+Res/RS4_filtered_R_1P.fq.gz
+Res/RS5_filtered_R_1P.fq.gz
+Res/RS6_filtered_R_1P.fq.gz
+Res/RS7_filtered_R_1P.fq.gz
+Res/RS8_filtered_R_1P.fq.gz
+Res/RS9_filtered_R_1P.fq.gz
+
+ls Sus/*R_1P.* | cat
+Sus/SS10_filtered_R_1P.fq.gz
+Sus/SS1_filtered_R_1P.fq.gz
+Sus/SS2_filtered_R_1P.fq.gz
+Sus/SS3_filtered_R_1P.fq.gz
+Sus/SS4_filtered_R_1P.fq.gz
+Sus/SS5_filtered_R_1P.fq.gz
+Sus/SS6_filtered_R_1P.fq.gz
+Sus/SS7_filtered_R_1P.fq.gz
+Sus/SS8_filtered_R_1P.fq.gz
+Sus/SS9_filtered_R_1P.fq.gz
+
+ls Needle/*R_1P.* | cat
+Needle/RN1_filtered_R_1P.fq.gz
+Needle/SN1_filtered_R_1P.fq.gz
+Needle/SN2_filtered_R_1P.fq.gz
+
+---
+Files in --right: 
+
+ls Cankered/*R_2P.* | cat
+Cankered/C10_filtered_R_2P.fq.gz
+Cankered/C11_filtered_R_2P.fq.gz
+Cankered/C12_filtered_R_2P.fq.gz
+Cankered/C13_filtered_R_2P.fq.gz
+Cankered/C1_filtered_R_2P.fq.gz
+Cankered/C3_filtered_R_2P.fq.gz
+Cankered/C4_filtered_R_2P.fq.gz
+Cankered/C5_filtered_R_2P.fq.gz
+Cankered/C6_filtered_R_2P.fq.gz
+Cankered/C7_filtered_R_2P.fq.gz
+Cankered/C8_filtered_R_2P.fq.gz
+Cankered/C9_filtered_R_2P.fq.gz
+Cankered/LP-C2_filtered_R_2P.fq.gz
+
+ls Res/*R_2P.* | cat
+Res/RS10_filtered_R_2P.fq.gz
+Res/RS1_filtered_R_2P.fq.gz
+Res/RS2_rep_filtered_R_2P.fq.gz
+Res/RS3_filtered_R_2P.fq.gz
+Res/RS4_filtered_R_2P.fq.gz
+Res/RS5_filtered_R_2P.fq.gz
+Res/RS6_filtered_R_2P.fq.gz
+Res/RS7_filtered_R_2P.fq.gz
+Res/RS8_filtered_R_2P.fq.gz
+Res/RS9_filtered_R_2P.fq.gz
+
+ls Sus/*R_2P.* | cat
+Sus/SS10_filtered_R_2P.fq.gz
+Sus/SS1_filtered_R_2P.fq.gz
+Sus/SS2_filtered_R_2P.fq.gz
+Sus/SS3_filtered_R_2P.fq.gz
+Sus/SS4_filtered_R_2P.fq.gz
+Sus/SS5_filtered_R_2P.fq.gz
+Sus/SS6_filtered_R_2P.fq.gz
+Sus/SS7_filtered_R_2P.fq.gz
+Sus/SS8_filtered_R_2P.fq.gz
+Sus/SS9_filtered_R_2P.fq.gz
+
+ls Needle/*R_2P.* | cat
+Needle/RN1_filtered_R_2P.fq.gz
+Needle/SN1_filtered_R_2P.fq.gz
+Needle/SN2_filtered_R_2P.fq.gz
+
+
+======================================
+Trinity finished: 
+
+scp -J inf2 brancourt@borealpfc.nfis.org:/public/genomics/Data-Dec2020/LP-NGS-RawData/LP-RNAseq-2015-trimmomatic/LP-RNAseq-2015-Trim-Trinity.zip .
+
+
+115633240 / 1170630935 = 9.88% reads selected during normalization.
+0 / 1170630935 = 0.00% reads discarded as likely aberrant based on coverage profiles.
+0 / 1170630935 = 0.00% reads discarded as below minimum coverage threshold=1
+
+Paired mode
+ Input data
+  Left.fasta    15939 MByte
+  Right.fasta   15862 MByte
+  Number of unique KMERs: 1301256358
+  Number of reads:        231266480 Output data
+  Trinity.fasta 722 MByte
+
+

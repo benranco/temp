@@ -1,0 +1,408 @@
+----------------------
+If Trinity run is so smooth, let us complete Trinity runs for other species  first. we still have data from western white pine and hemlock.
+----------------------
+Great!. We have downloaded the data. I’ll let know you once I have a brief looking
+
+For Trinity run of WWP RNA-seq reads, there are three subfolders (WWP_HC-HF-raw-data-2012, WWP_SB-HP-raw-data-2012, and WWP-PN6-raw data-2011), each has six samples, in a total of 18 samples, but their read different either 50-bp (PN6) or 100-bp (other two folders).
+
+Please have at look.
+----------------------
+
+Hi Jun-Jun, would you like me to run Trimmomatic on the WWP data first?
+
+I found the subfolders you named in the WWP-NGS-rawData folder, along with these two other subfolders:
+WWP-exome-data  
+WWP-gDNA-NGS-2013
+
+Below are lists of the contents of each of the subfolders you've asked me to work with. 
+
+The WWP_PN6-Raw-data-2011 folder has more files than I was expecting, and its files are in a tab-delimited table format that I'm not familiar with. I've attached a sample of the first few rows of one of these files. These files are all around 10 GB or more in size. Do I need to convert this data to fastq format to use it?
+
+WWP_HC-HF-Raw-data-2012: 
+H-Canker:
+S0008EF_GCCAAT_L003_R1.fq
+S0008EF_GCCAAT_L003_R2.fq
+S0008F2_CAGATC_L003_R1.fq
+S0008F2_CAGATC_L003_R2.fq
+S0008F6_CTTGTA_L003_R1.fq
+S0008F6_CTTGTA_L003_R2.fq
+H-SSfree:
+S0008F1_ACTTGA_L003_R1.fq
+S0008F1_ACTTGA_L003_R2.fq
+S0008F7_TTAGGC_L003_R1.fq
+S0008F7_TTAGGC_L003_R2.fq
+S0008F9_ATCACG_L003_R1.fq
+S0008F9_ATCACG_L003_R2.fq
+
+
+WWP_SB-HB-Raw-data-2012:
+HB:
+S0008F0_ACAGTG_L002_R1.fq
+S0008F0_ACAGTG_L002_R2.fq
+S0008F4_CGATGT_L002_R1.fq
+S0008F4_CGATGT_L002_R2.fq
+S0008FA_TGACCA_L002_R1.fq
+S0008FA_TGACCA_L002_R2.fq
+SB:
+S0008F3_GGCTAC_L002_R1.fq
+S0008F3_GGCTAC_L002_R2.fq
+S0008F5_GATCAG_L002_R1.fq
+S0008F5_GATCAG_L002_R2.fq
+S0008F8_TAGCTT_L002_R1.fq
+S0008F8_TAGCTT_L002_R2.fq
+
+
+WWP_PN6-Raw-data-2011:
+A03_N6ABXX_4_1_concat_qseq.txt
+A03_N6ABXX_4_3_concat_qseq.txt
+A04_N6ABXX_4_1_concat_qseq.txt
+A04_N6ABXX_4_3_concat_qseq.txt
+A05_N6ABXX_5_1_concat_qseq.txt
+A05_N6ABXX_5_3_concat_qseq.txt
+A06_N6ABXX_6_1_concat_qseq.txt
+A06_N6ABXX_6_3_concat_qseq.txt
+A07_U8ABXX_2_1_concat_qseq.txt
+A07_U8ABXX_2_3_concat_qseq.txt
+A08_GTABXX_2_1_concat_qseq.txt
+A08_GTABXX_2_2_concat_qseq.txt
+
+----------------------
+I began running trimmomatic on the files that were already in .fq format: 
+
+nohup ./trimmomatic_run_multiple.sh 2>&1 1>trim_master_log.txt &
+
+...finished trimmomatic.
+To create: trim_master_log-highlights.txt 
+grep -E "^==.*|--.*|running.*|r1.*|Input.*" trim_master_log.txt > trim_master_log-highlights.txt 
+
+
+----------------------
+Jun-Jun gave these two websites for info on converting qseq.txt to fastq: 
+https://sites.google.com/a/brown.edu/bioinformatics-in-biomed/qseq-to-fastq-without-filter
+http://qiime.org/1.4.0/tutorials/processing_illumina_data.html
+
+My own research on converting qseq to fastq: 
+
+Good description of the qseq and fastq formats here (pasted below):
+https://toolshed.g2.bx.psu.edu/repository/display_tool?repository_id=c6dafba9ea5df1a8&tool_config=database%2Fcommunity_files%2F000%2Frepo_39%2Fqseq2fastq%2Fqseq2fastq.xml&changeset_revision=6682236a1432
+---
+Examples
+
+The following data in QSEQ file format:
+HWI-EAS431      1       3       100     1792    1317    0       1       ................................A...G..............A..GG....G...............    BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB    0
+
+Will be converted to FASTQ file format:
+@3:100:1792:1317:N
+NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNANNNGNNNNNNNNNNNNNNANNGGNNNNGNNNNNNNNNNNNNNN
++
+BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB 
+
+About formats:
+
+QSEQ format: 
+QSEQ files are the output of the Illumina pipeline. These files contain the sequence, corresponding qualities, as well as lane, tile and X/Y position of clusters.
+
+According to Illumina manual qseq files have the following format:
+
+1. Machine name: (hopefully) unique identifier of the sequencer.
+2. Run number: (hopefully) unique number to identify the run on the sequencer.
+3. Lane number: positive integer (currently 1-8).
+4. Tile number: positive integer.
+5. X: x coordinate of the spot. Integer (can be negative).
+6. Y: y coordinate of the spot. Integer (can be negative).
+7. Index: positive integer. No indexing should have a value of 1.
+8. Read Number: 1 for single reads; 1 or 2 for paired ends.
+9. Sequence
+10. Quality: the calibrated quality string.
+11. Filter: Did the read pass filtering? 0 - No, 1 - Yes.
+
+FASTQ format: 
+A FASTQ file normally uses four lines per sequence. 
+Line 1 begins with a '@' character and is followed by a sequence identifier and an optional description (like a FASTA title line). 
+Line 2 is the raw sequence letters. 
+Line 3 begins with a '+' character and is optionally followed by the same sequence identifier (and any description) again. 
+Line 4 encodes the quality values for the sequence in Line 2, and must contain the same number of symbols as letters in the sequence.
+---
+
+---
+from: http://seqanswers.com/forums/showthread.php?t=6419
+
+You can try the following one liner in Bash: go to where those _qseq.txt files locate, and if those qseq.txt [file names] are in form of s_N_1_M_qseq.txt where N is lane number (1-8), M is tile number (1-120), then 
+The resulting s_N_sequence.fastq (N is 1->8) are the 8 fastq files you will need.
+One-liner bash code:
+
+for ((x=1;x<=8;x+=1)); do cat s_"$x"_1_*_qseq.txt | awk -F '\t' '{gsub(/\./,"N", $9); if ($11 > 0) printf("@%s_%04d:%s:%s:%s:%s#%s/%s\n%s\n+%s_%04d:%s:%s:%s:%s#%s/%s\n%s\n",$1,$2,$3,$4,$5,$6,$7,$8,$9,$1,$2,$3,$4,$5,$6,$7,$8,$10)}' > s_"$x"_sequence.fastq; done
+
+Same command made more readable (but not executable due to line breaks):
+for ((x=1;x<=8;x+=1)); 
+do 
+cat s_"$x"_1_*_qseq.txt | awk -F '\t' 
+'{
+gsub(/\./,"N", $9); 
+if ($11 > 0) 
+printf("@%s_%04d:%s:%s:%s:%s#%s/%s\n%s\n+%s_%04d:%s:%s:%s:%s#%s/%s\n%s\n",$1,$2,$3,$4,$5,$6,$7,$8,$9,$1,$2,$3,$4,$5,$6,$7,$8,$10)
+}' 
+> s_"$x"_sequence.fastq; 
+done
+
+---
+Hi Jun-Jun, I've written a short script to convert the qseq.txt files to fastq format. Before I begin running it, I have a question. The last value of each line in the qseq file indicates whether the read passed filtering or not (1 = pass, 0 = fail). I'm not sure what kind of filtering it was, but something to do with the Illumina pipeline. Would you like me to keep only those reads that passed filtering, or keep all of them when converting the files to fastq?
+After I have them in fastq format, I'll run Trimmomatic on them before running Trinity.
+Thanks,
+Ben
+---
+Hi Jun-Jun, 
+Yes, I'm definitely keeping the Quality score for each read (which is a string that always matches the same length as the sequence). But in the qseq file there is one additional value which is not part of the Quality score, it's either a 0 or 1, indicating whether the read passed filtering. One example of converting from qseq to fastq format that I looked at removed all the reads that didn't pass filtering. So I'm wondering, would you like me to keep all reads, or just keep the reads that passed filtering? There doesn't seem to be a way to preserve the Illumina pass/fail information in a way that would be used in fastq format.
+Here is some documentation on the two file types that I found. The pass/fail filter that I'm wondering about is number 11 in the qseq format, this is the only value that isn't encoded into the fastq format in the examples I found.
+According to Illumina manual each line in a qseq file has the following data:
+
+1. Machine name: (hopefully) unique identifier of the sequencer.
+2. Run number: (hopefully) unique number to identify the run on the sequencer.
+3. Lane number: positive integer (currently 1-8).
+4. Tile number: positive integer.
+5. X: x coordinate of the spot. Integer (can be negative).
+6. Y: y coordinate of the spot. Integer (can be negative).
+7. Index: positive integer. No indexing should have a value of 1.
+8. Read Number: 1 for single reads; 1 or 2 for paired ends.
+9. Sequence
+10. Quality: the calibrated quality string.
+11. Filter: Did the read pass filtering? 0 - No, 1 - Yes.
+
+FASTQ format: 
+A FASTQ file normally uses four lines per sequence. 
+Line 1 begins with a '@' character and is followed by a sequence identifier and an optional description (like a FASTA title line). 
+Line 2 is the raw sequence letters. 
+Line 3 begins with a '+' character and is optionally followed by the same sequence identifier (and any description) again. 
+Line 4 encodes the quality values for the sequence in Line 2, and must contain the same number of symbols as letters in the sequence.
+
+
+Here is an example read converted from QSEQ to Fastq: 
+A single line in QSEQ format:
+HS6     104     2       1101    1206    1887    0       2       ACCAGTAACATAAGCTTGAAGGAAGAAACCGAGCATTGAGTACATGGCCAACCTTCCATTTTTAATCTCCTTT.TT    caefeffdffeaadW``Nb]\cbcacecdd_feLfa_]]_BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB    1
+
+The same data in fastq format:
+@HS6_0104:2:1101:1206:1887:N 2
+ACCAGTAACATAAGCTTGAAGGAAGAAACCGAGCATTGAGTACATGGCCAACCTTCCATTTTTAATCTCCTTTNTT
++
+caefeffdffeaadW``Nb]\cbcacecdd_feLfa_]]_BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB
+
+---
+YES. Remove all the reads that didn't pass filtering. After this filtering, the number 11 in the qseq format (11. Filter: Did the read pass filtering? 0 - No, 1 – Yes) will not show in fq files.
+---
+Hi Jun-Jun, 
+
+All the qseq.txt files have been converted to fastq, and I might as well get Trimmomatic running on them too so as to not waste time. Are these files meant to be paired reads, or single-ended?:
+
+A03_N6ABXX_4_1_concat.fastq
+A03_N6ABXX_4_3_concat.fastq
+A04_N6ABXX_4_1_concat.fastq
+A04_N6ABXX_4_3_concat.fastq
+A05_N6ABXX_5_1_concat.fastq
+A05_N6ABXX_5_3_concat.fastq
+A06_N6ABXX_6_1_concat.fastq
+A06_N6ABXX_6_3_concat.fastq
+A07_U8ABXX_2_1_concat.fastq
+A07_U8ABXX_2_3_concat.fastq
+A08_GTABXX_2_1_concat.fastq
+A08_GTABXX_2_2_concat.fastq
+
+Also, the file size of all the them except one of them is what I'd expected if most of their reads passed the Illumina filtering step. But one of them, A03_N6ABXX_4_1_concat.fastq, has lost almost all of its data because the 11th value in the qseq line was 0 for most of them. It's file size is only 34MB, and it only has 187064 reads. In comparison, A03_N6ABXX_4_3_concat.fastq has a file size of 14GB and 74491502 reads.
+
+What would you like me to do about this? Should I just keep the lines that didn't pass the Illumina filtering after all? 
+
+Thanks,
+
+Ben
+---
+
+After running trimmomatic, to create the highlighst csv: 
+grep -E "^==.*|--.*|running.*|r1.*|Input.*" trim_PN6_log.txt > trim_PN6_log_highlights.csv 
+
+---
+Hi Jun-Jun, I've run Trimmomatic on the PN6 data, and I've added the summary data to the bottom of the attached csv file. Notice the A03 sample has significantly fewer paired reads than the others, as we previously discussed.
+
+Shall I begin Trinity on all the WWP data next?
+---
+Great Progress. Please go ahead to run Trinity using all PE reads of all 18 samples.
+---
+
+Real Trinity command, but without filename lists yet: 
+nohup /home/centos/software/trinity/trinityrnaseq-Trinity-v2.8.5/Trinity --seqType fq --left ./all_1P.fq  --right ./all_2P.fq --max_memory 944G --CPU 64 --output trinityOut 2>&1 1>trinity_run.log &
+
+Real Trinity command, with filename lists: 
+nohup /home/centos/software/trinity/trinityrnaseq-Trinity-v2.8.5/Trinity --seqType fq --left H-Canker/S0008EF_GCCAAT_L003_filtered_R_1P.fq,H-Canker/S0008F2_CAGATC_L003_filtered_R_1P.fq,H-Canker/S0008F6_CTTGTA_L003_filtered_R_1P.fq,H-SSfree/S0008F1_ACTTGA_L003_filtered_R_1P.fq,H-SSfree/S0008F7_TTAGGC_L003_filtered_R_1P.fq,H-SSfree/S0008F9_ATCACG_L003_filtered_R_1P.fq,SB/S0008F3_GGCTAC_L002_filtered_R_1P.fq,SB/S0008F5_GATCAG_L002_filtered_R_1P.fq,SB/S0008F8_TAGCTT_L002_filtered_R_1P.fq,HB/S0008F0_ACAGTG_L002_filtered_R_1P.fq,HB/S0008F4_CGATGT_L002_filtered_R_1P.fq,HB/S0008FA_TGACCA_L002_filtered_R_1P.fq,PN6/A03_N6ABXX_4_filtered_1P.fastq,PN6/A04_N6ABXX_4_filtered_1P.fastq,PN6/A05_N6ABXX_5_filtered_1P.fastq,PN6/A06_N6ABXX_6_filtered_1P.fastq,PN6/A07_U8ABXX_2_filtered_1P.fastq,PN6/A08_GTABXX_2_filtered_1P.fastq  --right H-Canker/S0008EF_GCCAAT_L003_filtered_R_2P.fq,H-Canker/S0008F2_CAGATC_L003_filtered_R_2P.fq,H-Canker/S0008F6_CTTGTA_L003_filtered_R_2P.fq,H-SSfree/S0008F1_ACTTGA_L003_filtered_R_2P.fq,H-SSfree/S0008F7_TTAGGC_L003_filtered_R_2P.fq,H-SSfree/S0008F9_ATCACG_L003_filtered_R_2P.fq,SB/S0008F3_GGCTAC_L002_filtered_R_2P.fq,SB/S0008F5_GATCAG_L002_filtered_R_2P.fq,SB/S0008F8_TAGCTT_L002_filtered_R_2P.fq,HB/S0008F0_ACAGTG_L002_filtered_R_2P.fq,HB/S0008F4_CGATGT_L002_filtered_R_2P.fq,HB/S0008FA_TGACCA_L002_filtered_R_2P.fq,PN6/A03_N6ABXX_4_filtered_2P.fastq,PN6/A04_N6ABXX_4_filtered_2P.fastq,PN6/A05_N6ABXX_5_filtered_2P.fastq,PN6/A06_N6ABXX_6_filtered_2P.fastq,PN6/A07_U8ABXX_2_filtered_2P.fastq,PN6/A08_GTABXX_2_filtered_2P.fastq --max_memory 944G --CPU 64 --output trinityOut 2>&1 1>trinity_run.log &
+
+
+--left parameter content: 
+
+H-Canker/S0008EF_GCCAAT_L003_filtered_R_1P.fq,H-Canker/S0008F2_CAGATC_L003_filtered_R_1P.fq,H-Canker/S0008F6_CTTGTA_L003_filtered_R_1P.fq,H-SSfree/S0008F1_ACTTGA_L003_filtered_R_1P.fq,H-SSfree/S0008F7_TTAGGC_L003_filtered_R_1P.fq,H-SSfree/S0008F9_ATCACG_L003_filtered_R_1P.fq,SB/S0008F3_GGCTAC_L002_filtered_R_1P.fq,SB/S0008F5_GATCAG_L002_filtered_R_1P.fq,SB/S0008F8_TAGCTT_L002_filtered_R_1P.fq,HB/S0008F0_ACAGTG_L002_filtered_R_1P.fq,HB/S0008F4_CGATGT_L002_filtered_R_1P.fq,HB/S0008FA_TGACCA_L002_filtered_R_1P.fq,PN6/A03_N6ABXX_4_filtered_1P.fastq,PN6/A04_N6ABXX_4_filtered_1P.fastq,PN6/A05_N6ABXX_5_filtered_1P.fastq,PN6/A06_N6ABXX_6_filtered_1P.fastq,PN6/A07_U8ABXX_2_filtered_1P.fastq,PN6/A08_GTABXX_2_filtered_1P.fastq
+
+--right parameter content: 
+
+H-Canker/S0008EF_GCCAAT_L003_filtered_R_2P.fq,H-Canker/S0008F2_CAGATC_L003_filtered_R_2P.fq,H-Canker/S0008F6_CTTGTA_L003_filtered_R_2P.fq,H-SSfree/S0008F1_ACTTGA_L003_filtered_R_2P.fq,H-SSfree/S0008F7_TTAGGC_L003_filtered_R_2P.fq,H-SSfree/S0008F9_ATCACG_L003_filtered_R_2P.fq,SB/S0008F3_GGCTAC_L002_filtered_R_2P.fq,SB/S0008F5_GATCAG_L002_filtered_R_2P.fq,SB/S0008F8_TAGCTT_L002_filtered_R_2P.fq,HB/S0008F0_ACAGTG_L002_filtered_R_2P.fq,HB/S0008F4_CGATGT_L002_filtered_R_2P.fq,HB/S0008FA_TGACCA_L002_filtered_R_2P.fq,PN6/A03_N6ABXX_4_filtered_2P.fastq,PN6/A04_N6ABXX_4_filtered_2P.fastq,PN6/A05_N6ABXX_5_filtered_2P.fastq,PN6/A06_N6ABXX_6_filtered_2P.fastq,PN6/A07_U8ABXX_2_filtered_2P.fastq,PN6/A08_GTABXX_2_filtered_2P.fastq
+
+-----
+Files used in the --left parameter:
+
+ls H-Canker/*1P.fq | cat
+H-Canker/S0008EF_GCCAAT_L003_filtered_R_1P.fq
+H-Canker/S0008F2_CAGATC_L003_filtered_R_1P.fq
+H-Canker/S0008F6_CTTGTA_L003_filtered_R_1P.fq
+
+ls H-SSfree/*1P.fq | cat
+H-SSfree/S0008F1_ACTTGA_L003_filtered_R_1P.fq
+H-SSfree/S0008F7_TTAGGC_L003_filtered_R_1P.fq
+H-SSfree/S0008F9_ATCACG_L003_filtered_R_1P.fq
+
+ls SB/*1P.fq | cat
+SB/S0008F3_GGCTAC_L002_filtered_R_1P.fq
+SB/S0008F5_GATCAG_L002_filtered_R_1P.fq
+SB/S0008F8_TAGCTT_L002_filtered_R_1P.fq
+
+ls HB/*1P.fq | cat
+HB/S0008F0_ACAGTG_L002_filtered_R_1P.fq
+HB/S0008F4_CGATGT_L002_filtered_R_1P.fq
+HB/S0008FA_TGACCA_L002_filtered_R_1P.fq
+
+ls PN6/*1P.fastq | cat
+PN6/A03_N6ABXX_4_filtered_1P.fastq
+PN6/A04_N6ABXX_4_filtered_1P.fastq
+PN6/A05_N6ABXX_5_filtered_1P.fastq
+PN6/A06_N6ABXX_6_filtered_1P.fastq
+PN6/A07_U8ABXX_2_filtered_1P.fastq
+PN6/A08_GTABXX_2_filtered_1P.fastq
+
+
+-----
+Files used in the --right parameter: 
+
+ls H-Canker/*2P.fq | cat
+H-Canker/S0008EF_GCCAAT_L003_filtered_R_2P.fq
+H-Canker/S0008F2_CAGATC_L003_filtered_R_2P.fq
+H-Canker/S0008F6_CTTGTA_L003_filtered_R_2P.fq
+
+ls H-SSfree/*2P.fq | cat
+H-SSfree/S0008F1_ACTTGA_L003_filtered_R_2P.fq
+H-SSfree/S0008F7_TTAGGC_L003_filtered_R_2P.fq
+H-SSfree/S0008F9_ATCACG_L003_filtered_R_2P.fq
+
+ls SB/*2P.fq | cat
+SB/S0008F3_GGCTAC_L002_filtered_R_2P.fq
+SB/S0008F5_GATCAG_L002_filtered_R_2P.fq
+SB/S0008F8_TAGCTT_L002_filtered_R_2P.fq
+
+ls HB/*2P.fq | cat
+HB/S0008F0_ACAGTG_L002_filtered_R_2P.fq
+HB/S0008F4_CGATGT_L002_filtered_R_2P.fq
+HB/S0008FA_TGACCA_L002_filtered_R_2P.fq
+
+ls PN6/*2P.fastq | cat
+PN6/A03_N6ABXX_4_filtered_2P.fastq
+PN6/A04_N6ABXX_4_filtered_2P.fastq
+PN6/A05_N6ABXX_5_filtered_2P.fastq
+PN6/A06_N6ABXX_6_filtered_2P.fastq
+PN6/A07_U8ABXX_2_filtered_2P.fastq
+PN6/A08_GTABXX_2_filtered_2P.fastq
+
+----------------------
+Hi Jun-Jun, 
+
+There was an error in the Trinity run which I should have caught sooner. It is because Trinity doesn't recognize the format of line-one of the PN6 fastq data (which I converted from qseq).
+
+I'm going to have to re-convert the qseq data to fastq, then run trimmomatic again on it. Thankfully neither of those processes will take too long. 
+
+I've been researching more on the fastq format. 
+Here is a successful example of a line-one from fastq data from one of the HB samples:
+@HWI-ST822:152:C0HVPACXX:2:1101:1173:2126 2:N:0:ACAGTG
+
+Here is an example unrecognized line-one from one of my PN6 fastq files (A05_N6ABXX_5_filtered_2P.fastq):
+@HS6_0103:5:1101:1441:1822:N:3
+
+I'll be basing my fastq format on this format obtained from: 
+https://help.basespace.illumina.com/articles/descriptive/fastq-files/  
+
+@Instrument:RunID:FlowCellID:Lane:Tile:X:Y Read:Filter(Y/N):0:(SampleNumber or IndexSequence)
+
+So, lining my new fastq format up with one of the successful ones, it will look like this (extra spaces not included):
+@HS6     :0103:N6ABXX   :5:1101:1441:1822 2:N:0:05
+@HWI-ST822:152:C0HVPACXX:2:1101:1197:2177 1:N:0:ACAGTG
+
+Of special note (highlighted in bold above), let me know if you think these will cause a problem: 
+- The second read in a pair in most of the qseq data is identified by a 3 instead of a 2, but I will be changing it to a 2 because that is required by the fasta specification.
+- I copied the N6ABXX from the file name, I assume it is the "flowcell id".
+- I copied the sample number 05 from the file name.
+
+I also noticed something which might affect how we deal with the reads which did not pass the Illumina filtering (most of the reads in A03_N6ABXX_4_1_concat):
+- The "Filter" parameter of the fastq specification species "Y" if the read did not pass filtering, or "N" if it passed.
+Do you still want me to just exclude all reads that didn't pass Illumina filtering, or should I include them but give them a "Y"? 
+
+Sorry about the error! I will test my solution with Trinity first on a small sample before committing to the whole process.
+Ben
+
+---
+Yes. Change ‘3’ into ‘2’. For paired reads, forward is p[resumed as ‘1’, and reverse as ‘2’.
+- I copied the N6ABXX from the file name, I assume it is the "flowcell id".
+It looks like true. In ‘A05_N6ABXX_5_filtered_2P.fastq’, sample ID is ‘A05’
+
+Exclude all reads that does not pass Illumina filtering. I suspect Illumina just know ‘N’, not ‘Y’. Here ‘Y means ‘C’ or ‘T’ .
+
+Please try data of ‘PN6 fastq’ first to see if they can be assembled alone by Trinity.
+
+---
+- I reran my conversion of qseq to fastq then trimmomatic on PN6.
+
+This is the test Trinity command I ran on the smallest PN6 trimmomtic output: 
+nohup /home/centos/software/trinity/trinityrnaseq-Trinity-v2.8.5/Trinity --seqType fq --left PN6/A03_N6ABXX_4_filtered_1P.fastq  --right PN6/A03_N6ABXX_4_filtered_2P.fastq --max_memory 944G --CPU 64 --output trinityOut 2>&1 1>trinity_run.log &
+
+- this worked, so I then reran the above original Trinity command.
+---
+Hi Jun-Jun,
+
+I've re-converted the PN6 data from qseq to fastq and rerun Trimmomatic on it. I've also tested Trinity with the smallest of the PN6 files, and it completed successfully, so I am now running Trinity again on the whole WWP dataset of 18 samples. 
+
+Ben
+---
+
+The final part of the Trinity log file: 
+
+...
+-reached max skip warning, turning off warnings for this.
+Number of Commands: 8807
+succeeded(8807)   100% completed.        
+
+All commands completed successfully. :-)
+
+
+
+** Harvesting all assembled transcripts into a single multi-fasta file...
+
+Friday, April 30, 2021: 18:31:20	CMD: find /work/trinityOut/read_partitions/ -name '*inity.fasta'  | /home/centos/software/trinity/trinityrnaseq-Trinity-v2.8.5/util/support_scripts/partitioned_trinity_aggregator.pl --token_prefix TRINITY_DN --output_prefix /work/trinityOut/Trinity.tmp
+-relocating Trinity.tmp.fasta to /work/trinityOut/Trinity.fasta
+Friday, April 30, 2021: 19:05:34	CMD: mv Trinity.tmp.fasta /work/trinityOut/Trinity.fasta
+Friday, April 30, 2021: 19:05:34	CMD: /home/centos/software/trinity/trinityrnaseq-Trinity-v2.8.5/util/support_scripts/get_Trinity_gene_to_trans_map.pl /work/trinityOut/Trinity.fasta > /work/trinityOut/Trinity.fasta.gene_trans_map
+
+
+###################################################################
+Trinity assemblies are written to /work/trinityOut/Trinity.fasta
+###################################################################
+
+
+---
+Hi Jun-Jun,
+
+Trinity has finished running, without any errors. Here's a link to the output Trinity.fasta file:
+https://www.dropbox.com/s/p8l2ngu2hnxkv8h/WWP-NGS-Trinity.zip?dl=1
+
+Here's some information I extracted from the log file about the percentage of reads selected during normalization:
+89008371 / 590726158 = 15.07% reads selected during normalization.
+0 / 590726158 = 0.00% reads discarded as likely aberrant based on coverage profiles.
+0 / 590726158 = 0.00% reads discarded as below minimum coverage threshold=1
+
+I counted 675367 transcripts in the final Trinity.fasta output file, based on how many times ">" occurred.
+---
+Hello, Ben:
+
+Great progress! Please go ahead to assembly RNA-sea data in the folder ‘Hemlock_Heterobasidion-2017’, where there are 30 samples.
+---
+
+

@@ -1,0 +1,840 @@
+===================================
+
+The next process will analyze the assemblies of you have generated using Trinity:
+
+Step 1: run Transdecoder to nucleotide and amino acid sequences for each assembly
+
+Step 2: extract the longest sequence for each gene based on outcomes of Transdecoder, if several  transcripts of the same gene have the same length of coding sequence, pick up the longest transcript to represent the gene. Get the longest transcript to present each gene in each assembly.
+
+Step 3: Sort out those  transcripts with obvious origins of  the trees and fungus by Blast search. (I can do this step in CLC genomics workbench using our own databases)
+
+Step 4: run MEGAN6 to sign each gene in each assembly to unique taxon.
+
+Objectives of step 1-3 help to decrease the sizes of input files for step 4.
+Thanks for your consideration.
+Jun-Jun
+
+---
+Can you put all of your Trinity assemblies in fasta file by adding species-ID and Sample no in the file name (Such as 'LP36-nt884,751,  WBP47-nt813,669, Hemlock30-ntxxxx,  WWP18-ntxxx, xxx means total number of the sequences) in a folder named "Ben's-Trinity-assembly" under "genomics\Data-Dec-2020"?
+
+LP36-nt884,751,  
+WBP47-nt813,669, 
+Hemlock30-nt1,193,147,  
+WWP18-nt675,367, 
+
+---
+I found you already have a fold as 'ben2021':
+
+Can you put all of your Trinity assemblies in fasta file by adding species-ID and Sample no in the file name (Such as 'LP36-nt884,751,  WBP47-nt813,669, Hemlock30-ntxxxx,  WWP18-ntxxx, xxx means total number of the sequences) in a folder named "Trinity-assembly" under "genomics\Data-Dec-2020\ben2021\Trinity-assembly"?
+
+===================================
+Step 1: TransDecoder: 
+
+TransDecoder commands (in two steps): 
+
+---
+nohup TransDecoder.LongOrfs -m 50 -t ../trin-assemblies/WWP18-nt675,367-Trinity.fasta 2>&1 1> WWP18-TransDecoder.LongOrfs.log &
+nohup TransDecoder.Predict --single_best_only -t ../trin-assemblies/WWP18-nt675,367-Trinity.fasta 2>&1 1> WWP18-TransDecoder.Predict.log &
+---
+TransDecoder.LongOrfs -m 50 -t ../trin-assemblies/Hemlock30-nt1,193,147-Trinity.fasta 2>&1 1> Hemlock30-TransDecoder.LongOrfs.log 
+TransDecoder.Predict --single_best_only -t ../trin-assemblies/Hemlock30-nt1,193,147-Trinity.fasta 2>&1 1> Hemlock30-TransDecoder.Predict.log 
+---
+TransDecoder.LongOrfs -m 50 -t ../trin-assemblies/LP36-nt884,751-Trinity.fasta 2>&1 1> LP36-TransDecoder.LongOrfs.log 
+echo "======================================"
+echo "done LongOrgs"
+echo "======================================"
+TransDecoder.Predict --single_best_only -t ../trin-assemblies/LP36-nt884,751-Trinity.fasta 2>&1 1> LP36-TransDecoder.Predict.log 
+---
+TransDecoder.LongOrfs -m 50 -t ../trin-assemblies/WBP47-nt813,669-Trinity.fasta 2>&1 1> WBP47-TransDecoder.LongOrfs.log 
+echo "======================================"
+echo "done LongOrfs"
+echo "======================================"
+TransDecoder.Predict --single_best_only -t ../trin-assemblies/WBP47-nt813,669-Trinity.fasta 2>&1 1> WBP47-TransDecoder.Predict.log 
+---
+
+Hi Jun-Jun,
+
+I've finished running TransDecoder on each Trinity assembly. Here are the sorts of output files it produces, using the WWP18 assembly as an example:
+
+WWP18-nt675,367-Trinity.fasta.transdecoder.bed
+WWP18-nt675,367-Trinity.fasta.transdecoder.cds
+WWP18-nt675,367-Trinity.fasta.transdecoder_dir
+WWP18-nt675,367-Trinity.fasta.transdecoder_dir.__checkpoints
+WWP18-nt675,367-Trinity.fasta.transdecoder_dir.__checkpoints_longorfs
+WWP18-nt675,367-Trinity.fasta.transdecoder.gff3
+WWP18-nt675,367-Trinity.fasta.transdecoder.pep
+
+I'm not sure how to do the next step:
+
+"Step 2: extract the longest sequence for each gene based on outcomes of Transdecoder, if several  transcripts of the same gene have the same length of coding sequence, pick up the longest transcript to represent the gene. Get the longest transcript to present each gene in each assembly."
+
+Can you explain how you'd like me to do this? Thanks.
+
+Also, for step 3, will you need to run CLC on the boreal cloud, or on your local computer? If you need to use it on the cloud I have figured out how to use graphical user interfaces on the cloud, but I haven't yet tested installing CLC and using the CLC License server that was set up for us, so it might take me some time to figure out how to do that.
+
+Thanks,
+
+Ben
+---
+Hello, Ben:
+
+For next step to pick the longest ORF or the longest transcripts to represent each gene, we know check gene ID and transcript IDs for each gene. The Trinity assembly you have got listed all transcript IDs. For example from WWP18-nt675,367: ‘TRINITY_DN0_c0_g1’ is the gene ID, under which 7 transcripts are listed from ‘TRINITY_DN0_c0_g1_i1’ to  ‘TRINITY_DN0_c0_g1_i7’. Similarly, gene ID ‘TRINITY_DN10_c0_g1’ has 8 transcripts with transcript IDs from xxx_i1 to xxx-i8.
+
+For transcripts of the same gene have the same length of the longest ORF, pick up that one having the longest transcript DNA sequence. If on [no?] good ORF is generated from Transdecoder, pick up the that one having the longest transcript DNA sequence.
+
+After this processing, the total sequence number of 675,367 will decrease to 449,052 transcripts to represent 449,052 genes in WWP18 assembly.
+I’ll give you the lists for transcripts presumed from tree and fungus, for further removal of some seqs before running MEGAN6. I’ll use my local standalone CLC to do it.
+
+BTW, 
+(1) to avoid confusion of seq ID among different assemblies, you may change IDs, such as ‘TRINITY_DN’ into ‘WWP18’ in the WWP18 assembly.
+2) to send the longest ORF nucleotide and amino acid sequences from the Transcdecorder run for each assembly  (I cannot download them from Boreal Cloudy)
+
+Let us keep the discussion if we have any more question.
+Thanks.
+Jun-Jun
+
+---
+My interpretation of Step 2:
+- for each gene, check which transcript has the longest ORF (in .pep file)
+- if there is a tie for longest ORF, pick the transcript that has the longest DNA sequence (in .fasta file)
+- if no good ORF is generated from TransDecoder, pick the transcript that has the longest DNA sequence
+- After this processing, the total sequence number of 675,367 will decrease to 449,052 transcripts to represent 449,052 genes in WWP18 assembly.
+- I’ll give you the lists for transcripts presumed from tree and fungus, for further removal of some seqs before running MEGAN6. I’ll use my local standalone CLC to do it.
+BTW, 
+- (1) to avoid confusion of seq ID among different assemblies, you may change IDs, such as ‘TRINITY_DN’ into ‘WWP18’ in the WWP18 assembly.
+- (2) to send the longest ORF nucleotide and amino acid sequences from the Transcdecorder run for each assembly  (I cannot download them from Boreal Cloudy)
+
+---
+Hi Jun-Jun, 
+
+I just want to make sure I understand correctly with this example: 
+
+Occurences of "TRINITY_DN0_c0_g1" in WWP18-nt675,367-Trinity.fasta:
+>TRINITY_DN0_c0_g1_i4 len=2951 path=...
+>TRINITY_DN0_c0_g1_i5 len=2866 path=...
+>TRINITY_DN0_c0_g1_i6 len=2786 path=...
+>TRINITY_DN0_c0_g1_i7 len=2871 path=...
+>TRINITY_DN0_c0_g1_i1 len=1726 path=...
+>TRINITY_DN0_c0_g1_i2 len=2949 path=...
+>TRINITY_DN0_c0_g1_i3 len=1320 path=...
+
+
+Occurences of "TRINITY_DN0_c0_g1" in WWP18-nt675,367-Trinity.fasta.transdecoder.pep 
+>TRINITY_DN0_c0_g1_i1.p1 TRINITY_DN0_c0_g1~~TRINITY_DN0_c0_g1_i1.p1  ORF type:3prime_partial len:512 (-),score=103.36 TRINITY_DN0_c0_g1_i1:2-1534(-)
+>TRINITY_DN0_c0_g1_i2.p1 TRINITY_DN0_c0_g1~~TRINITY_DN0_c0_g1_i2.p1  ORF type:complete len:379 (-),score=59.26 TRINITY_DN0_c0_g1_i2:1374-2510(-)
+>TRINITY_DN0_c0_g1_i3.p1 TRINITY_DN0_c0_g1~~TRINITY_DN0_c0_g1_i3.p1  ORF type:complete len:281 (-),score=44.12 TRINITY_DN0_c0_g1_i3:286-1128(-)
+>TRINITY_DN0_c0_g1_i4.p1 TRINITY_DN0_c0_g1~~TRINITY_DN0_c0_g1_i4.p1  ORF type:complete len:689 (-),score=131.43 TRINITY_DN0_c0_g1_i4:446-2512(-)
+>TRINITY_DN0_c0_g1_i5.p1 TRINITY_DN0_c0_g1~~TRINITY_DN0_c0_g1_i5.p1  ORF type:complete len:722 (-),score=138.21 TRINITY_DN0_c0_g1_i5:262-2427(-)
+>TRINITY_DN0_c0_g1_i6.p1 TRINITY_DN0_c0_g1~~TRINITY_DN0_c0_g1_i6.p1  ORF type:complete len:722 (-),score=138.21 TRINITY_DN0_c0_g1_i6:262-2427(-)
+>TRINITY_DN0_c0_g1_i7.p1 TRINITY_DN0_c0_g1~~TRINITY_DN0_c0_g1_i7.p1  ORF type:complete len:689 (-),score=131.43 TRINITY_DN0_c0_g1_i7:446-2512(-)
+
+In this example, there are two transcripts with the same longest ORF (len:722), i5 and i6. I would then look at the length of their DNA sequences in the Trinity fasta file and choose i5 because it has the longest len=2866. I will write a script to do this.
+
+I can also rename the TRINITY portion of the sequence ids in my output to WWP18. Would you like me to also do this for the existing Trinity assemblies and TransDecoder output files?
+
+Also, which output files from TransDecoder would you like me to send you? Here is a description of the final output files:
+
+transcripts.fasta.transdecoder.pep : peptide sequences for the final candidate ORFs; all shorter candidates within longer ORFs were removed.
+transcripts.fasta.transdecoder.cds  : nucleotide sequences for coding regions of the final candidate ORFs
+transcripts.fasta.transdecoder.gff3 : positions within the target transcripts of the final selected ORFs
+transcripts.fasta.transdecoder.bed  : bed-formatted file describing ORF positions, best for viewing using GenomeView or IGV.
+
+Thanks,
+
+Ben
+
+
+===================================
+
+scp -J inf2 ./choose_longest_orf_fasta-FAST-* brancourt@borealpfc.nfis.org:/public/genomics/Data-Dec2020/Bens-Trinity-assembly/trin-assemblies-renamedSeqIds-longest/
+
+scp -J inf2 ./chooseLongestOrfs_fasta.R  brancourt@borealpfc.nfis.org:/public/genomics/Data-Dec2020/Bens-Trinity-assembly/trin-assemblies-renamedSeqIds-longest/
+
+nohup ./choose_longest_orf_fasta-FAST-Hemlock30.sh 2>&1 1> Hemlock30.log &
+nohup ./choose_longest_orf_fasta-FAST-LP36.sh 2>&1 1> LP36.log &
+nohup ./choose_longest_orf_fasta-FAST-WBP47.sh 2>&1 1> WBP47.log &
+nohup ./choose_longest_orf_fasta-FAST-WWP18.sh 2>&1 1> WWP18.log &
+
+---
+
+scp -J inf2 brancourt@borealpfc.nfis.org:/public/genomics/Data-Dec2020/Bens-Trinity-assembly/trin-assemblies-renamedSeqIds-longest/longestOrf.zip .
+
+---
+Hi Jun-Jun,
+The Longest ORF stage is completed on all four datasets. It took a little longer than I thought it would because I had to rewrite some of my script to make it more efficient. Here is a zip file containing the output from all four datasets. 
+https://www.dropbox.com/s/3jvivzfx1o9ecxy/longestOrf.zip?dl=1
+
+The final output of each dataset is the "-longest.fasta" file. Each selected sequence is in two lines, the header + the actual sequence in one long line like the Trinity output was, but I can very easily format the sequence to 60 characters per line if you prefer that.
+
+Each folder contains some other files that I generated along the way too. Here is some information about the files in each folder:
+
+-longest.fasta  : final output
+-allGeneIds.txt  : all unique gene ids.
+-fastaData.csv  : some data extracted from the sequence headers in the Trinity fasta file.
+-pepData.csv  : some data extracted from the sequence headers in the TransDecoder .pep file.
+-longestDNASeqs-fromFasta.txt  : all sequence ids whose gene id didn't have a match in the .pep file, so the longest sequence for that gene was selected from the Trinity .fasta file.
+-longestOrfSeqs-all.txt  : all sequence ids that were selected either from the .pep file or (if not found in the .pep file) the .fasta file.
+-longestOrfSeqs-fromPep.txt  : all sequence ids that were selected from the .pep file.
+
+---
+Hello, Ben:
+Thanks for progress. Your output does make sense to me. I’m checking them in details.
+Also I’ll let you which IDs are for the assembly transcripts  proposed from tree or the rust fungus, these transcripts need to be removed before MEGAN6 run. I’ll get back to you asap.
+
+BTY, when you did Trinity assembly, do you save the output files for the outputs of reads normalization (with removals of those repeated reads, which accounting 80~90% of total input reads).
+Jun-Jun
+
+---
+Hello, Ben:
+I have had a look at the output data. They are great for the next step to run MEGAN6 using files “ -longest.fasta” (deceasing data size by 30%~40%). Because tree and rust fungus originated seqs only accounted <3% of the total seqs as revealed by BLASTn alone, it looks not necessary to remove. It also cost additional work for removal first before MEGAN run and adding them back after MEGAN run.
+
+Please start with WWP18 files “ -longest.fasta” as the first run of MEGAN, other species at next.
+Let us have a zoom meeting if you need additional discussion. Thanks!
+Jun-Jun
+
+---
+Hi Jun-Jun, 
+
+I haven't deleted any of the output files that Trinity created, however, I think Trinity might create and delete temporary files during its pipeline, and I don't know if those read normalization files would have been saved or deleted. I'm unable to login to the boreal cloud today for some reason, but I will see if I can find these files once access is restored. 
+
+I will also begin work with MEGAN6, starting with the WWP18 data.
+
+Ben
+---
+
+Hi Jun-Jun,
+
+Access to the boreal cloud is back up. I took a look at the Trinity output files for WWP18 to see if I can find the read normalization files. 
+
+Here are some output files from the WWP18 Trinity run:
+
+both.fa  - 23GB,  178,016,742 seqs  (this is the initial input combined into one fasta file)
+jellyfish.kmers.fa  - 34GB,  1,235,183,538 seqs
+inchworm.K25.L25.DS.fa  - 1.3GB,  10,008,914 seqs
+Trinity.fasta  - 522MB,  675,367 seqs
+
+Inside folder insilico_read_normalization/: 
+S0008EF_GCCAAT_L003_filtered_R_1P.fq_ext_all_reads.normalized_K25_maxC200_minC1_maxCV10000.fq  - 21GB (left.norm.fq)  
+S0008EF_GCCAAT_L003_filtered_R_2P.fq_ext_all_reads.normalized_K25_maxC200_minC1_maxCV10000.fq  - 20GB (right.norm.fq)
+This .fq files have 89,008,371 reads (number of lines divided by four).
+
+Are any of these files what you were looking for?
+
+
+I will begin on MEGAN6 next.
+
+Ben
+
+
+wc -l S0008EF_GCCAAT_L003_filtered_R_1P.fq_ext_all_reads.normalized_K25_maxC200_minC1_maxCV10000.fq
+356033484 
+wc -l S0008EF_GCCAAT_L003_filtered_R_2P.fq_ext_all_reads.normalized_K25_maxC200_minC1_maxCV10000.fq
+356033484 
+356033484/4 = 89,008,371
+
+===================================
+MEGAN6:
+
+IF CONNECTING FROM HOME: 
+In this case we need to set up an ssh tunnel through inf2 to borealpfc, then in a new terminal session set up a second tunnel through the first tunnel to connect to your virtual machine on the boreal cloud:
+ssh -v -L 2223:borealpfc.nfis.org:22 -N -l brancour inf2.pfc.forestry.ca
+Then, in a new terminal:
+ssh -v -C -L 5901:10.20.0.201:5901 -N -p 2223 -l brancourt localhost
+
+-------------
+Hi Jun-Jun,
+
+I've been reading through my notes on what we did last time to run MEGAN6. 
+
+Last time we took the .pep file of the TransDecoder output, split it into ten parts, then ran BLASTp on each part in paralell. Then we combined the BLASTp output into one file and used that as input for MEGAN6.
+
+I remember it took quite a long time for the BLASTp runs to complete, and that was with only 399,753 sequences split up into ten files of around 40,000 sequences each. 
+
+This time you would like me to use the "-longest.fasta" files as input. The smallest dataset (WWP18) has 449,052 sequences and the largest dataset (Hemlock30) has 904628 sequences, so if the BLAST process for these is similar they will also take a long time and require lots of computing power. 
+
+I will start with the WWP18-longest.fasta data. I have a couple questions:
+
+Do you want me to run BLASTp on the WWP18-longest.fasta data, or should I use a different BLAST tool? Just checking because we are using the .fasta file as input instead of the .pep file this time.
+
+Also, do you want me to use the NCBI NR database which I downloaded last time for the BLAST runs?
+
+Thanks,
+
+Ben
+-----
+Just ‘then ran BLASTx on each part in parallel’.
+-----
+If run BLASTn, we change the protein database into a NCBI DNA database
+-----
+Hi Jun-Jun, sorry, I'm not sure from your past two emails whether you'd like me to run BLASTx or BLASTn? If I should run BLASTn I would also need to download a DNA database from NCBI - do you mean the NT database?
+-----
+Please run  BLASTx using DNA seq as input to blast against the protein database (NCBI-nr)
+-----
+Hello, Ben:
+BLASTx is much slower than BLASTp/BLASTn. Let us run BLASTp using longest pep seqs (260,305).
+Thanks for your reminder!
+Jun-Jun
+-----
+
+
+===================================
+250 598 5867
+===================
+ 
+===================================
+WE HEARD FROM BRIAN THAT THE BOREAL CLOUD HAS BEEN RESERVED FOR FOREST FIRE MODELLING, SO WE CAN'T DO THE BLAST RUNS YET. 
+BELOW IS ANOTHER STEP TO FILTER THE DATA MORE BEFORE GETTING TO THE BLAST STEP.
+
+
+ALSO, IMMEDIATELY BELOW IS A PROBLEM WITH THE OUTPUT OF MY LONGEST ORF SCRIPT, THE -longestOrfSeqs-fromPep.txt DOES NOT INCLUDE THE pep id, SO I NEED TO REGENERATE THAT FILE WITH pep ids INCLUDED.
+--
+Hello, Ben:
+
+I’m checking the files of the longest IDs you extracted from Trinity assemblies. I found that in the files “xxx-longestOrfSeqs-fromPep”, you just listed their isoform IDs, such as ‘WBP47_DN9996_c0_g2_i1’,  can you add their corresponding pep IDs, such as “WBP47_DN9996_c0_g2_i1.p1’? This will allow us to extract pep seqs when necessary.
+Thanks,
+Jun-Jun
+----------------------
+
+===================================
+
+---
+Hello, Ben:
+
+I like to filter the Trinity assembly further to decrease the total seq number of the assembly before running Megan6 based on the reads mapped back to assembly using CLC or Botwie. For examples, those seq with mapped reads less than one reads per one or 10 million of total mapped reads can be filtered out due to their low abundance inside the total sets, or using RPKM/FPKM at one.
+
+For, using RPKM=1 as filter, we can cut WWP18 assembly from 675K sequence into 90K.
+
+Thanks for your consideration.
+
+---
+Hello, Ben:
+
+Please the process as below. I’m not sure if your original Trinity assembly process include this step or not. To ‘quantify read counts for each gene/isoform’ will allow us to filter out those genes/isoforms (the assembled sequences in output fasta file) with low numbers of reads in a samples. For example, we just keep those genes/isoforms with at least 10 mapped reads in at least one of total samples for MEGAN6 run.
+
+Thanks.
+Jun-Jun
+
+https://southgreenplatform.github.io/trainings/trinityTrinotate/TP-trinity/
+
+3.2 Reads mapping back rate and abundance estimation using the trinity script align_and_estimate_abundance.pl
+Read congruency is an important measure in determining assembly accuracy. Clusters of read pairs that align incorrectly are strong indicators of mis-assembly. A typical “good” assembly has ~80% reads mapping to the assembly and ~80% are properly paired.
+
+Several tools can be used to calculate reads mapping back rate over Trinity.fasta assembly : bwa, bowtie2 (mapping), kallisto, salmon (pseudo mapping). Quantify read counts for each gene/isoform can be calculate. Mapping and quantification can be obtained by using the –est_method argument into the align_and_estimate_abundance.pl script.
+
+We will performing this analyses step successively with the align_and_estimate_abundance.pl script :
+
+Pseudomapping methods (kallisto or salmon) are faster than mapping based. So firstly we will use salmon to pseudoalign reads from sample to the reference and quantify abondance.
+Then, we will use bowtie2 and RSEM to align and quantify read counts for each gene/isoform.
+
+---
+Hi Jun-Jun,
+
+I've read through the instructions in that link you sent me, and I think I understand what I need to do. It will require the read files (Trimmomatic output) for each dataset and the align_and_estimate_abundance.pl utility script that comes packaged with Trinity, along with the software it depends on. For me to run it on your Z800 in room 349 I would need to copy the Trimmomatic output data from the Boreal Cloud to your computer and install the Trinity package on your computer. It is quite complicated to install the Trinity package and its dependencies. I would prefer to use the Boreal Cloud where I have it already installed if possible, but I can install it on your computer if necessary. 
+
+In the example on the website, they used Salmon first, which is much faster than Bowtie + RSEM. Is there a possibility Salmon would be good enough, or do we need to run bowtie2? 
+
+Shall we have a chat about how to proceed? Feel free to call me when convenient.
+---
+
+Hi Jun-Jun,
+
+Which fasta file would you like me to use for the Read Mapping? Should I use the -longest.fasta file after already having filtered it by longest ORF/sequence, or the original output of Trinity before filtering by longest ORF/sequence?
+---
+Please use “the original output of Trinity before filtering by longest ORF/sequence’
+The longest ones may not have the highest numbers of mapped reads.
+---
+Also please check the parameters and setting for the read mapping, what are the default settings in bowtie2
+---
+See the link for settings
+http://bowtie-bio.sourceforge.net/bowtie2/manual.shtml#setting-function-options
+
+The bowtie2 aligner
+End-to-end alignment versus local alignment
+
+I prefer to use ‘local alignment’ with the default minimum score threshold is 20 + 8.0 * ln(L),
+Preset options in --local mode
+--very-fast-local       Same as: -D 5 -R 1 -N 0 -L 25 -i S,1,2.00
+--fast-local            Same as: -D 10 -R 2 -N 0 -L 22 -i S,1,1.75
+--sensitive-local       Same as: -D 15 -R 2 -N 0 -L 20 -i S,1,0.75 (default in --local mode)
+--very-sensitive-local  Same as: -D 20 -R 3 -N 0 -L 20 -i S,1,0.50
+
+I prefer to use ‘--very-fast-local’ and ‘--very-sensitive-local’
+Any others?
+
+---
+Thanks Jun-Jun, 
+
+I am about to start an initial test run of the align_and_estimate_abundance.pl script using Salmon because it is much faster. After that, if I don't run into problems I'll try with RSEM + bowtie2. 
+
+I think I might need to install RSEM first. I'll look at the RSEM parameters and bowtie2 parameters while I'm figuring this out (while the test with Salmon is running), and I'll let you know if I have questions.
+---
+
+
+------------
+
+Trimmomatic data folders: 
+
+/work/LP-NGS-RawData/LP-RNAseq-2015-trimmomatic
+Cankered
+Needle
+Res
+Sus
+
+/work/Hemlock-Heterobasidion-2017-trimmomatic
+Control
+Cured
+Pot-15
+Wild
+
+/work/WBP-NGS-trimmomatic
+MJ9
+Organ9
+rust
+SA9
+
+/work/WWP-NGS-trimmomatic
+HB
+SB
+H-Canker
+H-SSfree
+PN6
+
+------------
+
+First test with WWP18: 
+
+
+Usage for salmon (with samples file):
+nohup perl $TRINITY_HOME/util/align_and_estimate_abundance.pl --transcripts trin-assemblies-renamedSeqIds/WWP18-nt675367-Trinity.fasta --seqType fq --samples_file wwp18-samples.tab   --est_method salmon --trinity_mode --prep_reference --thread_count 62 --output_dir outSalmonWWP18 2>&1 1> salmon_align_and_estimate_abundance-WWP18.log &
+
+
+Usage for salmon:
+nohup perl $TRINITY_HOME/util/align_and_estimate_abundance.pl --transcripts trin-assemblies-renamedSeqIds/WWP18-nt675367-Trinity.fasta --seqType fq --left <string>   --right <string>   --est_method salmon --trinity_mode --prep_reference --thread_count 62 --output_dir outSalmonWWP18 2>&1 1> salmon_align_and_estimate_abundance-WWP18.log &
+
+
+Usage for salmon:
+nohup perl $TRINITY_HOME/util/align_and_estimate_abundance.pl --transcripts trin-assemblies-renamedSeqIds/WWP18-10000.fasta --seqType fq --left WWP18/H-Canker/S0008EF_GCCAAT_L003_filtered_R_1P.fq,WWP18/H-Canker/S0008F2_CAGATC_L003_filtered_R_1P.fq,WWP18/H-Canker/S0008F6_CTTGTA_L003_filtered_R_1P.fq,WWP18/H-SSfree/S0008F1_ACTTGA_L003_filtered_R_1P.fq,WWP18/H-SSfree/S0008F7_TTAGGC_L003_filtered_R_1P.fq,WWP18/H-SSfree/S0008F9_ATCACG_L003_filtered_R_1P.fq,WWP18/SB/S0008F3_GGCTAC_L002_filtered_R_1P.fq,WWP18/SB/S0008F5_GATCAG_L002_filtered_R_1P.fq,WWP18/SB/S0008F8_TAGCTT_L002_filtered_R_1P.fq,WWP18/HB/S0008F0_ACAGTG_L002_filtered_R_1P.fq,WWP18/HB/S0008F4_CGATGT_L002_filtered_R_1P.fq,WWP18/HB/S0008FA_TGACCA_L002_filtered_R_1P.fq,WWP18/PN6/A03_N6ABXX_4_filtered_1P.fastq,WWP18/PN6/A04_N6ABXX_4_filtered_1P.fastq,WWP18/PN6/A05_N6ABXX_5_filtered_1P.fastq,WWP18/PN6/A06_N6ABXX_6_filtered_1P.fastq,WWP18/PN6/A07_U8ABXX_2_filtered_1P.fastq,WWP18/PN6/A08_GTABXX_2_filtered_1P.fastq   --right WWP18/H-Canker/S0008EF_GCCAAT_L003_filtered_R_2P.fq,WWP18/H-Canker/S0008F2_CAGATC_L003_filtered_R_2P.fq,WWP18/H-Canker/S0008F6_CTTGTA_L003_filtered_R_2P.fq,WWP18/H-SSfree/S0008F1_ACTTGA_L003_filtered_R_2P.fq,WWP18/H-SSfree/S0008F7_TTAGGC_L003_filtered_R_2P.fq,WWP18/H-SSfree/S0008F9_ATCACG_L003_filtered_R_2P.fq,WWP18/SB/S0008F3_GGCTAC_L002_filtered_R_2P.fq,WWP18/SB/S0008F5_GATCAG_L002_filtered_R_2P.fq,WWP18/SB/S0008F8_TAGCTT_L002_filtered_R_2P.fq,WWP18/HB/S0008F0_ACAGTG_L002_filtered_R_2P.fq,WWP18/HB/S0008F4_CGATGT_L002_filtered_R_2P.fq,WWP18/HB/S0008FA_TGACCA_L002_filtered_R_2P.fq,WWP18/PN6/A03_N6ABXX_4_filtered_2P.fastq,WWP18/PN6/A04_N6ABXX_4_filtered_2P.fastq,WWP18/PN6/A05_N6ABXX_5_filtered_2P.fastq,WWP18/PN6/A06_N6ABXX_6_filtered_2P.fastq,WWP18/PN6/A07_U8ABXX_2_filtered_2P.fastq,WWP18/PN6/A08_GTABXX_2_filtered_2P.fastq   --est_method salmon --trinity_mode --prep_reference --thread_count 62 --output_dir outSalmonWWP18 2>&1 1> salmon_align_and_estimate_abundance-WWP18.log &
+
+
+
+--left parameter content WWP18: 
+
+WWP18/H-Canker/S0008EF_GCCAAT_L003_filtered_R_1P.fq,WWP18/H-Canker/S0008F2_CAGATC_L003_filtered_R_1P.fq,WWP18/H-Canker/S0008F6_CTTGTA_L003_filtered_R_1P.fq,WWP18/H-SSfree/S0008F1_ACTTGA_L003_filtered_R_1P.fq,WWP18/H-SSfree/S0008F7_TTAGGC_L003_filtered_R_1P.fq,WWP18/H-SSfree/S0008F9_ATCACG_L003_filtered_R_1P.fq,WWP18/SB/S0008F3_GGCTAC_L002_filtered_R_1P.fq,WWP18/SB/S0008F5_GATCAG_L002_filtered_R_1P.fq,WWP18/SB/S0008F8_TAGCTT_L002_filtered_R_1P.fq,WWP18/HB/S0008F0_ACAGTG_L002_filtered_R_1P.fq,WWP18/HB/S0008F4_CGATGT_L002_filtered_R_1P.fq,WWP18/HB/S0008FA_TGACCA_L002_filtered_R_1P.fq,WWP18/PN6/A03_N6ABXX_4_filtered_1P.fastq,WWP18/PN6/A04_N6ABXX_4_filtered_1P.fastq,WWP18/PN6/A05_N6ABXX_5_filtered_1P.fastq,WWP18/PN6/A06_N6ABXX_6_filtered_1P.fastq,WWP18/PN6/A07_U8ABXX_2_filtered_1P.fastq,WWP18/PN6/A08_GTABXX_2_filtered_1P.fastq
+
+--right parameter content WWP18: 
+
+WWP18/H-Canker/S0008EF_GCCAAT_L003_filtered_R_2P.fq,WWP18/H-Canker/S0008F2_CAGATC_L003_filtered_R_2P.fq,WWP18/H-Canker/S0008F6_CTTGTA_L003_filtered_R_2P.fq,WWP18/H-SSfree/S0008F1_ACTTGA_L003_filtered_R_2P.fq,WWP18/H-SSfree/S0008F7_TTAGGC_L003_filtered_R_2P.fq,WWP18/H-SSfree/S0008F9_ATCACG_L003_filtered_R_2P.fq,WWP18/SB/S0008F3_GGCTAC_L002_filtered_R_2P.fq,WWP18/SB/S0008F5_GATCAG_L002_filtered_R_2P.fq,WWP18/SB/S0008F8_TAGCTT_L002_filtered_R_2P.fq,WWP18/HB/S0008F0_ACAGTG_L002_filtered_R_2P.fq,WWP18/HB/S0008F4_CGATGT_L002_filtered_R_2P.fq,WWP18/HB/S0008FA_TGACCA_L002_filtered_R_2P.fq,WWP18/PN6/A03_N6ABXX_4_filtered_2P.fastq,WWP18/PN6/A04_N6ABXX_4_filtered_2P.fastq,WWP18/PN6/A05_N6ABXX_5_filtered_2P.fastq,WWP18/PN6/A06_N6ABXX_6_filtered_2P.fastq,WWP18/PN6/A07_U8ABXX_2_filtered_2P.fastq,WWP18/PN6/A08_GTABXX_2_filtered_2P.fastq
+
+
+------------
+Installing RSEM: 
+
+https://github.com/bli25broad/RSEM_tutorial
+https://github.com/deweylab/RSEM
+
+wget https://github.com/deweylab/RSEM/archive/refs/tags/v1.3.3.tar.gz
+mv v1.3.3.tar.gz RSEM-v1.3.3.tar.gz
+tar xvzf RSEM-v1.3.3.tar.gz 
+cd RSEM-1.3.3/
+make
+make ebseq
+pwd
+nano ~/.bash_profile   ## edit the PATH environment variable to include RSEM directory, then log out & log back in
+
+When I first tested RSEM with the align_and_estimate_abundance.pl script, I got this error:
+Can't locate Env.pm in @INC (@INC contains: /home/centos/software/RSEM-1.3.3 /usr/local/lib64/perl5 /usr/local/share/perl5 /usr/lib64/perl5/vendor_perl /usr/share/perl5/vendor_perl /usr/lib64/perl5 /usr/share/perl5 .) at /home/centos/software/RSEM-1.3.3/rsem-prepare-reference line 10.
+
+I found this solution: 
+https://superuser.com/questions/1181310/perl-script-cant-locate-env-pm-in-inc
+sudo yum install 'perl(Env)'
+
+------------
+Tests of RSEM/bowtie2 (actual runs in the next ==== section below: 
+
+First test of bowtie2/RSEM with WWP18: 
+
+ACTUAL RUN: Usage for bowtie2/RSEM (with samples file, default params):
+nohup perl $TRINITY_HOME/util/align_and_estimate_abundance.pl --transcripts trin-assemblies-renamedSeqIds/WWP18-nt675367-Trinity.fasta --seqType fq --samples_file wwp18-samples.txt   --est_method RSEM --aln_method bowtie2 --bowtie2_RSEM "--no-mixed --no-discordant --gbar 1000 --end-to-end -k 200 " --trinity_mode --prep_reference --thread_count 62 --output_dir outRSEM 2>&1 1> align_and_estimate_abundance-rsem_bowtie2_end-to-end.log &
+
+
+Usage for bowtie2/RSEM (with samples file, default params):
+nohup perl $TRINITY_HOME/util/align_and_estimate_abundance.pl --transcripts trin-assemblies-renamedSeqIds/WWP18-1000.fasta --seqType fq --samples_file wwp18-samples.txt   --est_method RSEM --aln_method bowtie2 --bowtie2_RSEM "--no-mixed --no-discordant --gbar 1000 --end-to-end -k 200 " --trinity_mode --prep_reference --thread_count 62 --output_dir outRSEM 2>&1 1> bowtie-end-to-end-1000-rsem_align_and_estimate_abundance.log &
+
+
+Usage for bowtie2/RSEM (with new samples file, custom params very-fast-local):
+nohup perl $TRINITY_HOME/util/align_and_estimate_abundance.pl --transcripts trin-assemblies-renamedSeqIds/WWP18-10000.fasta --seqType fq --samples_file wwp18-samples.txt   --est_method RSEM --aln_method bowtie2 --bowtie2_RSEM "--no-mixed --no-discordant --gbar 1000 --very-fast-local -k 200 " --trinity_mode --prep_reference --thread_count 62 --output_dir outRSEM 2>&1 1> bowtie2-customParams-rsem_align_and_estimate_abundance.log &
+
+Usage for bowtie2/RSEM (with new samples file, custom params very-sensitive-local):
+nohup perl $TRINITY_HOME/util/align_and_estimate_abundance.pl --transcripts trin-assemblies-renamedSeqIds/WWP18-1000.fasta --seqType fq --samples_file wwp18-samples.txt   --est_method RSEM --aln_method bowtie2 --bowtie2_RSEM "--no-mixed --no-discordant --gbar 1000 --very-sensitive-local -k 200 " --trinity_mode --prep_reference --thread_count 62 --output_dir outRSEM 2>&1 1> bowtie2-customParams-rsem_align_and_estimate_abundance.log &
+
+
+This seems to be the bowtie2 parameters it's using by default?:
+CMD: set -o pipefail && bowtie2 --no-mixed --no-discordant --gbar 1000 --end-to-end -k 200  -q -X 800 -x /work/Bens-Trinity-assembly/ReadMappingCounts/trin-assemblies-renamedSeqIds/WWP18-10000.fasta.bowtie2 -1 /work/Bens-Trinity-assembly/ReadMappingCounts/WWP18/H-Canker/S0008EF_GCCAAT_L003_filtered_R_1P.fq -2 /work/Bens-Trinity-assembly/ReadMappingCounts/WWP18/H-Canker/S0008EF_GCCAAT_L003_filtered_R_2P.fq -p 62 | samtools view -@ 62 -F 4 -S -b | samtools sort -@ 62 -n -o bowtie2.bam
+
+CMD: touch RSEM.isoforms.results.ok
+CMD: set -o pipefail && bowtie2 --no-mixed --no-discordant --gbar 1000 --end-to-end -k 200  -q -X 800 -x /work/Bens-Trinity-assembly/ReadMappingCounts/trin-assemblies-renamedSeqIds/WWP18-10000.fasta.bowtie2 -1 /work/Bens-Trinity-assembly/ReadMappingCounts/WWP18/H-Canker/S0008F2_CAGATC_L003_filtered_R_1P.fq -2 /work/Bens-Trinity-assembly/ReadMappingCounts/WWP18/H-Canker/S0008F2_CAGATC_L003_filtered_R_2P.fq -p 62 | samtools view -@ 62 -F 4 -S -b | samtools sort -@ 62 -n -o bowtie2.bam 
+
+
+============
+Actual runs of bowtie2/RSEM (with samples file, default params):
+
+WWP18 ACTUAL RUN: Usage for bowtie2/RSEM (with samples file, default params):
+nohup perl $TRINITY_HOME/util/align_and_estimate_abundance.pl --transcripts trin-assemblies-renamedSeqIds/WWP18-nt675367-Trinity.fasta --seqType fq --samples_file wwp18-samples.txt   --est_method RSEM --aln_method bowtie2 --bowtie2_RSEM "--no-mixed --no-discordant --gbar 1000 --end-to-end -k 200 " --trinity_mode --prep_reference --thread_count 62 --output_dir outRSEM 2>&1 1> align_and_estimate_abundance-rsem_bowtie2_end-to-end.log &
+
+WBP47 ACTUAL RUN: Usage for bowtie2/RSEM (with samples file, default params):
+nohup perl $TRINITY_HOME/util/align_and_estimate_abundance.pl --transcripts trin-assemblies-renamedSeqIds/WBP47-nt813669-Trinity.fasta --seqType fq --samples_file wbp47-samples.txt   --est_method RSEM --aln_method bowtie2 --bowtie2_RSEM "--no-mixed --no-discordant --gbar 1000 --end-to-end -k 200 " --trinity_mode --prep_reference --thread_count 30 --output_dir wbp47-outRSEM 2>&1 1> wbp47-align_and_estimate_abundance-rsem_bowtie2_end-to-end.log &
+
+Hemlock30 ACTUAL RUN: Usage for bowtie2/RSEM (with samples file, default params):
+nohup perl $TRINITY_HOME/util/align_and_estimate_abundance.pl --transcripts trin-assemblies-renamedSeqIds/Hemlock30-nt1193147-Trinity.fasta --seqType fq --samples_file hemlock30-samples.txt   --est_method RSEM --aln_method bowtie2 --bowtie2_RSEM "--no-mixed --no-discordant --gbar 1000 --end-to-end -k 200 " --trinity_mode --prep_reference --thread_count 30 --output_dir hemlock30-outRSEM 2>&1 1> hemlock30-align_and_estimate_abundance-rsem_bowtie2_end-to-end.log &
+
+LP36 ACTUAL RUN: Usage for bowtie2/RSEM (with samples file, default params):
+nohup perl $TRINITY_HOME/util/align_and_estimate_abundance.pl --transcripts trin-assemblies-renamedSeqIds/LP36-nt884751-Trinity.fasta --seqType fq --samples_file lp36-samples.txt   --est_method RSEM --aln_method bowtie2 --bowtie2_RSEM "--no-mixed --no-discordant --gbar 1000 --end-to-end -k 200 " --trinity_mode --prep_reference --thread_count 30 --output_dir lp36-outRSEM 2>&1 1> lp36-align_and_estimate_abundance-rsem_bowtie2_end-to-end.log &
+
+
+
+------------
+Hi Jun-Jun, 
+
+I've installed RSEM and I'm testing the align_and_estimate_abundance.pl script with RSEM/bowtie2, just using the default parameters for now. Bowtie2 is used by RSEM. So far it seems to be running smoothly.
+
+I'll be looking at the parameter options for both RSEM and bowtie2 along with the ones you sent me for bowtie2.
+
+If you'd like to look at RSEM as well here is some documentation:
+Official RSEM readme:
+https://github.com/deweylab/RSEM#table-of-contents
+Tutorial of RSEM: 
+https://github.com/bli25broad/RSEM_tutorial
+
+The align_and_estimate_abundance.pl script gives an option to pass a string of parameters into RSEM. I've pasted the defaults below along with a couple other paramters for RSEM. I think this --bowtie2_RSEM string is where we'd include all bowtie2 parameters.
+
+########################################
+#  RSEM opts:
+#
+#  --bowtie_RSEM <string> :
+#         if using 'bowtie', default: "--all --best --strata -m 300 --chunkmbs 512"
+#
+#  --bowtie2_RSEM <string> :
+#         if using 'bowtie2', default: "--no-mixed --no-discordant --gbar 1000 --end-to-end -k 200 "
+#
+#  ** if you change the defaults, specify the full set of parameters to use! **
+#
+#  --include_rsem_bam              provide the RSEM enhanced bam file including posterior probabilities of read assignments.
+#  --rsem_add_opts <string>        additional parameters to pass on to rsem-calculate-expression
+#
+########################################
+
+I have a question for you. The align_and_estimate_abundance.pl script wants me to pass the input sample filenames to it in a tab-delimited samples.txt file with four parameters per line. The third and fourth parameters are the R1 and R2 filenames, but I'm not sure what to do for the first two, so I've just been putting a piece of the filename for both of those. I've attached my wwp18-samples.tab file for you to look at. Can you let me know if I should be specifying the first two parameters differently? Here's what the align_and_estimate_abundance.pl documentation says about it: 
+
+tab-delimited text file indicating biological replicate relationships. ex:
+cond_A    cond_A_rep1    A_rep1_left.fq    A_rep1_right.fq
+cond_A    cond_A_rep2    A_rep2_left.fq    A_rep2_right.fq
+cond_B    cond_B_rep1    B_rep1_left.fq    B_rep1_right.fq
+cond_B    cond_B_rep2    B_rep2_left.fq    B_rep2_right.fq
+
+Thanks,
+
+Ben
+------
+Hello, Ben:
+
+RSEM is a further run step on the basis of Bowtie-2. Bowtie2 only calculates read numbers while RSEM wants to compare samples based on the read numbers to identify genes (sequences) with significant differences among samples.
+
+In the sample filenames with four parameters  , the 1st is for sample types, the 2nd is for biological replicates.
+
+For WWP18, we have 18 samples: PN-6, HB-3, SB-3, HC-3, and HF-3, representing 5 types of samples (conditions), with replicates at 6, 3, 3, 3, and 3 tomes, respectively.
+
+I'll get this table for you for three other species. Let us have a discussion if you have additional questions.
+
+Jun-Jun
+-----
+Hi Jun-Jun, 
+
+I've updated the wwp18-samples file (see attached), based on what you said. Can you tell me if this is correct?
+
+It looks like there is no option with the align_and_estimate_abundance.pl script to run bowtie2 without RSEM. It calls RSEM, and RSEM then uses bowtie2. Is that okay with you? Would RSEM take a long time? Unless RSEM takes a really long time it might be faster to just use this script rather than writing my own script to call bowtie2 directly.
+
+Here are the default bowtie2 parameters used by the script: 
+"--no-mixed --no-discordant --gbar 1000 --end-to-end -k 200 "
+
+Based on your preferred parameters, I will change this to: 
+"--no-mixed --no-discordant --gbar 1000 --very-fast-local -k 200 "
+or 
+"--no-mixed --no-discordant --gbar 1000 --very-sensitive-local -k 200 "
+
+Should I try it first with the --very-fast-local setting or the --very-sensitive-local setting?
+
+Do these parameters look okay to you? I've pasted below the descriptions of the other parameters: 
+
+--no-mixed
+By default, when bowtie2 cannot find a concordant or discordant alignment for a pair, it then tries to find alignments for the individual mates. This option disables that behavior.
+
+--no-discordant
+By default, bowtie2 looks for discordant alignments if it cannot find any concordant alignments. A discordant alignment is an alignment where both mates align uniquely, but that does not satisfy the paired-end constraints (--fr/--rf/--ff, -I, -X). This option disables that behavior.
+
+--gbar <int>
+Disallow gaps within <int> positions of the beginning or end of the read. Default: 4.
+
+-k mode: search for one or more alignments, report each
+In -k mode, Bowtie 2 searches for up to N distinct, valid alignments for each read, where N equals the integer specified with the -k parameter. That is, if -k 2 is specified, Bowtie 2 will search for at most 2 distinct alignments. It reports all alignments found, in descending order by alignment score. The alignment score for a paired-end alignment equals the sum of the alignment scores of the individual mates. Each reported read or pair alignment beyond the first has the SAM 'secondary' bit (which equals 256) set in its FLAGS field. Supplementary alignments will also be assigned a MAPQ of 255. See the SAM specification for details.
+Bowtie 2 does not "find" alignments in any specific order, so for reads that have more than N distinct, valid alignments, Bowtie 2 does not guarantee that the N alignments reported are the best possible in terms of alignment score. Still, this mode can be effective and fast in situations where the user cares more about whether a read aligns (or aligns a certain number of times) than where exactly it originated.
+
+
+------------
+
+"--no-mixed --no-discordant --gbar 1000 --very-sensitive-local -k 200 "
+
+bowtie2 -p 62 -x ref.fasta -1 R1.fq -2 R2.fq --very-sensitive-local --met-file bowtie2-metrics.txt -S output.sam
+
+bowtie2-build /work/Bens-Trinity-assembly/ReadMappingCounts/trin-assemblies-renamedSeqIds/WWP18-10000.fasta /work/Bens-Trinity-assembly/ReadMappingCounts/trin-assemblies-renamedSeqIds/WWP18-10000.fasta.bowtie2
+
+nohup bowtie2 --no-mixed --no-discordant --gbar 1000 --very-fast-local -k 200  -q -X 800 -x /work/Bens-Trinity-assembly/ReadMappingCounts/trin-assemblies-renamedSeqIds/WWP18-10000.fasta.bowtie2 -1 /work/Bens-Trinity-assembly/ReadMappingCounts/WWP18/H-Canker/S0008EF_GCCAAT_L003_filtered_R_1P.fq -2 /work/Bens-Trinity-assembly/ReadMappingCounts/WWP18/H-Canker/S0008EF_GCCAAT_L003_filtered_R_2P.fq -p 62 -S bowtie2-output-S0008EF_GCCAAT.sam 2>&1 1> bowtie2-S0008EF_GCCAAT.log &
+
+------------
+============
+AFTER successfully finishing the align....pl script for WWP18:
+---
+Hi Jun-Jun,
+
+The WWP18 bowtie2/RSEM read mapping process has finished, but the others are still running.
+
+I've attached a summary of the alignment rates for WWP18 in wwp18-overall-alignment-rate.txt.
+
+There is an output folder for each sample/rep (18 in total). I've attached a zip file containing all the output files except the .bam files (which are too large) from one of these folders (HB-3-rep1-S0008F0_ACAGTG). Here's a list of the complete contents of the output folder for sample HB-3-rep1-S0008F0_ACAGTG of WWP18: 
+
+bowtie2.bam  (4 GB)
+bowtie2.bam.for_rsem.bam  (4 GB)
+bowtie2.bam.ok
+RSEM.genes.results
+RSEM.isoforms.results
+RSEM.isoforms.results.ok
+RSEM.stat/
+RSEM.stat/RSEM.cnt
+RSEM.stat/RSEM.model
+RSEM.stat/RSEM.theta
+
+In your earlier instructions you said: "To ‘quantify read counts for each gene/isoform’ will allow us to filter out those genes/isoforms (the assembled sequences in output fasta file) with low numbers of reads in a samples. For example, we just keep those genes/isoforms with at least 10 mapped reads in at least one of total samples for MEGAN6 run."
+
+I'm not sure which file to extract this information from, or how to find it. Do I need to search the BAM file, or does one of the RSEM output files (attached in the .zip file) contain the information?
+
+I understand that my next step will be to go through all the sequences in the Trinity .fasta output file, and, for each sequence, check the number of mapped reads in each of the 18 samples. If the sequence has at least 10 mapped reads in at least one of these samples, keep it.
+Thanks,
+
+Ben
+
+------------
+The primary output of RSEM consists of two files, one for isoform-level estimates, and the other for gene-level estimates. Abundance estimates are given in terms of two measures. The first is an estimate of the number of fragments that are derived from a given isoform or gene.
+
+outputs should be in these two files, but we need to put them in a table to review.
+
+RSEM.genes.results
+RSEM.isoforms.results
+---
+Yes. The data we want are shown in those two files at gene or isoform level. for each sample, there are three values/column
+'expected_count',	'TPM',	'FPKM'. Please combine all 18 samples together in one table based on gene IDs, or isoform IDs, and then add three more column as 'total expected-count', 
+'total-TPM', and 'total FPKM' per gene or per isoform by summing the values of all 18 samples. Thirdly, we can filter gene/isoform numbers based on one of these three values.
+
+Great progress!
+
+Have a nice weekend!
+---
+Hi Jun-Jun, 
+If I put all 18 samples together in one table for RSEM.gene.results and one table for RSEM.isoforms.results, it will create two very large text/csv files, probably more than 700 MB each. I think it would be quite hard to open those for viewing in most programs. I'll begin writing a script to do that, but I can also just make it save the total-expected-count, total-TPM and total_FPKM if you prefer. 
+
+I can also write a script that searches these files without combining them if you want to use their information to filter genes/isoforms. Just let me know what criteria you'd like to use to filter the genes/isoforms.
+---
+Let us filter the data at TPM =, or > 1 in at least one of 18 samples.
+
+We are more interested in gene model than isoform model. Gene model will be linked to the longest isoform tor represent the genes with multiple isoforms per genes.
+---
+
+inPath
+
+My filtering logic:
+for each gene .csv file
+  save to curr_gene_id the gene_id col of only those rows whose TPM >= 1
+  write out the filtered csv file
+  unique(c(master_gen_id,curr_gene_id))
+
+--
+Mods:
+- filter individually only to get the master list of gene ids, and individual filtered output file
+- merge the full tables
+- then filter by the master list of gene ids
+Then:
+- add three more column as 'total expected-count', 'total-TPM', and 'total FPKM'
+
+
+------------
+Make sure the RSEM process is all done:
+grep -c "Expression Results are written" wwp18-align_and_estimate_abundance-rsem_bowtie2_end-to-end.log
+
+Then run my filtering scripts:
+nohup ./run_filter_RSEM.sh 2>&1 1>run.log &
+
+---
+Hi Jun-Jun,
+
+I've written and run a script to combine the results of the bowtie2/RSEM read mapping process from all samples into a single file each for genes and isoforms, and then filter them by TPM >= 1 in at least one of the samples. I've also included total_expected_count, total_TPM and total_FPKM columns. Here's a link to the results for WWP18, WBP47, LP36, Hemlock30:
+https://www.dropbox.com/s/ycg8yw8w6fywjbr/RSEM_results_filtered.zip?dl=1
+
+The .txt files just show the selected genes or isoforms after combining and then filtering the results.
+
+The .tab files are the combined results in tab-delimited format. I couldn't use comma-delimited because some of the fields contained commas. If you open it in Excel as a text or csv file, but choose tab as the delimiting field instead of comma, it should display properly. At least, that's how it works in OpenOffice/LibreOffice.
+
+These .tab files are all quite large, so they'll take a long time to load, and you'll need to make sure you have a decent amount of free RAM. You might want to start with the WWP18 genes file, which is the smallest at around 208 MB.
+
+Let me know if you'd like me to make any changes to how I've done this.
+
+Ben
+
+---
+---
+Hello, Ben:
+
+Your account issue is solved.
+
+BTW, I reviewed the Hemlock data about the filtering transcript by TPM=1 and then picking up longest transcript (IDs with i) per gene (IDs with g). You get 90,730 seqs as the longest with TPM at lest 1 in at least one of 30 samples.
+
+When I go back to see  how many transcripts (isoforms with i IDs) for 90,730 g IDs, you file “Hemlock30ALLsamples.RSEM.isoform.results.filtered.tab” contained only 123,545 transcripts (isoforms with I IDs), which corresponding to only 82,929 longest g IDs, different the 90,730 g IDs from another file.  Please have a confirmation.
+
+Thanks!
+---
+Hi Jun-Jun, 
+
+I ran my filtering script on the RSEM.genes.results files and the RSEM.isoforms.results files separately, so if the TPM values were different in the genes vs isoforms files, or if the RSEM output recorded different gene selections in the genes vs isoforms files then there might have been a different set of ids selected after the filtering.
+
+Maybe the TMP values were generally lower per isoform than per gene? If this is so then that would explain why the filtered results were 90,730 gene ids but only 123,545 isoform ids with only 82,929 of the selected gene ids accounted for. Is this what you would expect?
+
+I've confirmed that the Hemlock30_ALLsamples.RSEM.genes.results.filtered.tab file has 90730 gene ids and the Hemlock30_ALLsamples.RSEM.isoforms.results.filtered.tab file has 123546 isoform ids.
+
+Ben
+
+---
+
+=================
+BACK TO RUNNING BLASTx (but on which input? The original Trinity.fasta? The results of my longest ORF filering? A version filtered by the results of my Read Maping (using bowtie2/RSEM?)
+
+(see communications above line 280 for last instructions on BLASTx)
+
+Newer communications:
+---
+Great!
+Next step is to run BLASTx (using DNA seq as input to search against protein database-NCBI-nr). I wonder what output file types from your BLAST run.
+---
+We need BLAST results in XML format.
+
+Load BLAST results:
+If a BLAST result is already available in XML format, it can be directly loaded into Blast2GO by using Load > Load Blast Results in the File menu. You can choose here to import the Blast results as XML file or the new XML2/JSON format. These new formats can be loaded as Zip file. 
+---
+Hi Jun-Jun, 
+
+The output of my previous BLASTp runs used the default output which was not XML, but there is a way to specify the output, and it looks like there is also a way to convert the output as long is it was in the right format to begin with: 
+https://www.ncbi.nlm.nih.gov/books/NBK569843/
+
+Will you need me to convert the old BLASTp output to XML as well?I'm not sure which format our previous BLASTp output was in, I'm trying to find out what the default is. 
+---
+Please see  the link below. It looks like there is a way to do it. Please try a small set of seq for conversion of file types, then I can test it in BLAST2GO to see if it works in BLAST2Go..
+https://mail.google.com/mail/u/0/?tab=im&pli=1#inbox/FMfcgzGkbDZLLJCcmFTClzxJWhwsVzTg 
+---
+Both those links might be helpful, but I think the thing I need to do next is try a few small tests of BLASTx with different output format settings, like you said, and experiment with the output format converter.
+
+I think I'll get the longest seqs from the Excel file you sent me first, since I don't think it'll take too long. I have scripts that already do something similar.
+---
+Great. Please go ahead as your planning!
+---
+(Jun-Jun also told me to start with Hemlock30)
+- still not sure whether to use: the original Trinity fasta output, or the longest Orf output fasta, or something based on the Read Mapping (bowtie2/RSEM) filtering that I did. I'm going to do my tests using a small fragment of the longest Org output of Hemlock30.
+
+---
+From: https://www.ncbi.nlm.nih.gov/books/NBK569843/
+In order to use the blast_formatter to convert the blast output to different formats, when you run blast: 
+- you need to specify --outfmt 11
+- The --max_target_seqs option should be used to control the number of matches recorded in the alignment. 
+- The BLAST database used for the original search must be available, or the sequences need to be fetched from the NCBI, assuming the database contains sequences in the public dataset. (I think the .ncbi file shoul be in the the working folder).
+- Blast_formatter will format stand-alone searches performed with an earlier version of a database if both the search and formatting databases are prepared so that fetching by sequence ID is possible. To enable fetching by sequence ID use the –parse_seqids flag when running makeblastdb, or (if available) download preformatted BLAST databases from ftp://ftp.ncbi.nlm.nih.gov/blast/db/ using update_blastdb.pl (provided as part of the BLAST+ package). Currently the blast archive format and blast_formatter do not work with database free searches (i.e., -subject rather than –db was used for the original search).
+
+- e.g.:
+$ echo 1786181 | blastn -db ecoli -outfmt 11 -out out.1786181.asn
+$ blast_formatter -archive out.1786181.asn -outfmt "7 qacc sacc evalue
+
+From blastx --help: 
+ -max_target_seqs <Integer, >=1>
+   Maximum number of aligned sequences to keep 
+   (value of 5 or more is recommended)
+   Default = `500'
+
+---
+
+My tests with BLASTx:
+nohup blastx -num_threads 63 -db nr -query Hemlock30-longest-first100.fasta -out first100-blastx-Default.out > console_out.log &
+nohup blastx -num_threads 63 -db nr -query Hemlock30-longest-first100.fasta -outfmt 11 -out first100-blastx-11outfmt.out > console_out.log &
+
+nohup blast_formatter -archive first100-blastx-11outfmt.out -outfmt 0 -out first100-blastx-11outfmt-convertedTo0.formatted 2>&1 1> blast_formatter.log &
+
+nohup blast_formatter -archive first100-blastx-11outfmt.out -outfmt 5 -out first100-blastx-11outfmt-convertedTo5xml.formatted 2>&1 1> blast_formatter2.log &
+
+
+
+=====
+
+---
+
+Hi Jun-Jun, 
+
+I have two questions for you: 
+
+(1) When I begin the proper run of BLASTx, what would you like me to use as the input? The options that I'm aware of are: 
+- the original Trinity fasta output
+- the output from filtering the Trinity fasta file by longest Orf (and by DNA seq for those without a longest ORF)
+- (I haven't done this yet): the output from filtering the Trinity fasta by gene_id selected by the Read Mapping (bowtie2/RSEM) TPM>=1. If using this, would I also need to then select the longest sequence if there is more than one sequence per gene_id?
+
+(2) I'm doing some preliminary tests with BLASTx and output formats. From this information on the blast_formatter converter: 
+https://www.ncbi.nlm.nih.gov/books/NBK569843/
+"The --max_target_seqs option should be used to control the number of matches recorded in the alignment."
+I have not be specifying anything for --max_target_seqs, but from the documentation, the default is 500. Would you like me to specify something else for this?
+
+From blastx --help: 
+ -max_target_seqs <Integer, >=1>
+   Maximum number of aligned sequences to keep 
+   (value of 5 or more is recommended)
+   Default = `500'
+
+Thanks,
+
+Ben
+
+---
+Please use that set of DNA seqs I uploaded on-line and shared with you before your vacation.
+For ‘the --max_target_seqs’, using ‘500’ is fine. Sometimes I used ‘20’.
+---
+Hi Jun-Jun,
+
+Thanks for reminding me about the DNA seqs you sent me before the wedding. I'm uploading your Seq-TPM1.zip file to the Boreal Cloud now in preparation for running BLASTx. I'll start with Hemlock30.
+
+Brian is away until Tuesday, and Hao says he'll check with Brian about Boreal Cloud resource usage when he's back. 
+
+For the '--max_target_seqs, does selecting 500 or 20 or some other number affect how long it takes to process the data? Based on my initial tests, it seems like BLASTx will take a very long time.
+
+Ben
+---
+
+Hi Jun-Jun,
+
+I've attached the output (zipped) of a small test run of BLASTx after using blast_formatter to convert the output to BLAST XML format. This test was just with 100 sequences. Let me know if you'd like me to do a larger test. 
+
+I've been trying to determine the most effective way to allocate the Boreal Cloud RAM and CPU resources. Most documentation say I should have more RAM than the size of the database (about 250 GB total for the NR database), but I'm wondering if the sequence data we would be searching actually requires less size than the full database (ie. is there other data in the NR database which we would not need to load into memory).
+
+Also, do you want me to update our local copy of the NR database to the most recent version?
+---
+Hello, Ben:
+B2G does not accept the XML you generated. Let us forget about it! BTW, I noticed that the XML file from 100 seqs is very big. Please cut down maximum blast hits from 500 to 20. It may run Blastx fast.
+
+---
+
+
+
+--
+
+
+
+

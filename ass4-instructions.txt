@@ -1,0 +1,252 @@
+The main work would be sequence assembly using Trinity on Boreal Cloudy system and continuous analyses of assembled sequence data using pipeline Emly did on HP workstation in room 233. The raw data are > 1.0 TB, currently in my HP Z-800 at home. How to transfer data is a big issue. 
+
+Some work Emily did are shown as below. Of course, some modifications are required for our new work objectives. Also Kangokola did Trinity assembly using a large set of input data (>1 TB) , and he knew how to set up system configurations for a large data set.
+
+
+Trimmomatic with default settings was used to remove adapter sequences and low-quality bases (phred score <20) from the raw RNA-seq reads (Bolger et al., 2014). The clean reads were de novo assembled into transcripts for the aeciospores and cankered stems separately using Trinity (version: trinityrnaseq_r2013-02-25) with default k-mer length of 25 (Haas et al., 2013). A workflow as outlined by De Fine Licht et al. (2017) was used to remove host transcripts and reduce sequence redundancy. Putative WWP transcripts were first removed from two assemblies by BLASTn search (Altschul et al., 1990) against healthy WWP stem transcriptome (Liu et al., 2014) with a cut-off at e-value < e-6. The highest expressed isoform was then selected for each component using ‘pick_isoform_trinity_RSEM.py’ (Yang and Smith 2013), and overlapping sequences were assembled into contigs using CAP3 Sequence Assembly Program with setting -o 200 -p 99 (Huang and Madan 1999). After combining contigs and singlets, CD-Hit-EST (Fu et al., 2012) was run to combine transcripts at 97% identity of the nucleotide sequences. Finally, each sequence was assigned to a putative taxonomical origin with BLASTx searches (e-value < 1e-6) against the UNIPROT database (ver. 2015_1) using Metagenome Analyzer (MEGAN, ver 5.7.1) (Huson et al., 2011). Transcripts were assigned to four categories: ‘fungi’, ‘no hits’ (sequences for which BLASTx did not find any hits), ‘not assigned’ (sequences for which BLASTx found results but they were not assigned to a category), and ‘other’ for those sequences that were not in any of the above three categories. The category of ‘other’ included sequences of six subcategories: alveolata, amoebozoa, bacteria, metazoan, viridiplantae, and viruses and they were removed from Cri samples as potential contamination. Sequences in the category of ‘not assigned’ were also excluded where BLASTx search against the proteome of C.  quercuum f. sp. fusiforme (Pendleton et al., 2014; downloaded at https://mycocosm.jgi.doe.gov/Croqu1/Croqu1.home.html) had E values > e-6. The sequences were further filtered by total length >200-bp with a minimum open reading frame (ORF) long 50 codons as predicted by TransDecoder. The putative protein sequences were combined by a run of CD-Hit at 97% of amino acid sequence identity. The resulting transcript dataset, including all sequences in the categories ‘fungi’ and ‘no hits’ and a part of ‘not assigned’ sequences, was considered as a vcr2 reference transcriptome for further analysis. This transcriptome shotgun assembly project has been deposited at DDBJ/EMBL/GenBank 
+
+[attached tpj_2019.pdf]
+---
+
+Let us move to the next piece of the work---'Ka and Ks analysis'. Emily did it previously, and she possibly downloaded the software in HC-Z800 in  Room 233 or in Brain's HPC. Two softwares are involved as below. Please have a look at the reference papers and related websites. Once you get an idea about their programming, we'll discuss details of our input data at your convenience.  If you have problems accessing the papers and their websites, just let me know. 
+
+Cheers!
+
+Jun-Jun
+
+Genome evolution was analyzed by the measurement of synonymous substitution levels (Ks) and nonsynonymous nucleotide substitution rates (Ka) between paired orthologous sequences using PARAAT (Zhang et al., 2012) and the KAKS calculator, with model averaging (Zhang et al., 2006). A Ks cutoff of 2 was set for distribution analysis because of Ks saturation and stochastic effects (Vanneste et al., 2013).
+
+Zhang, Z., Li, J., Zhao, X.Q., Wang, J., Wong, G.K. and Yu, J. (2006) KaKs_Calculator: calculating Ka and Ks through model selection and model averaging. Genomics Proteomics Bioinformatics, 4, 259–263. 
+
+Zhang, Z., Xiao, J., Wu, J., Zhang, H., Liu, G., Wang, X. and Dai, L. (2012) ParaAT: a parallel tool for constructing multiple protein-coding DNA alignments. Biochem. Biophys. Res. Commun. 419, 779–781.
+
+---
+
+ParaAT: a parallel tool for constructing multiple protein-coding DNA alignments
+Zhang Zhang 1, Jingfa Xiao, Jiayan Wu, Haiyan Zhang, Guiming Liu, Xumin Wang, Lin Dai
+Affiliations expand
+PMID: 22390928 DOI: 10.1016/j.bbrc.2012.02.101
+Abstract
+Constructing multiple homologous alignments for protein-coding DNA sequences is crucial for a variety of bioinformatic analyses but remains computationally challenging. With the growing amount of sequence data available and the ongoing efforts largely dependent on protein-coding DNA alignments, there is an increasing demand for a tool that can process a large number of homologous groups and generate multiple protein-coding DNA alignments. Here we present a parallel tool - ParaAT that is capable of parallelly constructing multiple protein-coding DNA alignments for a large number of homologs. As testified on empirical datasets, ParaAT is well suited for large-scale data analysis in the high-throughput era, providing good scalability and exhibiting high parallel efficiency for computationally demanding tasks. ParaAT is freely available for academic use only at 
+http://cbb.big.ac.cn/software
+actually: 
+https://bigd.big.ac.cn/tools/paraat
+https://bigd.big.ac.cn/tools/paraat/faq
+https://bigd.big.ac.cn/tools/paraat/doc
+
+Also required, one of:
+https://www.ebi.ac.uk/Tools/msa/clustalw2/  (discontinued)
+https://www.ebi.ac.uk/Tools/msa/muscle/   
+https://www.ebi.ac.uk/Tools/msa/mafft/
+http://www.drive5.com/muscle/               (I downloaded and used muscle)
+https://mafft.cbrc.jp/alignment/software/
+
+
+
+[ben@localhost bin]$ ParaAT.pl -help
+****************************************************************
+Program: /home/ben/bin/ParaAT.pl [Version: 2.0; Oct. 4, 2014] 
+Function: Parallel Alignment & Translation 
+Reference: Zhang Z., et al. (2012) ParaAT: A parallel tool for constructing multiple protein-coding DNA alignments, Biochem Biophys Res Commun, 419, 779-781. 
+****************************************************************
+USAGE: /home/ben/bin/ParaAT.pl <Options>
+	-h, -homolog	Homolog group file [string, required]
+	-a, -aminoacid	File containing multiple amino acid sequences [string, required]
+	-n, -nuc	File containing multiple nucleotide sequences [string, required]
+	-p, -processor	File containing the number of processors (< number of physical cores), changeable during running [string, required]
+	-o, -output	Output folder [string, required]
+	-m, -msa	Multiple sequence aligner or specify with its full path [clustalw2 | t_coffee | mafft | muscle, optional]
+	-f, -format	Output file format [axt | fasta | paml | codon | clustal, optional], default = fasta
+	-c, -code	Genetic Code used [integer, optional], default = 1-The Standard Code
+			1-The Standard Code
+			2-The Vertebrate Mitochondrial Code
+			3-The Yeast Mitochondrial Code
+			4-The Mold, Protozoan, and Coelenterate Mitochondrial Code and the Mycoplasma/Spiroplasma Code
+			5-The Invertebrate Mitochondrial Code
+			6-The Ciliate, Dasycladacean and Hexamita Nuclear Code
+			9-The Echinoderm and Flatworm Mitochondrial Code
+			10-The Euplotid Nuclear Code
+			11-The Bacterial, Archaeal and Plant Plastid Code
+			12-The Alternative Yeast Nuclear Code
+			13-The Ascidian Mitochondrial Code
+			14-The Alternative Flatworm Mitochondrial Code
+			15-Blepharisma Nuclear Code
+			16-Chlorophycean Mitochondrial Code
+			21-Trematode Mitochondrial Code
+			22-Scenedesmus Obliquus Mitochondrial Code
+			23-Thraustochytrium Mitochondrial Code
+			See all documented codes at <http://www.ncbi.nlm.nih.gov/Taxonomy/Utils/wprintgc.cgi>
+	-g, -nogap	Remove aligned codons with gaps
+	-t, -nomismatch	Remove mismatched codons
+	-k, -kaks	Enable using KaKs_Calculator for Ka and Ks estimation (requiring axt format)
+	-v, -verbose	Verbose output
+	-?, -help	Display help information
+
+NOTE:
+	Sequence IDs in homologous group file, amino acid file and nucleotide file should be the same.
+
+DOWNLOAD:
+	Please visit <http://cbb.big.ac.cn> for downloads and updates.
+
+CONTACT:
+	Please send suggestions or bugs to Zhang Zhang at zhangzhang@big.ac.cn.
+
+[ben@localhost bin]$ 
+
+
+
+ParaAT.pl -h NBS387-Pila408nt.homologs -n NBS387-Pila408nt-cds.fasta -a NBS387-Pila408nt-AA.fasta -p proc -o output 2> paraat.error 1> paraat.log
+ParaAT.pl -h NBS387-Pila408nt.homologs -n NBS387-Pila408nt-cds.fasta -a NBS387-Pila408nt-AA.fasta -p proc -f axt -o output 2> paraat.error 1> paraat.log
+
+ParaAT.pl -h RLK121-Pila408nt.homologs -n RLK121-Pila408nt-cds.fasta -a RLK121-Pila408nt-AA.fasta -p proc -o output 2> paraat.error 1> paraat.log
+ParaAT.pl -h RLK121-Pila408nt.homologs -n RLK121-Pila408nt-cds.fasta -a RLK121-Pila408nt-AA.fasta -p proc -f axt -o output 2> paraat.error 1> paraat.log
+
+
+---
+KaKs_Calculator: calculating Ka and Ks through model selection and model averaging
+Zhang Zhang 1, Jun Li, Xiao-Qian Zhao, Jun Wang, Gane Ka-Shu Wong, Jun Yu
+Affiliations expand
+PMID: 17531802 PMCID: PMC5054075 DOI: 10.1016/S1672-0229(07)60007-2
+Free PMC article
+Abstract
+KaKs_Calculator is a software package that calculates nonsynonymous (Ka) and synonymous (Ks) substitution rates through model selection and model averaging. Since existing methods for this estimation adopt their specific mutation (substitution) models that consider different evolutionary features, leading to diverse estimates, KaKs_Calculator implements a set of candidate models in a maximum likelihood framework and adopts the Akaike information criterion to measure fitness between models and data, aiming to include as many features as needed for accurately capturing evolutionary information in protein-coding sequences. In addition, several existing methods for calculating Ka and Ks are also incorporated into this software.
+
+https://bigd.big.ac.cn/tools/kaks
+https://bigd.big.ac.cn/tools/kaks/download
+https://bigd.big.ac.cn/tools/kaks/doc
+
+
+Ben's notes on installing KaKs_Calculator on Linux:
+I had to compile from source, but needed to add this line to base.h: 
+#include<cstring> // added by Ben to get it to compile.
+See comments under top response to this question to understand why they didn't include it themselves: 
+https://stackoverflow.com/questions/12824595/difference-between-cstring-and-string
+
+
+[ben@localhost kaksTest]$ KaKs_Calculator -h
+
+******************************************************************
+  Program: KaKs_Calculator
+  Version: 1.2, Apr. 2006
+  Description: Calculate Ka and Ks through model selection and model averaging.
+******************************************************************
+
+Usage: Kaks_Calculator <options>
+	-i	Axt file name for calculating Ka & Ks.
+	-o	Output file name for saving results.
+	-c	Genetic code table (Default = 1-Standard Code).
+		  1-Standard Code			  2-Vertebrate Mitochondrial Code	
+		  3-Yeast Mitochondrial Code			  4-Mold Mitochondrial Code	
+		  5-Invertebrate Mitochondrial Code			  6-Ciliate, Dasycladacean and Hexamita Code	
+		  9-Echinoderm and Flatworm Mitochondrial Code			  10-Euplotid Nuclear Code	
+		  11-Bacterial and Plant Plastid Code			  12-Alternative Yeast Nuclear Code	
+		  13-Ascidian Mitochondrial Code			  14-Alternative Flatworm Mitochondrial Code	
+		  15-Blepharisma Nuclear Code			  16-Chlorophycean Mitochondrial Code	
+		  21-Trematode Mitochondrial Code			  22-Scenedesmus obliquus mitochondrial Code	
+		  23-Thraustochytrium Mitochondrial Code	
+		  (More information about the Genetic Codes: http://www.ncbi.nlm.nih.gov/Taxonomy/Utils/wprintgc.cgi?mode=c)
+	-m	Methods for estimating Ka and Ks and theirs references(Default = MA)
+		  NG		Nei, M. and Gojobori, T. (1986) Mol. Biol. Evol., 3, 418-426.
+		  LWL		Li, W.H., Wu, C.I. and Luo, C.C. (1985) Mol. Biol. Evol., 2, 150-174.
+		  LPB		Li, W.H. (1993) J. Mol. Evol., 36, 96-99.    Pamilo, P. and Bianchi, N.O. (1993) Mol. Biol. Evol., 10, 271-281.
+		  MLWL		Tzeng, Y.H., Pan, R. and Li, W.H. (2004) Mol. Biol. Evol., 21, 2290-2298.
+		  MLPB		Tzeng, Y.H., Pan, R. and Li, W.H. (2004) Mol. Biol. Evol., 21, 2290-2298.
+		  GY		Goldman, N. and Yang, Z. (1994) Mol. Biol. Evol., 11, 725-736.
+		  YN		Yang, Z. and Nielsen, R. (2000) Mol. Biol. Evol., 17, 32-43.
+		  MYN		Zhang, Z., Li, J. and Yu, J. (2006) BMC Evolutionary Biology, 6, 44.
+		  MS		Model Selection according to the AICc
+		  MA		Model Averaging on a set of candidate models
+		  ALL(including all above methods)
+	-d	File name for details about each candidate model when using the method of MS
+
+Example:
+	KaKs_Calculator -i test.axt -o test.axt.kaks	//use MA method based on a more suitable model and standard code
+	KaKs_Calculator -i test.axt -o test.axt.kaks -c 2	//use MA method and vertebrate mitochondrial code
+	KaKs_Calculator -i test.axt -o test.axt.kaks -m LWL -m MYN	//use LWL and MYN methods, and standard Code
+
+For help information:	KaKs_Calculator -h
+Please send bugs or advice to Zhang Zhang at zhangzhang@genomics.org.cn.
+
+[ben@localhost kaksTest]$ 
+
+---
+
+
+==============================
+
+Hello, Ben:
+
+Two tables to show cds pairs for comparison: NBS387 with 375 rows in yellow color for CDS ID (C and F column); RLK121 with 112 rows in yellow color for CDS ID (C and F column). 
+Two fasta files for CDS DNA seqs from limber pine (LPss) and sugar pine (PILA), both are easy to translate into protein seqs with (positive strand and the 1st reading frame) using any on-line protein translation.
+
+Let us a discuss if you have any questions.
+
+I'll send you aa seqs soon. [amino acid]
+
+
+Commands I used:
+ParaAT.pl -h NBS387-Pila408nt.homologs -n NBS387-Pila408nt-cds.fasta -a NBS387-Pila408nt-AA.fasta -p proc -o output 2> paraat.error 1> paraat.log
+ParaAT.pl -h NBS387-Pila408nt.homologs -n NBS387-Pila408nt-cds.fasta -a NBS387-Pila408nt-AA.fasta -p proc -f axt -o output 2> paraat.error 1> paraat.log
+
+ParaAT.pl -h RLK121-Pila408nt.homologs -n RLK121-Pila408nt-cds.fasta -a RLK121-Pila408nt-AA.fasta -p proc -o output 2> paraat.error 1> paraat.log
+ParaAT.pl -h RLK121-Pila408nt.homologs -n RLK121-Pila408nt-cds.fasta -a RLK121-Pila408nt-AA.fasta -p proc -f axt -o output 2> paraat.error 1> paraat.log
+
+./runKaksCalculatorOnFolder.sh > runKaksCalculatorOnFolder-NBS387.log
+./runKaksCalculatorOnFolder.sh > runKaksCalculatorOnFolder-RLK121.log 
+
+
+
+
+
+
+=========================================
+=========================================
+STEP TWO: 
+
+Hello, Ben:
+
+Great results!
+
+Enclosed are more for KaKs analysis, 155 seqs in 13 clusters (CNL-I ~ VII, TNL-I~VI). These seqs are grouped into different clusters. There are 2~33 seqs in different clusters. Please prepare all seq-pairs for all seq combinations inside each cluster. For example, if a cluster has only two seqs, then only resulting one seq-pair. If one cluster has 8 seqs, resulting in 28 seq-pairs. 
+Let us have a discussion if you have any questions.
+
+Thanks. Have a nice weekend.
+
+Jun-Jun
+
+1: 2 3 4 5 6 7 8
+   2:3 4 5 6 7 8
+     3:4 5 6 7 8
+       4:5 6 7 8
+         5:6 7 8
+           6:7 8
+             7:8
+=7+6+5+4+3+2+1=28
+
+-------------------
+Hi, Ben:
+
+I get it, and it looks great!
+
+Can you write map information into KaKs spreadsheet by adding additional column based on IDs of seq1 and seq2 in pairs ?  There are two sets of map information, you process them separately. I like to see if any KaKs difference between those seq pairs on the same LGs and those seq pairs on different LGs, as well as if seq map positions have any effect on KaKs values if seq pairs on the same LG.
+
+Let us have zoom meeting if you have questions on the data details.
+
+Thanks.
+
+Jun-Jun
+
+
+- the Map5094 data might contain same seqID more than once, so I'll need to include all that information in the same cell separated by :
+
+For the Map5094, new columns:
+Seq1_ID2, Seq1_LinkageGroup, Seq1_Map_pos_inverse 
+Seq2_ID2, Seq2_LinkageGroup, Seq2_Map_pos_inverse
+
+For the Map9510, new columns:
+Seq1_ID2, Seq1_LinkageGroup, 
+Seq1_comp_pos_g8780, Seq1_pos_LJ112_g4550, Seq1_pos_PHA106_g7142, Seq1_gap_dis_g8780, Seq1_comp_pos_g9510
+Seq2_ID2, Seq2_LinkageGroup, 
+Seq2_comp_pos_g8780, Seq2_pos_LJ112_g4550, Seq2_pos_PHA106_g7142, Seq2_gap_dis_g8780, Seq2_comp_pos_g9510
+
+

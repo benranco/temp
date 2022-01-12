@@ -1,0 +1,12 @@
+Hello, Ben:
+
+Enclose files for you to write them a csv file based sequence IDs. Take each seq ID pe row, write DNA seq in column B, and protein seq in column C.
+
+Thank You!
+
+Jun-Jun
+
+https://github.com/LANL-Bioinformatics/MeGAMerge
+
+This link is a pipeline for assembly of three subset data which Kangokola assembled from RNA-seq data on limber pine samples usingTrinity. 
+
