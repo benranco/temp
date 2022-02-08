@@ -831,10 +831,3 @@ B2G does not accept the XML you generated. Let us forget about it! BTW, I notice
 
 ---
 
-
-
---
-
-
-
-

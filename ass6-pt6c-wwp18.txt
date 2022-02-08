@@ -1,0 +1,137 @@
+
+====================
+Running BLASTx on the WWP18 data. 
+
+This time I'm choosing a BLASTx input fasta file size ratio for x1:mm2:mm1 servers as 1:2:2.5.
+
+[brancourt@jump BLASTx-WWP18]$ wc -l WWP18-longest172,303-PTM1ud.fasta 
+344606 WWP18-longest172,303-PTM1ud.fasta
+[brancourt@jump BLASTx-WWP18]$ grep -c "^>" WWP18-longest172,303-PTM1ud.fasta 
+172303
+
+Initial split of main fasta file by line numbers (always must be an even number), assuming 4 x1, 6 mm2, 3 mm1. 
+Basic unit of 1 = 344606/(1*4+2*6+2.5*3) = 14664
+14664*2 = 29328
+14664*2.5 = 36660
+
+awk 'NR > 0 && NR <= 14664' WWP18-longest172,303-PTM1ud.fasta > WWP18-longest172,303-PTM1ud-pt01-x1.fasta
+awk 'NR > 14664 && NR <= 29328' WWP18-longest172,303-PTM1ud.fasta > WWP18-longest172,303-PTM1ud-pt02-x1.fasta
+awk 'NR > 29328 && NR <= 43992' WWP18-longest172,303-PTM1ud.fasta > WWP18-longest172,303-PTM1ud-pt03-x1.fasta
+awk 'NR > 43992 && NR <= 58656' WWP18-longest172,303-PTM1ud.fasta > WWP18-longest172,303-PTM1ud-pt04-x1.fasta
+awk 'NR > 58656 && NR <= 95316' WWP18-longest172,303-PTM1ud.fasta > WWP18-longest172,303-PTM1ud-pt05-mm1.fasta
+awk 'NR > 95316 && NR <= 131976' WWP18-longest172,303-PTM1ud.fasta > WWP18-longest172,303-PTM1ud-pt06-mm1.fasta
+awk 'NR > 131976 && NR <= 168636' WWP18-longest172,303-PTM1ud.fasta > WWP18-longest172,303-PTM1ud-pt07-mm1.fasta
+awk 'NR > 168636 && NR <= 197964' WWP18-longest172,303-PTM1ud.fasta > WWP18-longest172,303-PTM1ud-pt08-mm2.fasta
+awk 'NR > 197964 && NR <= 227292' WWP18-longest172,303-PTM1ud.fasta > WWP18-longest172,303-PTM1ud-pt09-mm2.fasta
+awk 'NR > 227292 && NR <= 256620' WWP18-longest172,303-PTM1ud.fasta > WWP18-longest172,303-PTM1ud-pt10-mm2.fasta
+awk 'NR > 256620 && NR <= 285948' WWP18-longest172,303-PTM1ud.fasta > WWP18-longest172,303-PTM1ud-pt11-mm2.fasta
+awk 'NR > 285948 && NR <= 315276' WWP18-longest172,303-PTM1ud.fasta > WWP18-longest172,303-PTM1ud-pt12-mm2.fasta
+awk 'NR > 315276' WWP18-longest172,303-PTM1ud.fasta > WWP18-longest172,303-PTM1ud-pt13-mm2.fasta
+
+
+After several iterations to get the right file sizes, ended up settling on this: 
+13220 for each x1
+30128 for the first mm1
+33660 for the second mm1
+38192 for the third mm1
+35324, 39474, 38624 for the first three mm2's
+24440, 25440, 25440 for the last 3 m2's
+
+awk 'NR > 0 && NR <= 13220' WWP18-longest172,303-PTM1ud.fasta > WWP18-longest172,303-PTM1ud-pt01-x1.fasta
+awk 'NR > 13220 && NR <= 26440' WWP18-longest172,303-PTM1ud.fasta > WWP18-longest172,303-PTM1ud-pt02-x1.fasta
+awk 'NR > 26440 && NR <= 39660' WWP18-longest172,303-PTM1ud.fasta > WWP18-longest172,303-PTM1ud-pt03-x1.fasta
+awk 'NR > 39660 && NR <= 52880' WWP18-longest172,303-PTM1ud.fasta > WWP18-longest172,303-PTM1ud-pt04-x1.fasta
+awk 'NR > 52880 && NR <= 83008' WWP18-longest172,303-PTM1ud.fasta > WWP18-longest172,303-PTM1ud-pt05-mm1.fasta
+awk 'NR > 83008 && NR <= 116668' WWP18-longest172,303-PTM1ud.fasta > WWP18-longest172,303-PTM1ud-pt06-mm1.fasta
+awk 'NR > 116668 && NR <= 154860' WWP18-longest172,303-PTM1ud.fasta > WWP18-longest172,303-PTM1ud-pt07-mm1.fasta
+awk 'NR > 154860 && NR <= 190184' WWP18-longest172,303-PTM1ud.fasta > WWP18-longest172,303-PTM1ud-pt08-mm2.fasta
+awk 'NR > 190184 && NR <= 229658' WWP18-longest172,303-PTM1ud.fasta > WWP18-longest172,303-PTM1ud-pt09-mm2.fasta
+awk 'NR > 229658 && NR <= 268282' WWP18-longest172,303-PTM1ud.fasta > WWP18-longest172,303-PTM1ud-pt10-mm2.fasta
+awk 'NR > 268282 && NR <= 292722' WWP18-longest172,303-PTM1ud.fasta > WWP18-longest172,303-PTM1ud-pt11-mm2.fasta
+awk 'NR > 292722 && NR <= 318162' WWP18-longest172,303-PTM1ud.fasta > WWP18-longest172,303-PTM1ud-pt12-mm2.fasta
+awk 'NR > 318162' WWP18-longest172,303-PTM1ud.fasta > WWP18-longest172,303-PTM1ud-pt13-mm2.fasta
+
+--
+Then: 
+chmod 664 *.fasta
+- then made directories
+- then: chmod 777 WWP18pt*
+- then moved files to directories
+- then copied the .ncbirc file to each directory, and preseve its permissions
+
+sudo mount -t nfs 10.20.0.6:/Public/genomics/junjun/Data-Dec2020/Bens-Trinity-assembly/BLASTxRuns/BLASTx-WWP18/WWP18pt0-x1 /work
+sudo mount -t nfs 10.20.0.6:/Public/genomics/junjun/Data-Dec2020/Bens-Trinity-assembly/BLASTxRuns/BLASTx-WWP18/WWP18pt0-mm1 /work
+sudo mount -t nfs 10.20.0.6:/Public/genomics/junjun/Data-Dec2020/Bens-Trinity-assembly/BLASTxRuns/BLASTx-WWP18/WWP18pt0-mm2 /work
+
+--
+Running the BLASTx command (the input file is not fully specified here): 
+
+WWP18-longest172,303-PTM1ud-pt08-mm2.fasta
+
+x1:
+nohup time blastx -num_threads 8 -db nr -query WWP18 -max_target_seqs 20 -outfmt 11 -out WWP18-longest172303-PTM1ud-blastx-11outfmt-pt0.out 2>&1 1> time-WWP18-longest172303-PTM1ud-blastx-11outfmt-pt0-x1.log &
+
+mm2:
+nohup time blastx -num_threads 16 -db nr -query WWP18 -max_target_seqs 20 -outfmt 11 -out WWP18-longest172303-PTM1ud-blastx-11outfmt-pt0.out 2>&1 1> time-WWP18-longest172303-PTM1ud-blastx-11outfmt-pt0-mm2.log &
+
+mm1: 
+nohup time blastx -num_threads 28 -db nr -query WWP18 -max_target_seqs 20 -outfmt 11 -out WWP18-longest172303-PTM1ud-blastx-11outfmt-pt0.out 2>&1 1> time-WWP18-longest172303-PTM1ud-blastx-11outfmt-pt0-mm1.log &
+
+--
+Hi Jun-Jun, 
+
+I've started the BLASTx processes for WWP18 running on 13 virtual machines. I'll monitor their progress, and tomorrow I'll begin doing the MEGAN6 stuff for WBP47.
+
+Ben
+--
+
+Restarting some the got interrupted: 
+
+
+sudo mount -t nfs 10.20.0.6:/Public/genomics/junjun/Data-Dec2020/Bens-Trinity-assembly/BLASTxRuns/BLASTx-WWP18/WWP18pt0-x1 /work
+sudo mount -t nfs 10.20.0.6:/Public/genomics/junjun/Data-Dec2020/Bens-Trinity-assembly/BLASTxRuns/BLASTx-WWP18/WWP18pt0-mm1 /work
+sudo mount -t nfs 10.20.0.6:/Public/genomics/junjun/Data-Dec2020/Bens-Trinity-assembly/BLASTxRuns/BLASTx-WWP18/WWP18pt0-mm2 /work
+
+
+benmm2-06
+benx1-04 
+benx1-03 
+benmm1-03
+
+
+
+
+
+
+
+====================
+These were the files in the output folder for MEGAN6 on the Hemlock data: 
+[centos@ben-vnc megan]$ ls -lah /work
+total 8.3G
+drwxrwxrwx.  8   5061   5008 4.0K Dec  4 00:21 .
+dr-xr-xr-x. 20 root   root    262 Nov 12 04:08 ..
+-rw-rw-r--.  1 centos centos    0 Nov 12 02:25 blast_formatter.log
+drwxrwxr-x.  2 centos centos 4.0K Dec  4 00:20 Hemlock30_blastx_MEGAN6_csvOutput
+-rw-rw-r--.  1 centos centos 6.2M Dec  4 00:21 Hemlock30_blastx_MEGAN6_csvOutput.zip
+-rw-rw-r--.  1 centos centos 5.8G Nov 12 02:55 Hemlock30_longest-90,730-blastx-11outfmt.MASTER
+-rw-rw-r--.  1 centos centos 1.6G Nov 12 03:33 Hemlock30_longest-90,730-blastx-11outfmt.MASTER-convertedTo0.formatted.blastx
+-rw-rw-r--.  1 centos centos 175M Jan 17  2022 Hemlock30_longest-90,730-blastx-11outfmt.MASTER-convertedTo0.formatted.rma6
+-rw-rw-r--.  1 centos centos 175M Nov 12 19:32 Hemlock30_longest-90,730-blastx-11outfmt.MASTER-convertedTo0.formatted.rma6-BACKUP
+-rw-rw-r--.  1 centos centos 217M Nov 19 23:58 Hemlock30_longest-90,730-blastx-6outfmt.MASTER.csv
+-rw-rw-r--.  1 centos centos 217M Nov 19 23:53 Hemlock30_longest-90,730-blastx-6outfmt.MASTER.tab
+-r--r--r--.  1   5061   5008  77M Aug 18 01:43 Hemlock30_longest-90,730-PTM1ud.fasta
+-rw-rw-r--.  1 centos centos  23M Nov 12 02:39 Hemlock30_longest-blastx-11outfmt-pt20b-convertedTo0.formatted
+drwxrwxr-x.  7 centos centos 4.0K Dec  3 23:45 MEGAN6-extractedReads
+drwxrwxr-x.  2 centos centos 4.0K Nov 30 01:02 MEGAN6-images
+-rw-rw-r--.  1 centos centos 3.7K Dec  4 00:06 mergeCsvFilesByColumn.R
+-rw-rw-rw-.  1   5061   5008  549 Jan 19  2021 .ncbirc
+drwxrwxrwx.  2 centos centos 4.0K Nov 12 02:58 original_BLASTx_output_files
+-rwxrwxrwx.  1 centos centos 2.2K Nov 20 00:50 selectLowestEValueSeqsFromBlastxCsv.R
+drwxrwx---.  2 centos centos 4.0K Nov 19 07:04 tabularTest
+drwxrwxr-x.  2 centos centos 4.0K Nov 12 04:26 testFiles
+-rw-rw-r--.  1   5061   5008  11M Nov 11 01:24 tmp
+[centos@ben-vnc megan]$ 
+
+
+
+

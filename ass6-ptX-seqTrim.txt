@@ -1,0 +1,239 @@
+
+---
+Hello, Ben:
+We have a small set of seqs that needed to be trimmed. Based on sequence positions listed in column ‘alignment start’ and ‘alignment end’ in the Sheet ‘NB742-735’, we need to trim seqs by removal amino acids before ‘alignment start’ and after ‘alignment end’.
+
+For example: ...
+
+We need to keep sequence from position 224 to 451 for WWP18_DN10008_c2_g1_i2.p1.
+A few seqs need to be trimmed more than once. For these cases, you just add –a, -b, or –c to the original seq IDs.
+Let us have a discussion if you have any questions.
+Jun-Jun
+
+attached: 
+WWP-Total-NBS735-HMM-ud.fasta
+Seq735HMM-again.xlsx
+
+---
+Hello, Ben:
+In total, we have four sets of seqs needed to be trimmed as enclosed. Thanks.
+Jun-Jun
+
+attached:
+LP36-HMM-NB1,101aa.fasta
+"NB-summary-for-Ben's extract.xlsx"
+Pila-NB-HMM-663aa.fasta
+WBP47-HMM-NB-pep875aa.fasta
+WWP18-HMM-NB-735aa.fasta
+
+---
+Hello, Ben:
+Probably you have not touched sequence trim yet. I have a update on the input data as enclosed. Please process this updated set if you have not tried on the previous set.
+Just let me know if you have any questions.
+Thanks.
+Jun-Jun
+
+attached: 
+LP36-HMM-NB1,103aa.fasta
+"NB-summary-for-Ben's extract.xlsx"
+'Pila-NB-ARC-663+11=674AA.fasta'
+WBP47-HMM-NB-pep875aa.fasta
+WWP18-NBS736aa-HMM-ud.fasta
+
+
+-----------
+Hi Jun-Jun,
+
+I've completed the sequence trim on the most recent updated data you sent me. Attached are the results. For sequence ids that occur more than once, I added "-fn" to the sequence id, where n is a unique number. 
+
+I've also pasted below the output of my sequence trim script, which recorded some off-by-one differences in your expected alignment length and the trimmed alignment length.
+
+Ben
+
+
+> source('trimSeqInFasta-aug2021-Pila-SP674-706.R')
+Running trimSeqInFasta.R.
+Loading required package: seqinr
+Input .csv file: SP674-706.csv
+Input fasta file: Pila-NB-ARC-663+11=674AA.fasta
+WARNING: For seq=PILA_08017 the trimmed sequence length is 48 but the expected alignment length is 47.
+WARNING: For seq=PILA_10779 the trimmed sequence length is 74 but the expected alignment length is 73.
+WARNING: For seq=PILA_18755 the trimmed sequence length is 30 but the expected alignment length is 29.
+WARNING: For seq=PILA_21348 the trimmed sequence length is 34 but the expected alignment length is 33.
+WARNING: For seq=PILA_22214 the trimmed sequence length is 37 but the expected alignment length is 36.
+WARNING: For seq=PILA_26827 the trimmed sequence length is 112 but the expected alignment length is 111.
+WARNING: For seq=PILA_29041 the trimmed sequence length is 37 but the expected alignment length is 36.
+WARNING: For seq=PILA_31373 the trimmed sequence length is 43 but the expected alignment length is 42.
+WARNING: For seq=PILA_32570 the trimmed sequence length is 120 but the expected alignment length is 119.
+WARNING: For seq=PILA_36945 the trimmed sequence length is 38 but the expected alignment length is 37.
+WARNING: For seq=PILA_38252 the trimmed sequence length is 38 but the expected alignment length is 37.
+================================================
+FINISHED.
+
+
+> source('trimSeqInFasta-aug2021-WWP18-743-736.R')
+Running trimSeqInFasta.R.
+Loading required package: seqinr
+Input .csv file: WWP18-743-736.csv
+Input fasta file: WWP18-NBS736aa-HMM-ud.fasta
+Warning in readLines(file) :
+  incomplete final line found on '/home/ben/pfc/junjun/ass6-pt7/sequenceTrim/newData/WWP18-NBS736aa-HMM-ud.fasta'
+  [Ben's note: I checked the above warning, and it did not affect the sequence trim results].
+WARNING: For seq=WWP18_DN20998_c0_g3_i4.p1 the trimmed sequence length is 101 but the expected alignment length is 100.
+================================================
+FINISHED.
+
+
+> source('trimSeqInFasta-aug2021-WBP47-882-875.R')
+Running trimSeqInFasta.R.
+Loading required package: seqinr
+Input .csv file: WBP47-882-875.csv
+Input fasta file: WBP47-HMM-NB-pep875aa.fasta
+================================================
+FINISHED.
+
+
+> source('trimSeqInFasta-aug2021-LP36-1108-1103.R')
+Running trimSeqInFasta.R.
+Loading required package: seqinr
+Input .csv file: LP36-1108-1103.csv
+Input fasta file: LP36-HMM-NB1,103aa.fasta
+Warning in readLines(file) :
+  incomplete final line found on '/home/ben/pfc/junjun/ass6-pt7/sequenceTrim/newData/LP36-HMM-NB1,103aa.fasta'
+  [Ben's note: I checked the above warning, and it did not affect the sequence trim results].
+WARNING: For seq=LP36_DN1108_c0_g3_i2.p1 the trimmed sequence length is 138 but the expected alignment length is 137.
+WARNING: For seq=LP36_DN21635_c0_g1_i1.p1 the trimmed sequence length is 33 but the expected alignment length is 32.
+================================================
+FINISHED.
+
+
+=====================
+Hello, Ben:
+Great output!. I’ll look at them, and let you any modification is required.
+BTW, I send you the seq data based on filtering from both longest and PYM=I for BLAST through Dropbox. Please let me know if you can access and download them.
+Thanks.
+Jun-Jun
+
+----
+
+=====================
+Ben:
+
+please see enclosed file to pick up lengest seq for representative of the genes.
+
+An example as  below, seq 1 ~ seq4 belong to the gene 'comp21958_c0'. Please pick up the row  'comp21958_c0_seq3' for this gene and the longest length '313' as the gene length.
+Name	Length
+comp21958_c0_seq1	272
+comp21958_c0_seq2	218
+comp21958_c0_seq3	313
+comp21958_c0_seq4
+--
+Hi Jun-Jun,
+I've attached the results from selecting the longest sequences of the Ht5313+5396-Trinity85,183-length file you sent me.
+--
+
+=====================
+jan 2022
+Hello, Ben:
+Hope all is well and that you got some time off for Christmas/Holiday period.
+Enclosed are file for you to trim the sequences, only keeping sequences for each with the same mIDs from positions of ‘Querry start’ to ‘Querry end’ as shown in the tab.
+Thanks!
+Jun-Jun
+'Seeq-220-for exon-trimming.xlsx'
+Total-205+14nt.fasta
+--
+Hi Jun-Jun, thanks, I had a very good and very busy Christmas/New Year with family. I will try to make up some time this week by looking again at the LD paper. 
+
+I've just checked the progress of the BLASTx runs on the WBP47 data, and more than half of them have finished, so I think the remaining half will finish soon. 
+
+I've attached the trimmed version of the Total-205+14nt.fasta file based on your instructions above. My script identified a few warnings, one because the sequence WWP18_DN4669_c0_g1_i1 wasn't found in the fasta file, and the rest because the trimmed sequence length didn't match the Hit length. I've pasted these below.
+
+For the missing sequence, I did find one WWP18_DN4669_c0_g1_i11, but I don't think it was intended because its sequence was shorter than the 'Query end' for WWP18_DN4669_c0_g1_i1.
+
+Ben
+
+
+WARNING: Removing the following sequence ids from the input id list because they were not found in the fasta file: 
+WWP18_DN4669_c0_g1_i1
+WARNING: For seq=WWP18_DN19612_c0_g1_i3 the trimmed sequence length is 3550 but the recorded Hit length is 3555.
+WARNING: For seq=WWP18_DN9141_c0_g1_i9 the trimmed sequence length is 2269 but the recorded Hit length is 2267.
+WARNING: For seq=WWP18_DN1701_c0_g2_i5 the trimmed sequence length is 2147 but the recorded Hit length is 2152.
+WARNING: For seq=WWP18_DN55545_c0_g1_i1 the trimmed sequence length is 2096 but the recorded Hit length is 2095.
+WARNING: For seq=WWP18_DN8312_c0_g1_i1 the trimmed sequence length is 2090 but the recorded Hit length is 2087.
+WARNING: For seq=WWP18_DN577_c1_g2_i2 the trimmed sequence length is 2075 but the recorded Hit length is 2074.
+WARNING: For seq=WWP18_DN134_c0_g2_i2 the trimmed sequence length is 1873 but the recorded Hit length is 1894.
+WARNING: For seq=WWP18_DN104039_c0_g1_i1 the trimmed sequence length is 1814 but the recorded Hit length is 1817.
+WARNING: For seq=WWP18_DN6245_c0_g1_i1 the trimmed sequence length is 1566 but the recorded Hit length is 1562.
+WARNING: For seq=WWP18_DN2573_c0_g1_i1 the trimmed sequence length is 1490 but the recorded Hit length is 1502.
+WARNING: For seq=WWP18_DN7079_c0_g1_i3 the trimmed sequence length is 1496 but the recorded Hit length is 1497.
+WARNING: For seq=WWP18_DN2390_c0_g1_i3 the trimmed sequence length is 1375 but the recorded Hit length is 1362.
+WARNING: For seq=WWP18_DN20481_c0_g2_i5 the trimmed sequence length is 1356 but the recorded Hit length is 1355.
+WARNING: For seq=WWP18_DN17906_c0_g1_i1 the trimmed sequence length is 1343 but the recorded Hit length is 1332.
+WARNING: For seq=WWP18_DN8284_c0_g1_i2 the trimmed sequence length is 1265 but the recorded Hit length is 1266.
+WARNING: For seq=WWP18_DN1918_c1_g1_i9 the trimmed sequence length is 1256 but the recorded Hit length is 1259.
+WARNING: For seq=WWP18_DN35196_c0_g1_i3 the trimmed sequence length is 1239 but the recorded Hit length is 1240.
+WARNING: For seq=WWP18_DN25958_c0_g1_i2 the trimmed sequence length is 1241 but the recorded Hit length is 1234.
+WARNING: For seq=WWP18_DN7193_c0_g1_i2 the trimmed sequence length is 1206 but the recorded Hit length is 1205.
+WARNING: For seq=WWP18_DN22107_c0_g1_i1 the trimmed sequence length is 1132 but the recorded Hit length is 1135.
+WARNING: For seq=WWP18_DN126290_c0_g1_i2 the trimmed sequence length is 1151 but the recorded Hit length is 1131.
+WARNING: For seq=WWP18_DN2664_c0_g1_i15 the trimmed sequence length is 1140 but the recorded Hit length is 1125.
+WARNING: For seq=WWP18_DN6552_c0_g2_i3 the trimmed sequence length is 1121 but the recorded Hit length is 1123.
+WARNING: For seq=WWP18_DN619_c0_g1_i4 the trimmed sequence length is 1070 but the recorded Hit length is 1075.
+WARNING: For seq=WWP18_DN12132_c0_g1_i1 the trimmed sequence length is 1051 but the recorded Hit length is 1050.
+WARNING: For seq=WWP18_DN11457_c0_g1_i2 the trimmed sequence length is 1053 but the recorded Hit length is 1049.
+WARNING: For seq=WWP18_DN2803_c0_g1_i6 the trimmed sequence length is 982 but the recorded Hit length is 983.
+WARNING: For seq=WWP18_DN1838_c1_g1_i3 the trimmed sequence length is 955 but the recorded Hit length is 952.
+WARNING: For seq=WWP18_DN5845_c0_g2_i1 the trimmed sequence length is 936 but the recorded Hit length is 935.
+WARNING: For seq=WWP18_DN1954_c1_g2_i2 the trimmed sequence length is 931 but the recorded Hit length is 925.
+WARNING: For seq=WWP18_DN1774_c1_g3_i5 the trimmed sequence length is 911 but the recorded Hit length is 913.
+WARNING: For seq=WWP18_DN7676_c0_g1_i13 the trimmed sequence length is 914 but the recorded Hit length is 911.
+WARNING: For seq=WWP18_DN1551_c0_g1_i16 the trimmed sequence length is 898 but the recorded Hit length is 902.
+WARNING: For seq=WWP18_DN4191_c0_g1_i1 the trimmed sequence length is 873 but the recorded Hit length is 877.
+WARNING: For seq=WWP18_DN9376_c0_g1_i4 the trimmed sequence length is 846 but the recorded Hit length is 849.
+WARNING: For seq=WWP18_DN6640_c0_g2_i14 the trimmed sequence length is 822 but the recorded Hit length is 819.
+WARNING: For seq=WWP18_DN45_c0_g1_i1 the trimmed sequence length is 795 but the recorded Hit length is 806.
+WARNING: For seq=WWP18_DN41984_c0_g1_i3 the trimmed sequence length is 780 but the recorded Hit length is 779.
+WARNING: For seq=WWP18_DN976_c2_g1_i6 the trimmed sequence length is 771 but the recorded Hit length is 773.
+WARNING: For seq=WWP18_DN2824_c0_g1_i3 the trimmed sequence length is 714 but the recorded Hit length is 716.
+WARNING: For seq=WWP18_DN28065_c0_g1_i7 the trimmed sequence length is 725 but the recorded Hit length is 710.
+WARNING: For seq=WWP18_DN10230_c0_g1_i4 the trimmed sequence length is 692 but the recorded Hit length is 695.
+WARNING: For seq=WWP18_DN9935_c0_g1_i3 the trimmed sequence length is 672 but the recorded Hit length is 671.
+WARNING: For seq=WWP18_DN1556_c1_g1_i1 the trimmed sequence length is 662 but the recorded Hit length is 661.
+WARNING: For seq=WWP18_DN2398_c0_g1_i3 the trimmed sequence length is 656 but the recorded Hit length is 658.
+WARNING: For seq=WWP18_DN22776_c0_g1_i1 the trimmed sequence length is 655 but the recorded Hit length is 656.
+WARNING: For seq=WWP18_DN18644_c0_g2_i2 the trimmed sequence length is 643 but the recorded Hit length is 648.
+WARNING: For seq=WWP18_DN22618_c0_g1_i3 the trimmed sequence length is 623 but the recorded Hit length is 632.
+WARNING: For seq=WWP18_DN10329_c0_g1_i13 the trimmed sequence length is 602 but the recorded Hit length is 601.
+WARNING: For seq=WWP18_DN5120_c0_g1_i19 the trimmed sequence length is 574 but the recorded Hit length is 572.
+WARNING: For seq=WWP18_DN27690_c1_g1_i1 the trimmed sequence length is 560 but the recorded Hit length is 563.
+WARNING: For seq=WWP18_DN15615_c0_g1_i2 the trimmed sequence length is 560 but the recorded Hit length is 561.
+WARNING: For seq=WWP18_DN21829_c0_g1_i2 the trimmed sequence length is 551 but the recorded Hit length is 552.
+WARNING: For seq=WWP18_DN1070_c0_g1_i1 the trimmed sequence length is 555 but the recorded Hit length is 549.
+WARNING: For seq=WWP18_DN28935_c0_g1_i1 the trimmed sequence length is 533 but the recorded Hit length is 547.
+WARNING: For seq=WWP18_DN19568_c0_g1_i5 the trimmed sequence length is 552 but the recorded Hit length is 546.
+WARNING: For seq=WWP18_DN5580_c0_g1_i1 the trimmed sequence length is 557 but the recorded Hit length is 541.
+WARNING: For seq=WWP18_DN2280_c0_g5_i2 the trimmed sequence length is 556 but the recorded Hit length is 532.
+WARNING: For seq=WWP18_DN959_c0_g1_i5 the trimmed sequence length is 527 but the recorded Hit length is 526.
+WARNING: For seq=WWP18_DN18202_c0_g2_i6 the trimmed sequence length is 534 but the recorded Hit length is 524.
+WARNING: For seq=WWP18_DN3827_c0_g1_i7 the trimmed sequence length is 514 but the recorded Hit length is 513.
+WARNING: For seq=WWP18_DN1922_c0_g1_i2 the trimmed sequence length is 511 but the recorded Hit length is 512.
+WARNING: For seq=WWP18_DN26646_c0_g1_i1 the trimmed sequence length is 506 but the recorded Hit length is 505.
+WARNING: For seq=WWP18_DN36690_c0_g1_i5 the trimmed sequence length is 489 but the recorded Hit length is 491.
+WARNING: For seq=WWP18_DN3428_c0_g1_i4 the trimmed sequence length is 502 but the recorded Hit length is 482.
+WARNING: For seq=WWP18_DN17522_c0_g1_i1 the trimmed sequence length is 444 but the recorded Hit length is 447.
+WARNING: For seq=WWP18_DN57705_c0_g1_i1 the trimmed sequence length is 428 but the recorded Hit length is 440.
+WARNING: For seq=WWP18_DN483_c0_g1_i22 the trimmed sequence length is 443 but the recorded Hit length is 436.
+WARNING: For seq=WWP18_DN7997_c0_g1_i2 the trimmed sequence length is 422 but the recorded Hit length is 412.
+WARNING: For seq=WWP18_DN1344_c0_g1_i17 the trimmed sequence length is 413 but the recorded Hit length is 395.
+WARNING: For seq=WWP18_DN14609_c0_g1_i4 the trimmed sequence length is 351 but the recorded Hit length is 360.
+WARNING: For seq=WWP18_DN4512_c0_g3_i1 the trimmed sequence length is 332 but the recorded Hit length is 335.
+WARNING: For seq=WWP18_DN2344_c1_g1_i1 the trimmed sequence length is 319 but the recorded Hit length is 324.
+WARNING: For seq=WWP18_DN10055_c0_g1_i13 the trimmed sequence length is 317 but the recorded Hit length is 309.
+WARNING: For seq=WWP18_DN18680_c0_g1_i3 the trimmed sequence length is 301 but the recorded Hit length is 303.
+WARNING: For seq=WWP18_DN8796_c0_g1_i13 the trimmed sequence length is 275 but the recorded Hit length is 274.
+WARNING: For seq=WWP18_DN6191_c0_g1_i13 the trimmed sequence length is 251 but the recorded Hit length is 248.
+WARNING: For seq=WWP18_DN3803_c0_g6_i1 the trimmed sequence length is 219 but the recorded Hit length is 218.
+
+
+=====================
+

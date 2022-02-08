@@ -1,0 +1,344 @@
+==============================
+Figuring out how to show three variables by scatterplot:
+
+--
+Ben:
+I like to present some data as Figure 3a and 3c. Basically they show three variables in X- and Y-axis. Thanks for your consideration
+Have a nice weekend.
+Go-term-network.pdf
+--
+Hi Jun-Jun, it looks like in Figures 3a and 3c the x and y variables determine the location of the circle, and the z variable determines how large the circle is. Am I right? I will see if I can find a way to do this.
+--
+Your understanding is right. When you get time, I can send link about how to drawn this kind pictures using three variables.
+--
+Hello, Ben:
+The WBP47 data is completed at this stage. If you have time, please take a look at this paper. It mentioned a way show three variables by scatterplot in Figure 2.  We have a ms completed but needs something like this. Thanks.
+For this ms!
+Hemlock-MS-Feb-2022.docx
+Figures 1-5.pptx
+--
+Hello, Ben:
+Another way to present our data is like Figure 6B, 6C as in this paper.
+Using dot size to present gene number and using colors to present p-values.
+XY-axis to present item ID, and X-axis to present either up- or down-regulated genes
+This kind presentation is easy for you?
+Thanks for your consideration.
+Have a nice weekend.
+biomedicines-09-01817.pdf
+--
+When X-axis is used to present either up- or down-regulated genes, it is better to put the dots at different positions of X-axis (see enclosed fraft); not align the dots at exact one position of the X-axis as in that paper.
+Go-presentation.jpg
+--
+Hi Jun-Jun,
+I've found a way to do the first kind of scatterplot with different-sized dots, but I've needed to install a newer of R to use it properly. I'm still working on that and making sure I can do graphics stuff with it. Once I'm sure that's working properly I can also look for a way to do this new type of plot that you showed me. Actually, I think I might be able to use the same tools to do both kinds, since they are very similar. Would you prefer to plot the data this newer way rather than the first example you sent me? 
+
+Ben
+--
+Hello, Ben:
+The newer version actually present two variables as enclosed tab. The old version will present three variables. I’ll take a look to see if I can extract the 3rd variable or not at weekend (using GO names to tract gene IDs). This is why I think the newer version should simpler than the older version.
+Enriched-data-Figure4-OLD.xlsx
+--
+Hello, Ben:
+I just find that we can get data for first kind of scatterplot with different-sized dots. So please focus on this type of data presentation. P-values will be changed to –log (p-values)
+For example:
+
+Go Term ID       p-values  (y-axis)      fold change (x-axis)         Gene no or the 2nd p-values (sizes)
+GO term 1:       1 x 10-10               10                           10      (1 x 10-5)
+GO term2:        1 x 10-5                -5                            2      (1 x 10-4)
+GO-term3         1 x 10-2                 6                            4      (1 x 10-3)
+--
+Hello, Ben:
+I have dug out the data at weekend. It looks that we have a total of five variables: (1) GO name, (2) Change fold (CF) of the genes,  (3) log(CF-p-values), (4) Log (GO-FDR-p-values), and (5) Sizes (Gene no). Please see the enclosed two data-spread-sheets. Once you have installed the new R-package, let us discuss how to present this kind data.
+Thanks.
+Enriched-datainput-Figure4.xlsx
+--
+Hi Jun-Jun,
+I've successfully tested the bubble plot graphics. Shall we chat via Zoom this afternoon? I can do any time after 1:30pm.
+
+Ben
+--
+Hi Jun-Jun,
+Here's an initial test of the QR data. There are only 15 points because GO-0009800-seq3-QRup183 and GO-0009803-seq3-QRup183 have the same numbers. I haven't tried to refine the margins or legends or add the names yet. Let me know if you have any suggestions. Are the bubbles a decent size? Should I make them bigger?
+
+Ben
+QR-test1.png
+--
+Hello, It looks great! You can make bubbles half of the sizes. Also, you can make the legends of the sizes and CF-FDR-p-values  much smaller, and better put them inside image if you can?
+
+Thanks.
+Jun-Jun
+--
+IMAGE REQUIREMENTS FROM THE JOURNAL: 
+For figures with more than one panel, panels should be clearly indicated using labels (A), (B), (C), (D), etc.
+
+In case of acceptance, our Production Office might require high-resolution files of the figures included in the manuscript in EPS, JPEG or TIF/TIFF format.
+
+Figures should be prepared with the PDF layout in mind. Individual figures should not be longer than one page and with a width that corresponds to 1 column (85 mm) or 2 columns (180 mm).
+
+All images must have a resolution of 300 dpi at final size.
+--
+
+
+
+if(!require(ggplot2)) {
+  install.packages('ggplot2', repos='http://cran.us.r-project.org')
+}
+library(ggplot2)
+
+if(!require(ggrepel)) {
+  install.packages('ggrepel')
+}
+library(ggrepel) 
+
+
+--
+QR data:
+dataQr <- data.frame( 
+  change_fold = c(45.1,45.1,6.9,6.9,18.8,12.7,147.9,-18.9,-18.9,-18.9,-42.6,-10.9,-48.7,-102.3,-154.7,-18.4), 
+  GO_FDR_p_values = c(1.24,1.39,1.84,1.84,2.31,2.58,5.08,3.2,1.47,3.37,5.6,2.57,7.27,4.42,4.79,2.21), 
+  sizes = c(8,8,3,3,7,3,39,7,7,7,7,2,8,20,15,3), 
+  CF_p_values = c(37.6,37.6,5.7,5.7,14.2,202.4,342.9,11.8,11.8,11.8,12.3,3.2,13.6,34.3,27.7,7.7), 
+  GO_name = c("terpenoid metabolic process","terpenoid biosynthetic process","cinnamic acid biosynthetic process","cinnamic acid metabolic process","benzene-containing compound metabolic process","GDP-mannose 3,5-epimerase activity","oxidoreductase activity","steroid metabolic process","response to wounding","xylem and phloem pattern formation","cellular respiration","iron coordination entity transport","electron transfer activity","oxidoreductase activity","transmembrane transporter activity","proton-transporting ATP synthase complex"), 
+  lab_order = c(15,14,12,13,11,10,16,6,8,5,4,9,3,2,1,7), 
+  stringsAsFactors = TRUE )
+
+
+
+SUS data:
+dataSus <- data.frame( 
+  change_fold = c(49.7,121.3,37.6,37.6,51.6,62.9,22.6,103.5,91.6,36.5,-16.3,-194.4,-12.3), 
+  GO_FDR_p_values = c(4.19,1.79,1.36,1.59,1.91,2.42,1.95,2.22,2.35,8.7,0.29,0.28,0.28), 
+  sizes = c(11,36,13,13,19,20,9,34,31,7,3,2,2), 
+  CF_p_values = c(17.9,89.4,43.2,43.2,43.3,47.6,30.9,94.3,84.2,12.4,10.3,4.2,3.7), 
+  GO_name = c("DNA replication","cellular component organization","external encapsulating structure organization","cell wall organization","DNA-binding transcription factor activity","hydrolase activity, hydrolyzing O-glycosyl compounds","pectinesterase activity","cell periphery","plasma membrane","MCM complex","plant-type cell wall modification","basic amino acid transport","killing of cells of other organism"), 
+  lab_order = c(5,13,8,7,9,10,6,12,11,4,2,1,3), 
+  stringsAsFactors = TRUE )
+
+
+--
+# QR:
+gr <- ggplot(dataQr, aes(x=change_fold, y=GO_FDR_p_values, size=sizes)) + geom_point(alpha=0.7, aes(color=CF_p_values)) + scale_size(name = "#DEGs involved\nin the GO term", limits = c(2, 40), range = c(1.4, 14.2), breaks = c(30, 15, 7, 2)) + scale_colour_gradient(name = "\u03A3 -log(p-value) of\nDEGs' change fold", low="blue", high="red", limits = c(0, 350), breaks = c(0, 100, 200, 300)) + theme(legend.key.size = unit(0.5, "cm")) + xlab("\u03A3 Change Fold") + ylab("-log(p-value) of the GO term")
+
+gr + geom_label_repel(aes(label = lab_order), size=3.5, box.padding = 0.25, point.padding = 0.2 , segment.color = 'grey50', direction = "both", max.time = 10, nudge_y = 0.5, force = 100)
+
+
+gr <- ggplot(dataQr, aes(x=change_fold, y=GO_FDR_p_values, size=sizes)) + geom_point(alpha=0.7, aes(color=CF_p_values)) + scale_size(name = "#DEGs involved\nin the GO term", limits = c(2, 40), range = c(1.4, 14.2), breaks = c(30, 15, 7, 2)) + scale_colour_gradient(name = "\u03A3 -log(p-value) of\nDEGs' change fold", low="blue", high="red", limits = c(0, 350), breaks = c(0, 100, 200, 300)) + theme(legend.position=c(.75, .67), legend.key.size = unit(0.5, "cm")) + xlab("\u03A3 Change Fold") + ylab("-log(p-value) of the GO term") + geom_label_repel(aes(label = lab_order), size=3.5, box.padding = 0.25, point.padding = 0.2 , segment.color = 'grey50', direction = "both", max.time = 10, nudge_y = 0.5, force = 100)
+
+
+--
+# SUS:
+gs <- ggplot(dataSus, aes(x=change_fold, y=GO_FDR_p_values, size=sizes)) + geom_point(alpha=0.7, aes(color=CF_p_values)) + scale_size(name = "#DEGs involved\nin the GO term", limits = c(2, 40), range = c(1.4, 14), breaks = c(30, 15, 7, 2)) + scale_colour_gradient(name = "\u03A3 -log(p-value) of\nDEGs' change fold", low="blue", high="red", limits = c(0, 100), breaks = c(0, 30, 60, 90)) + theme(legend.key.size = unit(0.5, "cm")) + xlab("\u03A3 Change Fold") + ylab("-log(p-value) of the GO term")
+
+gs + geom_label_repel(aes(label = lab_order), size=3.5, box.padding = 0.25, point.padding = 0.2 , segment.color = 'grey50', direction = "both", max.time = 10, nudge_y = 0.7, force = 100)
+
+
+gs <- ggplot(dataSus, aes(x=change_fold, y=GO_FDR_p_values, size=sizes)) + geom_point(alpha=0.7, aes(color=CF_p_values)) + scale_size(name = "#DEGs involved\nin the GO term", limits = c(2, 40), range = c(1.4, 14), breaks = c(30, 15, 7, 2)) + scale_colour_gradient(name = "\u03A3 -log(p-value) of\nDEGs' change fold", low="blue", high="red", limits = c(0, 100), breaks = c(0, 30, 60, 90)) + theme(legend.position=c(.3, .6), legend.key.size = unit(0.5, "cm")) + xlab("\u03A3 Change Fold") + ylab("-log(p-value) of the GO term") + geom_label_repel(aes(label = lab_order), size=3.5, box.padding = 0.25, point.padding = 0.2 , segment.color = 'grey50', direction = "both", max.time = 10, nudge_y = 0.7, force = 100)
+
+--
+scp -J inf2 brancourt@borealpfc.nfis.org:/public/genomics/junjun/Data-Dec2020/Bens-Trinity-assembly/BLASTxRuns/BLASTx-WBP47/BLASTxResultsAll/tmp/*.png .
+
+ssh -v -L 2223:borealpfc.nfis.org:22 -N -l brancour inf2.pfc.forestry.ca
+ssh -v -L 5901:10.20.0.120:5901 -N -p 2223 brancourt@localhost
+java -jar VncViewer-1.11.0.jar
+
+--
+
+Hi Jun-Jun,
+
+Sorry for the slow progress. It took me a while to figure out how to get the labels to display nicely. I've attached a sample chart each for QR and SUS, not in the right format for printing yet. Would you like me to include the GO names on a legend for each chart, or would you prefer to include them in the caption. Below are the corresponding GO names for the label numbers:
+
+--
+QR:
+1.	transmembrane transporter activity
+2.	oxidoreductase activity
+3.	electron transfer activity
+4.	cellular respiration
+5.	xylem and phloem pattern formation
+6.	steroid metabolic process
+7.	proton-transporting ATP synthase complex
+8.	response to wounding
+9.	iron coordination entity transport
+10.	GDP-mannose 3,5-epimerase activity
+11.	benzene-containing compound metabolic process
+12.	cinnamic acid biosynthetic process
+13.	cinnamic acid metabolic process
+14.	terpenoid biosynthetic process
+15.	terpenoid metabolic process
+16.	oxidoreductase activity
+
+
+SUS: 
+1.	basic amino acid transport
+2.	plant-type cell wall modification
+3.	killing of cells of other organism
+4.	MCM complex
+5.	DNA replication
+6.	pectinesterase activity
+7.	cell wall organization
+8.	external encapsulating structure organization
+9.	DNA-binding transcription factor activity
+10.	hydrolase activity, hydrolyzing O-glycosyl compounds
+11.	plasma membrane
+12.	cell periphery
+13.	cellular component organization
+
+
+--
++ ggtitle("HELLO")
+
+--
+gr + theme(legend.justification=c(1,0), legend.position=c(1,0))
+gr + theme(legend.key.size = unit(0.5, "cm"))
+
+gr + scale_size_continuous(name = "Prop.", breaks = bb, limits = c(.05, .4), labels = ll, range = c(0, 6) )
+gr + scale_size_continuous(name = "Test.", limits = c(2, 40), range = c(1.4, 18.2), breaks = c(30, 15, 7, 2))
+
+--
+ + geom_text(aes(label = lab_order), size=4, hjust = 1,  vjust = -1)
+ + geom_text(aes(label = GO_name), size=3.5, hjust = 1,  vjust = -1)
+
+ + geom_label_repel(aes(label = GO_name), size=3.5, box.padding = 0.35, point.padding = 0.5, segment.color = 'grey50') 
+ + geom_label_repel(aes(label = GO_name), size=3.5, box.padding = 0.35, point.padding = 0.5, segment.color = 'grey50',  nudge_y = 4.5)
+
+
+gs + 
+geom_label_repel(aes(label = GO_name), size=3.5, box.padding = 0.35, point.padding = 0.5, segment.color = 'grey50',  nudge_y = 4.5) + 
+
+ + geom_label_repel(aes(label = GO_name), size=3.5, box.padding = 0.25, point.padding = 0.2, segment.color = 'grey50',  nudge_y = 4.5)
+ + geom_label_repel(aes(label = GO_name), size=3.5, box.padding = 0.25, point.padding = 0.2, segment.color = 'grey50',  direction = "y", nudge_y = 0.5, max.time = 10)
+
+gs + geom_label_repel(aes(label = lab_order), size=3.5, box.padding = 0.25, point.padding = 0.2 , segment.color = 'grey50', direction = "both", max.time = 10, nudge_y = 0.5, force = 100)
+
+--
+gr + geom_label_repel(aes(label = lab_order), size=3.5, box.padding = 0.25, point.padding = 0.2 , segment.color = 'grey50', direction = "both", max.time = 10, nudge_y = 0.5, force = 100)
+
+Possibly add this: min.segment.length = 0.1,  
+
+--
+     geom_text_repel(
+       mapping = NULL,
+       data = NULL,
+       stat = "identity",
+       position = "identity",
+       parse = FALSE,
+       ...,
+       box.padding = 0.25,
+       point.padding = 1e-06,
+       min.segment.length = 0.5,
+       arrow = NULL,
+       force = 1,
+       force_pull = 1,
+       max.time = 0.5,
+       max.iter = 10000,
+       max.overlaps = getOption("ggrepel.max.overlaps", default = 10),
+       nudge_x = 0,
+       nudge_y = 0,
+       xlim = c(NA, NA),
+       ylim = c(NA, NA),
+       na.rm = FALSE,
+       show.legend = NA,
+       direction = c("both", "y", "x"),
+       seed = NA,
+       verbose = FALSE,
+       inherit.aes = TRUE
+     )
+
+
+
+------------------------------------
+> library(ggplot2)
+Error in library(ggplot2) : there is no package called ‘ggplot2’
+> 
+> if(!require(ggplot2))
++ {
++   install.packages('ggplot2', repos='http://cran.us.r-project.org')
++ }
+Loading required package: ggplot2
+Installing package into ‘/usr/lib64/R/library’
+(as ‘lib’ is unspecified)
+Warning in install.packages("ggplot2", repos = "http://cran.us.r-project.org") :
+  'lib = "/usr/lib64/R/library"' is not writable
+Would you like to use a personal library instead? (yes/No/cancel) yes
+Would you like to create a personal library
+‘~/R/x86_64-redhat-linux-gnu-library/3.6’
+to install packages into? (yes/No/cancel) yes
+.
+.
+.
+Error: package ‘glue’ was installed by an R version with different internals; it needs to be reinstalled for use with this R version
+Execution halted
+ERROR: lazy loading failed for package ‘ggplot2’
+* removing ‘/home/centos/R/x86_64-redhat-linux-gnu-library/3.6/ggplot2’
+
+The downloaded source packages are in
+	‘/tmp/Rtmp8xtihQ/downloaded_packages’
+Warning messages:
+1: In library(package, lib.loc = lib.loc, character.only = TRUE, logical.return = TRUE,  :
+  there is no package called ‘ggplot2’
+2: In install.packages("ggplot2", repos = "http://cran.us.r-project.org") :
+  installation of package ‘ggplot2’ had non-zero exit status
+
+
+------------------------------
+
+
+----
+INSTALLING R:
+
+--
+Installing R in CentOS 8 (Don't use this method, instead build from source so I can have multiple versions): 
+https://linuxize.com/post/how-to-install-r-on-centos-8/
+https://computingforgeeks.com/install-r-and-rstudio-on-centos-rhel-linux/
+
+--
+Installing multiple versions of R in Centos 7/8 by building from source: 
+
+https://support.rstudio.com/hc/en-us/articles/215488098-Installing-multiple-versions-of-R-on-Linux
+https://www.r-bloggers.com/2018/03/multiple-versions-of-r/
+
+sudo yum-builddep R
+# then get and unpack the source tarball from:  https://cran.rstudio.com/src/base/
+wget https://cran.rstudio.com/src/base/R-4/R-4.1.2.tar.gz
+tar -xzvf R-4.1.2.tar.gz
+cd R-4.1.2
+# Build R from source
+#./configure --prefix=/opt/R/$(cat VERSION) --enable-R-shlib --with-blas --with-lapack
+./configure --prefix=/home/centos/software/R/installed/$(cat VERSION) --enable-R-shlib --with-blas --with-lapack
+make
+make install  # (don't use sudo unless installing in a root location)
+
+cd /usr/local/bin  # or cd ~/bin, if it exists
+sudo ln -s /home/centos/software/R/installed/4.1.2/bin/R R4
+sudo ln -s /home/centos/software/R/installed/4.1.2/bin/Rscript Rscript4
+
+
+
+configure: WARNING: neither inconsolata.sty nor zi4.sty found: PDF vignettes and package manuals will not be rendered optimally
+
+
+---------------------------
+INSTALLING GGPLOT2: 
+
+
+if(!require(ggplot2)) {
+  install.packages('ggplot2', repos='http://cran.us.r-project.org')
+}
+
+if(!require(ggplot2)) {
+  install.packages('ggplot2')
+}
+...
+* DONE (ggplot2)
+The downloaded source packages are in
+	‘/tmp/Rtmpf7kD1m/downloaded_packages’
+Updating HTML index of packages in '.Library'
+Making 'packages.html' ... done
+Warning message:
+In library(package, lib.loc = lib.loc, character.only = TRUE, logical.return = TRUE,  :
+  there is no package called ‘ggplot2’
+> 
+
+
+library(ggplot2)
+
+

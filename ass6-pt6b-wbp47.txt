@@ -18,6 +18,8 @@ Strategy:
       And after some jigging of the numbers for relative equal sizes, I ended up with:      
       So: 2 of 56914,2 of 57914, 2 of 36368, 2 of 75394*0.8=60316, 1 of 79394-4000=75394, 4 of 22684+3000=25684
 
+[AFTER COMMENT: I ended up choosing a size ratio (for x1:mm2:mm1) of roughly 1:1.45:2.25. The mm2's were the fastest, the x1's were the slowest. I suggest next time choosing a ratio of 1:2:2.5].
+
 - put each section into its own folder labelled sequentially, with .ncbirc file as well
 - create script to: combine all output files in proper order, convert format to desired format
         
@@ -78,5 +80,164 @@ The final BLASTx processes for WBP47 have all completed this morning. Would you 
 
 For the WBP47 data, I will combine the BLASTx output and open it in MEGAN6.
 --
+
+mkdir BLASTxResultsAll
+chmod 777 BLASTxResultsAll
+mv `find . -mindepth 2 -maxdepth 2 -name *.out -type f` BLASTxResultsAll/
+
+cat WBP47_longest300575-blastx-11outfmt-pt01.out >> WBP47_longest300575-blastx-11outfmt.MASTER
+cat WBP47_longest300575-blastx-11outfmt-pt02.out >> WBP47_longest300575-blastx-11outfmt.MASTER
+cat WBP47_longest300575-blastx-11outfmt-pt03.out >> WBP47_longest300575-blastx-11outfmt.MASTER
+cat WBP47_longest300575-blastx-11outfmt-pt04.out >> WBP47_longest300575-blastx-11outfmt.MASTER
+cat WBP47_longest300575-blastx-11outfmt-pt05.out >> WBP47_longest300575-blastx-11outfmt.MASTER
+cat WBP47_longest300575-blastx-11outfmt-pt06.out >> WBP47_longest300575-blastx-11outfmt.MASTER
+cat WBP47_longest300575-blastx-11outfmt-pt07.out >> WBP47_longest300575-blastx-11outfmt.MASTER
+cat WBP47_longest300575-blastx-11outfmt-pt08.out >> WBP47_longest300575-blastx-11outfmt.MASTER
+cat WBP47_longest300575-blastx-11outfmt-pt09.out >> WBP47_longest300575-blastx-11outfmt.MASTER
+cat WBP47_longest300575-blastx-11outfmt-pt10.out >> WBP47_longest300575-blastx-11outfmt.MASTER
+cat WBP47_longest300575-blastx-11outfmt-pt11.out >> WBP47_longest300575-blastx-11outfmt.MASTER
+cat WBP47_longest300575-blastx-11outfmt-pt12.out >> WBP47_longest300575-blastx-11outfmt.MASTER
+cat WBP47_longest300575-blastx-11outfmt-pt13.out >> WBP47_longest300575-blastx-11outfmt.MASTER
+
+
+sudo mount -t nfs 10.20.0.6:/Public/genomics/junjun/Data-Dec2020/Bens-Trinity-assembly/BLASTxRuns/BLASTx-WBP47/BLASTxResultsAll /work
+
+--
+Convert to 0 format for MEGAN6 input:
+blast_formatter -archive WBP47_longest300575-blastx-11outfmt.MASTER -outfmt 0 -out WBP47_longest300575-blastx-0outfmt.MASTER
+
+Opening it in MEGAN6: 
+
+Here are the LCA parameters I ended up with for the Hemlock30 data, so reusing these (all default except Min Support Percent): 
+Min Score: 50.0
+Max Expected: 0.01 
+Min Percent Identity: 0.0
+Top Percent: 10.0
+Min Support Percent: (custom) 0
+Min Support: 0
+Use Min-Complexity Filter: off
+LCA Algorithm: naive
+Percent to cover: 100%
+Read assignment mode: readCount
+Use 16S Percent Identity Filter: off
+
+Can try to try running parameter in case difference?  Min Support Percent: (custom) 0.01 down to 0.
+I can not find: Read assignment mode: readCount. We have NOT used raw NGS reads for BLAST, what we used is assembled seq from raw reads.
+
+
+Copying the images I exported from MEGAN6 to my computer: 
+scp -J inf2 brancourt@borealpfc.nfis.org:/public/genomics/junjun/Data-Dec2020/Bens-Trinity-assembly/BLASTxRuns/BLASTx-WBP47/BLASTxResultsAll/WBP47-MEGAN6-images/* .
+or: 
+scp -J borealremote brancourt@borealjump.nfis.org:/public/genomics/junjun/Data-Dec2020/Bens-Trinity-assembly/BLASTxRuns/BLASTx-WBP47/BLASTxResultsAll/WBP47-MEGAN6-images/* .
+
+--
+
+Ran this blast_formatter command to get *TABULAR* data: 
+nohup blast_formatter -archive WBP47_longest300575-blastx-11outfmt.MASTER -outfmt "6 qseqid stitle ssciname staxid evalue sacc" -out WBP47_longest300575-blastx-6outfmt.MASTER.tab 2>&1 > blast_formatter.log &
+
+- then replace all instances of comma with semicolon:  
+    sed -i 's/,/;/g' WBP47_longest300575-blastx-6outfmt.MASTER.tab
+- then replace all tab with comma:  
+    sed 's/\t/,/g' WBP47_longest300575-blastx-6outfmt.MASTER.tab > WBP47_longest300575-blastx-6outfmt.MASTER.csv 
+- then add header line (just using cat and >>): 
+query id,subject title,subject sci name,subject tax id,evalue,subject acc.
+
+--
+Hi Jun-Jun,
+
+I've extracted the WBP47 BLASTx data into a .csv file, and I've also opened the BLASTx output in MEGAN6. I used the same MEGAN6 settings as the Hemlock30 data. 
+
+I've attached an image of the MEGAN6 tree structure that I've created based on the tree we decided on for the Hemlock30 data, to the same number of levels. Would you like me to make any changes to this tree before I extract the MEGAN6 data to add it to the BLASTx csv data?
+
+Ben
+
+--
+Image looks fine. Please go ahead to extract data in the same way as you did on Hemlock30.
+--
+
+To extract data from MEGAN6, select nodes and us the AC button:
+- for leaf nodes, include Summarized reads
+- for non-leaf nodes, don't unclide Summarized reads
+
+--
+For the MEGAN6 part, "maybe you just listed the specification (taxonomic-terms) under Node-1 to Node-6 based on the image you sent.":
+x- for non-leaf nodes, export only the assigned
+x- for leaf nodes, export both the assigned and the summarized
+x- the taxonomic term is in the filename
+x- for each file, update the filename to include its sequence of parents separated by a comma
+- create a table of seq ids with taxonomic term
+    - for each file, export only the > rows, and replace the > with the filename plus comma
+          grep ">" filename > filename
+          sed -i 's/^>/filename,/g filename
+    - do I need to add commas at end of rows for non-leaf nodes? probably: 
+          sed -i 's/.*$/&,,,/g' tmp.txt
+          or: 
+          sed -i 's/$/,,,/g' tmp.txt
+    - join all files and add a header line
+
+For the above, see script: extractOnlySeqIdsFromFastaFilesAndPasteFilename.sh
+
+Then:
+nano MEGAN6_seqCategories_all.txt, and add this header line:
+seq_id,level_01,level_02,level_03,level_04,level_05,level_06,level_07,level_08
+Then, contatenate all to it:
+cat `ls *.csv` >> MEGAN6_seqCategories_all.txt
+
+- then merge that table with my blastx table based on seq id: 
+mergeCsvFilesByColumn.R
+
+NCBI,
+NCBI,cellular_organisms,
+NCBI,cellular_organisms,Eukaryota,
+NCBI,cellular_organisms,Eukaryota,Opisthokonta,
+NCBI,cellular_organisms,Eukaryota,Opisthokonta,Metazoa,
+NCBI,cellular_organisms,Eukaryota,Opisthokonta,Fungi,
+NCBI,cellular_organisms,Eukaryota,Opisthokonta,Fungi,Dikarya,
+NCBI,cellular_organisms,Eukaryota,Opisthokonta,Fungi,Dikarya,Ascomycota,
+NCBI,cellular_organisms,Eukaryota,Opisthokonta,Fungi,Dikarya,Basidiomycota,
+NCBI,cellular_organisms,Eukaryota,Opisthokonta,Metazoa,Eumetazoa,
+NCBI,cellular_organisms,Eukaryota,Opisthokonta,Metazoa,Eumetazoa,Bilateria,
+NCBI,cellular_organisms,Eukaryota,Opisthokonta,Metazoa,Eumetazoa,Bilateria,Protostomia,
+NCBI,cellular_organisms,Eukaryota,Viridiplantae,
+NCBI,cellular_organisms,Eukaryota,Viridiplantae,Streptophyta,
+NCBI,cellular_organisms,Eukaryota,Viridiplantae,Streptophyta,Streptophytina,
+NCBI,cellular_organisms,Eukaryota,Viridiplantae,Streptophyta,Streptophytina,Embryophyta,
+
+Next, made sure the filenames no longer began with "reads-" or "leafReads-", then...:
+Then ran ./extractOnlySeqIdsFromFastaFilesAndPasteFilename.sh 
+
+Then:
+nano MEGAN6_seqCategories_all.txt, and add this header line:
+seq_id,level_01,level_02,level_03,level_04,level_05,level_06,level_07,level_08
+Then, contatenate all to it:
+cat `ls *.csv` >> MEGAN6_seqCategories_all.txt
+
+- then merge that table with my blastx table based on seq id: 
+mergeCsvFilesByColumn.R
+
+WBP47_longest300575-blastx-6outfmt.MASTER.csv
+WBP47_longest300575-blastx-6outfmt.MASTER-topPicks.csv
+WBP47-MEGAN6-reads/MEGAN6_seqCategories_all.csv
+
+
+source('selectLowestEValueSeqsFromBlastxCsv.R')
+
+write("==========================================================")
+
+source('mergeCsvFilesByColumn.R')
+
+
+--
+Hi Jun-Jun,
+
+Here is the csv output of BLASTx and MEGAN6, both separate and combined. The BLASTx data has been filtered by lowest e-value, which I remember you asked for last time. 
+https://www.dropbox.com/s/i67quvi0b1x6b92/WBP47-BLASTx-MEGAN6-csvOutput.zip?dl=1
+
+Ben
+
+--
+
+
+
 
 

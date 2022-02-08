@@ -1,0 +1,55 @@
+
+
+---
+Hi, Ben and Kangakola:
+
+Below is a set of simplest data (4 SNPs x 20 samples) for our case study. It may help understanding the calculation procedures. Thanks. Jun-Jun
+
+                    *              *
+SNPID,Sample01,Sample02,Sample03,Sample04,Sample05,Sample06,Sample07,Sample08,Sample09,Sample10,Sample11,Sample12,Sample13,Sample14,Sample15,Sample16,Sample17,Sample18,Sample19,Sample20
+SNP1,AA,AA,AA,AA,AA,AA,AA,AA,AA,AA,AG,AG,AG,AG,AG,AG,AG,AG,AG,AG
+SNP2,AA,AA,AA,AA,AA,AA,AA,AA,AA,AA,AA,AG,AG,AG,AG,AG,AG,AG,AG,AG
+SNP3,AA,AA,AA,AA,AG,AG,AG,AG,AG,AG,AA,AA,AA,AA,AA,AG,AG,AG,AG,AG
+SNP4,AA,AA,AA,AA,AG,AA,AG,AG,AG,AG,AA,AA,AA,AA,AA,AG,AG,AG,AG,AG
+
+SNP1 and SNP2 are associated with 0.5% recombination between them.
+SNP3 and SNP4 are associated with 0.5% recombination between them.
+SNP1 and SNP3 are not associated, and so on.
+--
+If all samples come from one same father and one same mother, recombination rates (RR) and LD values are in opposite linear relationship. Two markers are same pattern across all samples, then RR=0, and LD=1 as their relationship devalued. If two markers show random patterns between them, then RR=50%, LD=0.
+
+Below example data, SNP1-2, LD=0.95, RR=0.05
+
+The samples shared ancestors many generations ago, then RR and LD are opposite non-linear relationship. I believe that paper contributed to how to calculate this kind non-liner relationship between any two markers of all markers.
+
+As for RR and LD values alone are very easy calculated, there are many software can do it. For example, TASSEL can do calculate millions of makers across thousands samples very quickly.
+-- 
+jun-jun: 
+https://www.maizegenetics.net/tassel
+--
+[kangakola]:
+Hello Jun-Jun,
+
+What kind of output that you expect from using TASSEL? I see the graph but is there other quantitative output such as statistical significance and LD threshold just wondering.
+
+If this software can give the same results as described in the article, may this is the way to go.
+--
+[kangakola]:
+Here is the link fro the tassel R front end for Ben to explore.
+
+https://bitbucket.org/bucklerlab/rtassel/src/master/R/
+--
+jun-jun:
+Input for TASSEL is genotypic data, it is easy to modify the raw SNP data from Ben’s Pipeline as an input file. The outcomes of TASSEL include statistics analysis and LD values for all potential pairs of SNPs. The issues are how put these data into analysis at next step, linking to the formula as specified in the paper.
+--
+[kangakola]:
+Ok, now I get it. I will do my best to explore how to do this.
+--
+jun-jun:
+This paper calculated LD values between any two SNPs of all 72 SNPS in ~150 samples (Fig. 2) using TASSEL windows version.
+2020-AB-LP-fpls.pdf
+--
+
+
+ 
+

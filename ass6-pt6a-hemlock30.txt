@@ -421,7 +421,7 @@ Looks that you have got the right items. Blast Top Hit for each sequence is base
 
 As for MEGAN6 data extraction, maybe you just listed the specification (taxonomic-terms) under Node-1 to Node-6 based on the image you sent.
 --
-Ran this blast_blastformatter command to get tabular data on the whole Hemlock30 dataset: 
+Ran this blast_formatter command to get tabular data on the whole Hemlock30 dataset: 
 
 nohup blast_formatter -archive Hemlock30_longest-blastx-11outfmt.MASTER -outfmt "6 qseqid stitle ssciname staxid evalue sacc" -out Hemlock30_longest-blastx-6outfmt.MASTER.tab 2>&1 > blast_formatter.log &
 

@@ -1,0 +1,180 @@
+Relevant email threads: 
+
+Association or not:
+Details about your paper
+
+
+From Kangakola: 
+https://www.google.com/search?q=linkage+disequilibrium++in+R&ei=dF6FYa7DIcOrqtsP2ueX2Ao&oq=linkage+disequilibrium++in+R&gs_lcp=Cgxnd3Mtd2l6LXNlcnAQDDIGCAAQBxAeMgYIABAHEB4yBggAEAgQHjIGCAAQCBAeMgYIABAIEB4yBggAEAgQHjIGCAAQCBAeMgYIABAIEB4yBggAEAgQHkoECEEYAVDxQljFwgFg_NQBaAFwAHgBgAGiA4gBzUSSAQowLjcuMjcuMi4xmAEAoAEBwAEB&sclient=gws-wiz-serp&ved=0ahUKEwiuzZfk1IH0AhXDlWoFHdrzBasQ4dUDCA4
+
+
+--
+Hi Jun-Jun,
+
+I found a dataset in the Boreal Cloud in a folder called "Liu_Conifer_192gDNA" which has the filenames you listed above. We ran the SNPpipeline on this dataset using ten VMs in parallel after splitting the reference up into ten parts. I also found the same raw data on the Z800 in room 349. Is this what you are looking for? I couldn't find anything that looked like what you were talking about in terms of normalizing this data. Could it possibly be on one of your external harddrives? Do you remember what software we used to normalize it? Maybe I could normalize it again if we can't find it.
+--
+BTW, I’m considering to have computing co-op to handle the genetic mapping using SNP data you generated from 192 WWP samples. Can you help on interviewing once candidates are coming in?
+--
+Yes, I can help you interview co-op students. I would need to have a better understanding of what you want them to do for the genetic mapping. Is this to implement the framework described in the "Constructing a linkage–linkage disequilibrium map using dominant-segregating markers" paper you sent me?
+--
+Yes. Exactly follow the methods as described in the paper.
+--
+Can we have a Zoom chat to discuss the requirements of implementing the model from the LD paper? When I was reading it I found the greatest challenge to be converting the theoretical/formal description into practical implementation. It would be much easier to understand the model and write software to implement it if it were presented through a practical example with real data, for example, using 9 mothers and their offspring and processing the data manually according to the formulas from the paper. After doing that it would be easier to understand how complex the job would be and to write the software to do it. 
+--
+I forget how to transfer big files to you. What approach I used last time?  I have a fold from you as ‘SNP-192gDNA-June15-2019’,  ‘report-Liu_conifer_192gDNA’ containing files we want to try:
+
+One is ‘MAF_cutoof_report’ listing data about 55,276 SNPs x 196 samples and the other is  ‘percentage_snps.cvs’  listing 6,1398 SNPs (MAF cut-off at 0.05, getting 55,276 SNPs).
+
+When you process the SNP genotypic data, for example, when SNP is C/T  you change the 2nd allele (v2=T, with lower percentage across 192 gDNA samples) as ‘TT’ genotype, and change the 1st allele (v1=C, with higher percentage across 192 gDNA samples) as C/T. For our case, always there are two genoptype acroos all samples: v1/v2, and v2/v2, no the 3rd genotype (v1/v1). For idels, just simply as to one single letter from any of A, T, C, G.
+
+If you can find two files in your storage, it would be great.
+--
+Our data would fit in Table 1 in the paper. Our 192 samples would be the offspring, the genotype of the mother is not available, but can be traced back or presumed according to genotypes of the 192 offspring at SNP-A and SNP-B sites.
+
+For our case, the genotypes of offspring only have five potential genotypes: AABb, AaBb, AaBB, Aabb, and aaBb across 192 samples for any two SNP sites. Based on presence of any combinations of these five genotypes across 196 samples, it would be easy to get the genotype of the mother.
+--
+To fit this model, any genotype of the 1st SNP site can be considered as AA and Aa, and the 2nd SNP sites in pairs can be considered as BB and Bb. No the 3rd genotype for every SNP sites. So I think our data would be simpler than that in Table 1 that have 9 potential genotypes in offspring when two sites are put in pair.
+--
+1000 rows/SNPs
+[attached]
+--
+Things Jun-Jun said: 
+- ours would be the co-dominant model
+--
+I have spent several hours reading the paper, and my understanding has grown, but I still have lots of questions and would probably need to work very closely with you if I were to understand it well enough to implement it, asking you questions as I go. 
+
+The main challenge would be to understand every detail described in the paper well enough to understand what they're doing in the same way that a geneticist would understand it, so I can express it in computer programming language. If I had enough time to do it I think I would enjoy it, but I think it would take me a lot of time. My first question would be that I still don't understand how to derive the maternal dataset, and whether we need to derive the full maternal dataset first or infer each mother as we process each pair of markers according to the codominant model. I have other questions as well, but this would be a good place to start. I think it would be helpful if you could direct the implementation process by breaking the process down into smaller pieces which are easier to understand, and explaining either to me or the co-op student what needs to be done at each step. I think deriving the maternal dataset might be the first step, which is why I've asked about it first.
+--
+Usually using MAF value cut-off (at 0.15) to generate mother’s genotypes. Mother is homozygous (AA, or GG, depending on which is majority) if MAF < 0.15;  while mother is heterozygous (A/G)  if MAF > 0.15, up to 0.5.  This MAF cut-off may be adjusted depending on outcomes.
+--
+Hi Jun-Jun,
+
+I found another folder with the SNP pipeline reports for the Conifer_192gDNA results (stored separately from the raw input data, which is why I didn't find it last time). This folder also has LepMAP2 results from .linkage files based on what I think might be from the MAF_cutoff_report_chi.csv file originally, but the input file is called SNP11078-p-0.001-4-LeMap4.xlsx which I got from you. 
+There's also a folder called KINGdata_filledReport, and a folder called KINGdata_MAFreport. I can't remember what I was doing with that though or whether you found them useful.
+
+Also, when comparing my SNPpipeline output files (in all backups of this data), I seem to have a different number of rows in the MAF cutoff report from you. Mine has 45,394 rows, whereas you said yours has about 55,276 SNPs.
+Similarly, my percentage_snps.csv has 53,698 rows whereas you said yours has 61,398 SNPs (MAF cut-off at 0.05, getting 55,276 SNPs.
+
+I will compare the first 1000 rows of my MAF report to see if it matches the one you sent me soon.
+--
+Yes. You run SNP-pipeline twice on WPP-192 data, one using raw data and another using normalized raw data (removing repeated reads from each sample). That smaller SNP data set might come from the 2nd SNP-pipeline run. Both SNO sets were subjected to mapping using either JointMap (I run in Windows), or LepMAP2 run by you. Mapping results were not good due to sample contamination and no way to remove contaminated samples. LD-mapping would not consider sample contamination at all because it uses random population, not requiring marker/SNP segregation ratio at 1:1 or 3:1. So we can include those SNPs with MAF < 0.3 down to MAF=0.05.
+--
+Kangakola suggested a google search for "linkage disequilibrium  in R"
+--
+
+==========
+QUESTIONS: 
+
+How to get the mothers? 
+
+==========
+Understanding Jun-Jun's example above: 
+
+Given SNP (row) C/T:
+- first allele (v1) is C, with higher percentage across 192 gDNA samples in the row
+- second allele (v2) is T, with lower percentage across 192 gDNA samples in the row
+
+- first allele (C) is changed to C/T (v1/v2)
+- second allele (T) is changed to T/T (v2/v2)
+
+- in our case, only always two gentypes across all samples: v1/v2, v2/v2 (no v1/v1)
+
+
+
+
+
+Model:
+
+2.1 Sampling Strategy
+n unrelated moms
+"open-pollinated" seeds from each mom
+
+n1  = number of mom plants with genotype 1
+n1a = number of offspring with genotype 1a derived from genotyp 1
+
+==========
+(WRONG) Example using the first two columns (sampled children) of row 1 (identified SNP site) of data: 
+
+child1: G/G
+child2: A/A
+
+Joint Genotypes/Combinations: 
+G/G G/G 
+G/G G/A 
+G/G A/A
+G/G A/G
+
+G/A G/A
+G/A A/A
+G/A A/G
+
+A/A A/A
+A/A A/G
+
+A/G A/G
+
+--
+==========
+Assuming a "pair of biallelic markers" refers to two rows (markers), each row containing two alleles.
+A marker/row is an SNP (= "SNP site") if it has a discrepancy (more than one allele) across the 192 samples.
+An SNP-A site is the marker/row which we are using for Aa, and an SNP-B site is the marker/row we are using for Bb.
+
+Let's take the pair of biallelic markers from rows 2 and 5 of the 1000 row csv:
+row 2: A=A/A  a=G/G  
+row 5: B=C/C  b=T/T  
+
+9 Combinations in real data: 
+AA BB   A/A C/C
+AA Bb   A/A C/T
+AA bb   A/A T/T
+
+Aa BB   A/G C/C
+Aa Bb   A/G C/T
+Aa bb   A/G T/T
+
+aa BB   G/G C/C
+aa Bb   G/G C/T
+aa bb   G/G T/T
+
+
+For Jun-Jun's data though, we can only have 5 combinations in real data: 
+AABb, AaBb, AaBB, Aabb, and aaBb
+
+AA Bb   A/A C/T
+
+Aa BB   A/G C/C
+Aa Bb   A/G C/T
+Aa bb   A/G T/T
+
+aa Bb   G/G C/T
+
+Combinations which aren't possible for Jun-Jun's data: 
+AA BB   A/A C/C
+AA bb   A/A T/T
+aa BB   G/G C/C
+aa bb   G/G T/T
+
+
+==========
+My pseudocode: 
+
+Do we need to derive maternal dataset first, or do we infer the mother for each pair as we apply the co-dominant model?
+
+Determine the first and second allele for each row and the frequency of each allele (easy).
+For each pair of rows, apply the co-dominant model (1000 rows * 1000/2 = 500000 pairs): 
+  Construct table 1 for the current pair.
+  Construct table 2 for the current pair.
+
+
+Questions: 
+Exactly how do we infer the maternal dataset?
+
+
+==========
+Resources: 
+Mendel's principles of inheritance: 
+https://www.nature.com/scitable/topicpage/gregor-mendel-and-the-principles-of-inheritance-593/
+
+
+
+
