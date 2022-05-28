@@ -1,0 +1,683 @@
+
+--
+Hello, Ben:
+Next work can be mining of SNPs from 192 WWP-Calif samples. You have downloaded this set of Fluidigm reads recently as shown below. Enclosed is the reference sequences for Bowtie mapping of reads using the SNP pipeline you and Fupan constructed previously. All of these samples are diploid (N=2).
+
+Let us have a discussion if you need clarification for any question.
+Thanks.
+Total-205+14nt.fasta
+--
+
+
+scp -J borealremote Total-205+14nt.fasta brancourt@borealjump.nfis.org:/public/genomics/junjun/Data-Dec2020/nanuq-2022/WWP-CA192-Fluidigm-Mar2022/
+
+
+openstack server create \
+	--image CentOS7_SNPpipeline \
+  --security-group default \
+	--key-name brancourt \
+	--nic net-id=Private \
+	--flavor mm1.8xlarge \
+	benmm1-pip
+
+sudo mount -t nfs 10.20.0.6:/Public/genomics/junjun/Data-Dec2020/nanuq-2022/WWP-CA192-Fluidigm-Mar2022 /work
+
+git clone https://github.com/benranco/SNPpipeline.git
+
+--
+Hi Jun-Jun,
+
+I am just preparing to start the SNP pipeline on the WWP CA192 data using the reference you sent me. Below are the input parameters I will use. Notice that I have specified not to remove indels, and not to generate the chi_sq report and not to generate the depth stats report. Let me know if you'd like me to change these.
+
+SNP pipelin input parameters: 
+
+# paired input raw data files (e.g. R1 & R2) vs unpaired files: (1) paired, (0) unpaired
+paired=1
+
+# whether each sample has its own raw data file(s), or samples are pooled into combined input file(s): (1) single, (2) pooled, (3) both
+single=1
+
+#ploidy values for single and pooled runs: (1) haploid, (2) diploid
+singleploidy=2  
+pooledploidy=2
+
+
+#use default freebayes parameters or not: (3) custom (not implemented), (1) default params for single raw data files, (2) default params for pooled raw data files (only difference$
+freebayesParams=1
+
+#maf cutoff
+mafcut=0.05
+
+# (1) remove indels after finding SNPs, (0) don't remove indels after finding SNPs
+remove_indels=0
+
+# (1) run the full pipeline, (2) just process the data and do not generate reports (ie. just run the first half of the pipeline), (3) just generate reports based on data that has $
+what_to_run=1
+
+# some optional reports which you might choose not to generate in order to save time:
+
+# (1) yes, (0) no
+generate_chi_sq_report=1
+
+# (1) yes, (0) no. This can be very time consuming, and as yet has not been useful.
+generate_probability_report=0
+
+# (1) yes, (0) no. This can be very time consuming.
+generate_depth_stats_report=1
+
+--
+[I actually, I did choose to generate the chi sq and depth stats reports]
+--
+
+nohup ./start.sh 2>&1 1>pipeline.log &
+
+--
+
+Seem to be getting lots of these errors during the parallel processing part: 
+
+**************** parallel_process.R: An error occured trying to execute the following system command: 
+/work/SNPpipeline/tools/samtools-1.3.1/samtools tview /work/SNPpipeline/dataTemp/single/MI.M03992_0714.001.TSP0001---TSP200X.WP19LTB-322-41_sorted_markDup.bam /work/SNPpipeline/reference/formatted_output.fasta -d T -p "PLE133-LRR9Eca-330bpNo6:193"
+And below is the error message from R:
+duplicate 'row.names' are not allowed 
+We will skip trying to retrieve data from the BAM file for this particular row+sample.
+
+
+**************** parallel_process.R: An error occured trying to execute the following system command: 
+/work/SNPpipeline/tools/samtools-1.3.1/samtools tview /work/SNPpipeline/dataTemp/single/MI.M03992_0714.001.TSP0179---TSP200X.WP1756-21-45_sorted_markDup.bam /work/SNPpipeline/reference/formatted_output.fasta -d T -p "PLE133-LRR9Eca-330bpNo6:193"
+And below is the error message from R:
+duplicate 'row.names' are not allowed 
+We will skip trying to retrieve data from the BAM file for this particular row+sample.
+
+
+Use grep to search for a string in all .txt files in a location:
+grep --include=*.txt -rn '.' -e "duplicate 'row.names' are not allowed"
+
+See both the top two answer:
+https://stackoverflow.com/questions/8854046/duplicate-row-names-are-not-allowed-error
+
+First two columns/samples in report:
+"MI.M03992_0714.001.TSP0001---TSP200X.WP19LTB-322-41.tab","MI.M03992_0714.001.TSP0002---TSP200X.WP19LTB-322-35.tab"
+
+Two test calls to samtools tview seem to return results:
+/work/SNPpipeline/tools/samtools-1.3.1/samtools tview /work/SNPpipeline/dataTemp/single/MI.M03992_0714.001.TSP0001---TSP200X.WP19LTB-322-41_sorted_markDup.bam /work/SNPpipeline/reference/formatted_output.fasta -d T -p "PLE133-LRR9Eca-330bpNo6:193" > bam_for_MI.M03992_0714.001.TSP0001---TSP200X.WP19LTB-322-41_CHROM-PLE133-LRR9Eca-330bpNo6_POS-193.txt
+
+/work/SNPpipeline/tools/samtools-1.3.1/samtools tview /work/SNPpipeline/dataTemp/single/MI.M03992_0714.001.TSP0002---TSP200X.WP19LTB-322-35_sorted_markDup.bam /work/SNPpipeline/reference/formatted_output.fasta -d T -p "PLE133-LRR9Eca-330bpNo6:193" > bam_for_MI.M03992_0714.001.TSP0002---TSP200X.WP19LTB-322-35_CHROM-PLE133-LRR9Eca-330bpNo6_POS-193.txt
+
+
+/work/SNPpipeline/tools/samtools-1.3.1/samtools tview /work/SNPpipeline/dataTemp/single/MI.M03992_0714.001.TSP0179---TSP200X.WP1756-21-45_sorted_markDup.bam /work/SNPpipeline/reference/formatted_output.fasta -d T -p "PLE133-LRR9Eca-330bpNo6:193" > bam_for_MI.M03992_0714.001.TSP0179---TSP200X.WP1756-21-45_CHROM-PLE133-LRR9Eca-330bpNo6_POS-193.txt
+
+grep -n "PLE133-LRR9Eca-330bpNo6\",193" /work/SNPpipeline/WWP-CA192-Fluidigm-SNPpipeline-reports/reports-withFilledReport/report.csv
+grep -n "PLE133-LRR9Eca-330bpNo6\",193" /work/SNPpipeline/WWP-CA192-Fluidigm-SNPpipeline-reports/reports-withFilledReport/filled_report.csv
+
+Reading these results into R to reproduce and solve the error:
+> bam1 <- read.delim("./test-tview-1.txt", sep = "\n") # This gave me the duplicate row.names error
+> bam1 <- read.delim("./test-tview-1.txt", header=FALSE, sep = "\n") # This solved it.
+> mat1 <- as.matrix(bam1)
+> mat1[1:5,1] 
+[1] "                                                                                "
+[2] "G*G***A*******A*************************T******************************G********"
+[3] ". .   .       .                         .                              .        "
+[4] ".*.***.*******G*************************.******************************.********"
+[5] ".*.***.*******G*************************.******************************.********"
+
+So the first line is empty, which is causing the duplicate row.names error.
+Has the code in parallel_process.R ever worked??
+
+--
+After editing parallel_process.R:
+
+scp -J borealremote SNPpipeline/scripts/parallel_process.R brancourt@borealjump.nfis.org:/public/genomics/junjun/Data-Dec2020/nanuq-2022/WWP-CA192-Fluidigm-Mar2022/
+
+I moved all the generated files associated with the report generation of the first attempt to a folder called OLD-filledReportBug and then re-ran just the report generation part of the pipeline: 
+
+nohup ./start-pt2-regenerateReports.sh 2>&1 1>pipeline-pt2-regenerateReports.log &
+
+--
+
+When tring to determine how far back these bugs go, I searched all SNPpipeline runs that I could find in the boreal cloud. 
+
+These ones share the exact same code as before this week's bug fixes:
+/public/genomics/junjun/192gDNA_pipeline  (Liu_Conifer_192gDNA) (Sept/Oct 2019)
+/public/genomics/junjun/33sampleRNA_pipeline/  (Nov 2019)
+
+
+This one from 2017 has what I think is Fupan's original code:
+public/genomics/junjun/Data-Dec2020/fluidigm-SNPpipelineBen
+scp -J borealremote brancourt@borealjump.nfis.org:/public/genomics/junjun/Data-Dec2020/fluidigm-SNPpipelineBen/scripts/*.* scripts/
+(the raw data and the intermediate files from the pipeline (but not the reports) are also replicated in /public/genomics/junjun/storage/SNPpipeline-fluidigm )
+
+
+This one from Jan-March2019 has two different versions of parallel_process.R, where I'm making changes. The first one I've already changed some indexing in the substring function parameters from 0 to 1, and the second one where I've begun to make the changes that include the searchBAMfile function and the try-catch block:
+/public/genomics/junjun/storage/jj_vol/SNPpipeline-42sampleSet/
+There seems to be an earlier attempt at this pipeline in: 
+/public/genomics/junjun/storage/jj_big_vol/SNPpipeline-42sampleSetPartial
+and 
+/public/genomics/junjun/storage/jj_big_vol/SNPpipeline-28samples
+
+
+--
+
+Hi Jun-Jun, 
+
+I noticed that the SNPpipeline for WWP-CA192-Fluidigm was encountering trouble extracting data from the BAM files to generate the filled_report.csv, so I carefully tested the code for that part of the pipeline and found two bugs which I had missed before. I have fixed these and I'm regenerating the reports. 
+
+I didn't notice these bugs before because I think with the previous datasets the majority of the SNPs were found with Freebayes (saved in report.csv), so the difference made by going back to the BAM files to check for all SNP data that we couldn't get from the Freebayes output wasn't as great, and when I investigated the errors I didn't understand the BAM file output well enough so I thought it was just because the BAM file didn't have the data.
+
+I'm now trying to figure out when these bugs were introduced by looking at all the SNPpipeline runs that I have access to on the Boreal Cloud, so you can know how it has affected your results in other pipelines. I had definitely previously made some changes to Fupan's code while trying to deal with other problems that I encountered, but I inadvertently added at least one of these bugs while doing that.
+
+I'm quite confident that for these other two pipelines the filled_report.csv would have had exactly the same data as the report.csv: 
+Liu_Conifer_192gDNA  (Sept/Oct 2019)
+33sampleRNA_pipeline  (Nov 2019)
+
+This pipeline from 2017 has what I think is Fupan's original code:
+public/genomics/junjun/Data-Dec2020/fluidigm-SNPpipelineBen
+
+This pipeline from Jan-March 2019 has two different versions of the code for checking the BAM files, both of which I had already begun to make some changes in response to a problem I encountered with the original code: 
+SNPpipeline-42sampleSet
+
+I will investigate more closely what the code was doing for the filled_report.csv in these three older versions of the pipeline.
+
+Sorry for not noticing this bug sooner. It was a hard one to understand.
+
+Ben
+
+--
+Hello, Ben:
+
+Thanks for noticing this issue and fixing the bugs. It would be nice to check how large the difference was caused by the bugs. 
+
+Jun-Jun
+--
+I'll send you both sets of the reports for the WWP-CA192-Fluidigm data when the new reports have finished being generated.
+
+I'll also re-generate the reports for these two datasets so you can compare the differences:
+Liu_Conifer_192gDNA  (Sept/Oct 2019)
+33sampleRNA_pipeline  (Nov 2019)
+
+Let me know if you'd also like me to regenerate the reports for these two datasets:
+public/genomics/junjun/Data-Dec2020/fluidigm-SNPpipelineBen  (2017)
+SNPpipeline-42sampleSet  (Jan-March 2019)
+--
+scp -J borealremote Total-205+14nt.fasta brancourt@borealjump.nfis.org:/public/genomics/junjun/Data-Dec2020/nanuq-2022/WWP-CA192-Fluidigm-Mar2022/SNPpipeline/WWP-CA192-Fluidigm-SNPpipeline-reports.zip .
+
+https://www.dropbox.com/s/8zif1bd4ovoeffa/WWP-CA192-Fluidigm-SNPpipeline-reports.zip?dl=1
+
+--
+Other datasets to regenerate reports for:
+/public/genomics/junjun/192gDNA_pipeline  (Liu_Conifer_192gDNA) (Sept/Oct 2019)
+/public/genomics/junjun/33sampleRNA_pipeline/  (Nov 2019)
+
+sudo mount -t nfs 10.20.0.6:/Public/genomics/junjun/192gDNA_pipeline /work3
+sudo mount -t nfs 10.20.0.6:/Public/genomics/junjun/33sampleRNA_pipeline /work3
+
+----
+Investigating Fupan's original code against the data from 2017:
+
+This pipeline from 2017 has what I think is Fupan's original code:
+public/genomics/junjun/Data-Dec2020/fluidigm-SNPpipelineBen
+
+I had to get the reports from the work3 location and the data from the work2 location: 
+sudo mount -t nfs 10.20.0.6:/Public/genomics/junjun/storage /work2
+sudo mount -t nfs 10.20.0.6:/Public/genomics/junjun/Data-Dec2020/fluidigm-SNPpipelineBen /work3
+
+
+The first four samples of line one of report.csv vs filled_report.csv:
+"CHROM","POS","REF","MI.M03992_0050.001.FLD0289.Fluidigm_301.tab", "MI.M03992_0050.001.FLD0290.Fluidigm_313.tab", "MI.M03992_0050.001.FLD0291.Fluidigm_325.tab", "MI.M03992_0050.001.FLD0292.Fluidigm_338.tab"
+report.csv:
+"LPss10459_c0_seq1_m.7129",24,"G",NA,NA,NA,NA
+filled_report.csv: 
+"LPss10459_c0_seq1_m.7129",24,"G","G/G",NA,"G/G","G/G"
+
+Samtools tview commands and output:
+(note, here I didn't find a _markDup.bam file, so that must have been implemented by me later)
+
+/work2/SNPpipeline-fluidigm/tools/samtools-1.3.1/samtools tview /work2/SNPpipeline-fluidigm/dataTemp/single/MI.M03992_0050.001.FLD0289.Fluidigm_301_sorted.bam /work2/SNPpipeline-fluidigm/reference/formatted_output.fasta -d T -p "LPss10459_c0_seq1_m.7129:24" > ~/test1.txt
+Output:
+       31        41        51        61        71        81        91           
+GCTGGCAAAGGAAATTTTTAACAGGAAAAATTCATATTATGGTAGATCGTGCTTTTTATCAGATGTAAGCGCTAGGGCAG
+....................................................C................G..........
+....................................................C................G..........
+                                  ,,,,,,,,,,,,,,,,,,c,,,,,,,,,,,,,,,,g,,,,,,,,,,
+
+
+/work2/SNPpipeline-fluidigm/tools/samtools-1.3.1/samtools tview /work2/SNPpipeline-fluidigm/dataTemp/single/MI.M03992_0050.001.FLD0290.Fluidigm_313_sorted.bam /work2/SNPpipeline-fluidigm/reference/formatted_output.fasta -d T -p "LPss10459_c0_seq1_m.7129:24" > ~/test2.txt
+Output (for the NA one):
+       31        41        51        61        71        81        91           
+GCTGGCAAAGGAAATTTTTAACAGGAAAAATTCATATTATGGTAGATCGTGCTTTTTNNNNNNNNNNNNNNNNNNNNNNN
+
+/work2/SNPpipeline-fluidigm/tools/samtools-1.3.1/samtools tview /work2/SNPpipeline-fluidigm/dataTemp/single/MI.M03992_0050.001.FLD0291.Fluidigm_325_sorted.bam /work2/SNPpipeline-fluidigm/reference/formatted_output.fasta -d T -p "LPss10459_c0_seq1_m.7129:24" > ~/test3.txt
+Output:
+       31        41        51        61        71        81        91           
+GCTGGCAAAGGAAATTTTTAACAGGAAAAATTCATATTATGGTAGATCGTGCTTTTTATCAGATGTAAGCGCTAGGGCAG
+...............................................M....C................G..........
+....................................................C................G..........
+A..A.................T.........................A....C................G..........
+                                  ,,,,,,,,,,,,,,,,,,c,g,,,a,,,,,,,,,,g,,,,,,,,,,
+                                  ,,,,,,,,,,,,,a,,,,c,,,,,,,,,,,,,,,,g,,,,,,,,,,
+
+/work2/SNPpipeline-fluidigm/tools/samtools-1.3.1/samtools tview /work2/SNPpipeline-fluidigm/dataTemp/single/MI.M03992_0050.001.FLD0292.Fluidigm_338_sorted.bam /work2/SNPpipeline-fluidigm/reference/formatted_output.fasta -d T -p "LPss10459_c0_seq1_m.7129:24" > ~/test4.txt
+Output:
+       31        41        51        61        71        81        91           
+GCTGGCAAAGGAAATTTTTAACAGGAAAAATTCATATTATGGTAGATCGTGCTTTTTATCAGATGTAAGCGCTAGGGCAG
+....................................................C..........Y.....G..........
+....................................................C..........C.....G..........
+....................................................C................G..........
+....................................................C................G..........
+....................................................C................G..........
+..........................................G.........C................G..........
+....................................................C................G..........
+                                  ,,,,,,,,,,,,,,,,,,c,,,,,,,,,,c,,,,,g,,,,,,,,,,
+                                  ,,,,,,,,,,,,,,,,,,c,,,,,,,,,,,,,,,,g,,,,,,,,,,
+                                  ,,,,,,,,,,,,,,,,,,c,,,,,,,,,,,,,,,,g,,,,,,,,,,
+                                  ,,,,,,,,,,,,,,a,,,c,,,,,,,,,,,,,,,,g,,,,,a,,,,
+                                  ,,,,,,,,,,,,,,,,,,c,,,,,,,,,,,,,,,,g,,,,,,,,,,
+                                   ,,,,,,,,,,,,,,,,,c,,,,,,,,,,,,,,,,g,,,,,,,,,,
+
+
+--
+Hi Jun-Jun, 
+
+The new SNP pipeline reports have finished generating for the WWP-CA192-Fluidigm data. Here is a zip file containing all the reports both from before and after I fixed the bugs in the filled_report.csv process: 
+https://www.dropbox.com/s/8zif1bd4ovoeffa/WWP-CA192-Fluidigm-SNPpipeline-reports.zip?dl=1
+
+To confirm with you that I have the correct process for extracting information from the BAM file for filled_report.csv in situations where the results from Freebayes are NA, here is what the pipeline is doing in these situations:
+(1) Use samtools tview to search the current sample's BAM file for the current CHROM:POS.
+(2) Check if the first line of the returned data begins with the reference, and if it does:
+(3) Check if the corresponding character(s) in the following line are either "." or ",", and if this is true:
+(4) Replace the NA at that location in report.csv with REF/REF.
+
+Is this what you expect?
+
+A real example from the WWP-CA192-Fluidigm dataset is for CHROM "PLE133-LRR9Eca-330bpNo6", POS 193 for sample MI.M03992_0714.001.TSP0001---TSP200X.WP19LTB-322-41, which is on line 1314 of report.csv and line 6381 of filled_report.csv in the fixed reports (they are on different lines because the parallel processing for filled_report returns the results in a different order). The reference is "G". I've pasted the first ten lines of the results from the BAM file using samtools tview below. In this case, the NA in the report will be updated to G/G because there is a "." beneath the first "G":
+
+G****************G***A***A*************************T****************************
+.                .   .   .                         .                            
+.****************.***.***.*************************.****************************
+.****************.***.***.*************************.****************************
+.****************.***.***.*************************.****************************
+.****************.***.***G*************************.****************************
+.****************.***.***.*************************.****************************
+.****************.***.***G*************************.****************************
+.****************.***.***G*************************.****************************
+.****************.***.***.*************************.****************************
+
+I've attached the full results from this samtools tview query in the attached text file.
+
+Let me know if what I am doing is correct.
+
+I have not yet begun to re-generate the reports for the Liu_Conifer_192gDNA (Sept/Oct 2019) and 33sampleRNA_pipeline (Nov 2019) datasets because they each require me to run ten instances of the pipeline on ten VMs. I will start the process for Liu_Conifer_192gDNA (Sept/Oct 2019) tomorrow unless you prefer that I do something else.
+
+Ben
+--
+Hello, Ben:
+No rush on other sets of data. Let us figure out WWP-CA192 first.  I will check outcomes of these two runs. If you can  give me a contrasted results like below in text, maybe better to me understand the impacts from the bugs.
+Thanks!
+Jun-Jun
+--
+The key issue is how to distinguish real missing data (NA at reference positions no mapping reads at all), homozygotes (either Ref/Ref, or Alt/Alt)), and heterozygotes (Ref/Alt). The later two should have reads mapped at ref positions.
+
+The 2nd issue is to determine at which cut-off (ratio of ref reads to alt reads) to separate homozygotes from heterozygotes.
+--
+Hello, Ben:
+In your case below, the 1st G position would be G/G, as all below lines are ‘.’ At this position. How about the 2nd A position, it has 5 ‘.’ As ‘A’, and 3 ‘G’. its final SNP call is ‘A/G’ with allele frq at 5/8, and 3/5? This is back to my 2nd question in the previous email: which ratio cut-off is used to determine if a special position is homozygotes (Ref/Ref, or Alt/Alt), or heterozygote (Ref/Alt).
+
+Jun-Jun
+--
+The big difference between bug presence and bug fixed is dataset sizes. After you fixed the bugs, the outcome dataset is increased a lot. You can extract WWP-CA-192 data at missing data percentage at 75%, currently is 50%. If missing data is 75% of total samples, we still have ~50 samples with data, increasing the SNP set, also we still have a chance to play statistics using 50 samples.  
+--
+I see your attached txt file. At a special SNP position, ‘.’ means an allele the same as Reference.  Empty means truly missing data, where no reads were mapped. Large letter means the alternative allele, difference from reference (as the 2nd allele?)?  Small letter means alternative allele as the 3rd, or 4th one? I do not understand what means by ‘,’.
+--
+=====
+Jun-Jun and I had a chat about what to do next.
+
+Next Steps: 
+
+The code for parallel_process is sufficient for identifying homozygous 1 (matches the REF), but not for homozygous 2 (matches the ALT) or heterozygous. 
+...see column 1 of rows 65 (homozygous 2) and especially 208 (heterozygous) of report.csv
+
+samtools tview on sample 1 of row 208 (heterozygous): 
+/work/SNPpipeline/tools/samtools-1.3.1/samtools tview /work/SNPpipeline/dataTemp/single/MI.M03992_0714.001.TSP0001---TSP200X.WP19LTB-322-41_sorted_markDup.bam /work/SNPpipeline/reference/formatted_output.fasta -d T -p "F2-4-T7-WPWR-EacTC-447bp:137" > bam_for_MI.M03992_0714.001.TSP0001---TSP200X.WP19LTB-322-41_CHROM-F2-4-T7-WPWR-EacTC-447bp_POS-137.txt
+
+samtools tview on sample 1 of row 65 (matches ALT): 
+/work/SNPpipeline/tools/samtools-1.3.1/samtools tview /work/SNPpipeline/dataTemp/single/MI.M03992_0714.001.TSP0001---TSP200X.WP19LTB-322-41_sorted_markDup.bam /work/SNPpipeline/reference/formatted_output.fasta -d T -p "F16-12-bp325:91" > bam_for_MI.M03992_0714.001.TSP0001---TSP200X.WP19LTB-322-41_CHROM-F16-12-bp325_POS-91.txt
+
+samtools tview on sample 1 of row 86 (matches ALT indel): 
+/work/SNPpipeline/tools/samtools-1.3.1/samtools tview /work/SNPpipeline/dataTemp/single/MI.M03992_0714.001.TSP0001---TSP200X.WP19LTB-322-41_sorted_markDup.bam /work/SNPpipeline/reference/formatted_output.fasta -d T -p "F16-12-bp325:151" > bam_for_MI.M03992_0714.001.TSP0001---TSP200X.WP19LTB-322-41_CHROM-F16-12-bp325_POS-151.txt
+
+samtools tview on sample 1 of row 116 (matches REF indel): 
+/work/SNPpipeline/tools/samtools-1.3.1/samtools tview /work/SNPpipeline/dataTemp/single/MI.M03992_0714.001.TSP0001---TSP200X.WP19LTB-322-41_sorted_markDup.bam /work/SNPpipeline/reference/formatted_output.fasta -d T -p "F2-4-T7-WPWR-EacTC-447bp:35" > bam_for_MI.M03992_0714.001.TSP0001---TSP200X.WP19LTB-322-41_CHROM-F2-4-T7-WPWR-EacTC-447bp_POS-35.txt
+
+samtools tview on sample 1 of row 352 (heterozygous REF/ALT indel): 
+/work/SNPpipeline/tools/samtools-1.3.1/samtools tview /work/SNPpipeline/dataTemp/single/MI.M03992_0714.001.TSP0001---TSP200X.WP19LTB-322-41_sorted_markDup.bam /work/SNPpipeline/reference/formatted_output.fasta -d T -p "F2-4-T7-WPWR-EacTC-447bp:203" > bam_for_MI.M03992_0714.001.TSP0001---TSP200X.WP19LTB-322-41_CHROM-F2-4-T7-WPWR-EacTC-447bp_POS-203.txt
+
+samtools tview on sample 3 of row 359 (another heterozygous REF/ALT indel): 
+/work/SNPpipeline/tools/samtools-1.3.1/samtools tview /work/SNPpipeline/dataTemp/single/MI.M03992_0714.001.TSP0003---TSP200X.WP2001-08-15_sorted_markDup.bam /work/SNPpipeline/reference/formatted_output.fasta -d T -p "F2-4-T7-WPWR-EacTC-447bp:206" > bam_for_MI.M03992_0714.001.TSP0003---TSP200X.WP2001-08-15_CHROM-F2-4-T7-WPWR-EacTC-447bp_POS-206.txt
+
+samtools tview on sample 2 of row 359 (another heterozygous REF/ALT indel): 
+/work/SNPpipeline/tools/samtools-1.3.1/samtools tview /work/SNPpipeline/dataTemp/single/MI.M03992_0714.001.TSP0002---TSP200X.WP19LTB-322-35_sorted_markDup.bam /work/SNPpipeline/reference/formatted_output.fasta -d T -p "F2-4-T7-WPWR-EacTC-447bp:206" > bam_for_MI.M03992_0714.001.TSP0002---TSP200X.WP19LTB-322-35_CHROM-F2-4-T7-WPWR-EacTC-447bp_POS-206.txt
+
+
+TODO 1:
+Find what percentage is the cutoff to determine whether it is homozygous vs heterozygous (eg. Jun-Jun suspects default of 15%).
+See the above observation beginning with "The code for parallel_process is sufficient for...".
+Make sure I convert small letters appropriately (what do they mean?).
+Find out what the "," means.
+Need to convert for [W,S,M,K,R,Y]:
+https://en.wikipedia.org/wiki/Nucleic_acid_sequence
+eg. R = A/G = G/A
+
+Jun-Jun's guess on what the small letter (eg a vs A) might mean: might mean quality is low, or ratio is low? or alternative allele as the 3rd, or 4th one?
+
+TODO 2:
+Add four summary columns in new tables for each SNP/row, both report_stats.csv and filled_report_stats.csv:
+- how many homozygous 1, homozygous 2, heterozygous, NA (both totals and percentages, so 8 columns)
+
+--
+Dealing with TODO 1:
+
+- the comma and small letters, *, etc, are explained below, especially the wikipedia and htslib links:
+https://www.biostars.org/p/151739/
+https://en.wikipedia.org/wiki/Pileup_format
+https://www.biostars.org/p/8371/
+https://www.htslib.org/doc/samtools-mpileup.html
+
+# The following logic is based on information from these two links: 
+# https://en.wikipedia.org/wiki/Pileup_format
+# https://en.wikipedia.org/wiki/Nucleic_acid_sequence
+# It assumes the very first line returned from tview is either some sort of header or blank spaces, 
+# the second line begins with the REF, and the third line is a summary/conclusion of all the lines 
+# below it.
+# 
+# pseudocode:
+# if . or , then REF/REF (diploid) or REF/ (haploid)
+# if (A|G|C|T|a|g|c|t) then uppercase(x/x or x/)
+# if diploid:
+#   if W then A/T or T/A (depending on which is REF)
+#   if S then C/G or G/C
+#   if M then A/C or C/A
+#   if K then G/T or T/G
+#   if R then A/G or G/A
+#   if Y then C/T or T/C
+
+
+--
+Hi Jun-Jun,
+
+From this page: 
+https://en.wikipedia.org/wiki/Pileup_format
+
+. (dot) means a base that matched the reference on the forward strand
+, (comma) means a base that matched the reference on the reverse strand
+AGTCN (upper case) denotes a base that did not match the reference on the forward strand
+agtcn (lower case) denotes a base that did not match the reference on the reverse strand
+* (asterisk) is a placeholder for a deleted base in a multiple basepair deletion that was mentioned in a previous line by the -[0-9]+[ACGTNacgtn]+ notation
+
+So should I treat "," exactly the same as "."? And should I treat agtc exactly the same as AGTC?
+
+I'm still no closer to finding out the percentage cutoff to determine whether it is homozygous vs heterozygous.
+
+Ben
+--
+Nice to the details!
+Yes. Both dot and comma mean the same as reference! Treat agtc exactly the same as AGTC.
+Right, let the script ignores ‘*’.
+--
+
+In the following communication, I've put Jun-Jun's responses in [[ ]].
+Hi Jun-Jun,
+
+I have some uncertainties about the logic for extracting information from the BAM files to replace NAs in report.csv. 
+The basic logic for normal cases is pretty simple, which I've expressed below. Can you please correct me if I'm wrong about any of it: 
+
+- Look at the character immediately below the REF in the tview output 
+- If it's a "." or "," then replace the NA in report.csv with REF/REF (diploid) or REF/ (haploid)
+- If it's either of A,G,C,T,a,g,c,t then use the uppercase version of that letter instead of REF
+- If W then: 
+    - if diploid then use A/T or T/A (order depends on which is the REF??) 
+    - if haploid then use ALT/ (just a guess??) 
+    [[In the case of  haploid, no chance to appear “W’, ‘R’, ‘Y”, It only appears A. T, C. G because each position has only one possibility.]]
+- If S,M,K,R,Y then do the same as with the W, but with the appropriate replacements 
+- If * then ignore this position
+
+My biggest problem is with indels. I can extend this logic similarly in the case of indels, but when I test it against some known values in report.csv I sometimes get different results. I've attached a zip file of the tview results for a few examples from report.csv. Below are what I think my logic would give me, along with questions where my results differ from what report.csv has, or when I am unsure. Can you look through these examples and give me your feedback on how to deal with indels? Thanks.
+
+tview_for_row65_sample1:
+G/G
+[[Correct. All lines below ref are actual seqs in this samples, they have ‘G’ or ‘g’ at this position. So it would be ‘G/G’ for diploid sample at this position.]]
+
+tview_for_row86_sample1:
+GAC/GAC  (how would I know to pick the C and not the T for the Y position?)
+[[It is ‘AAT’ in ref. if you check lines below ref, you see ‘GAC’ in two lines, GAY in one line, GAT in two lines. If two dominant ones are picked up, it would be ‘GAC/GAT’.]]
+
+tview_for_row116_sample1:
+CAACC/TAACC  (why does report.csv have TAACC/TAACC?)
+[[Here TAACC is ref.  majority of lines below ref have ‘C’ at the ref ‘T’ position, only 12 lines (?) have ‘T’, the same as ref. on others (A and G). It make sense to pick up ‘CAACC/TAACC ‘.  I do not know why report.csv pick up ‘TAACC/TAACC’ here!]]
+
+tview_for_row208_sample1:
+G/A
+[[the same as other cases, it makes sense to pick up ‘G/A’ almost half of lines have ‘G’ and other half of lines have ‘A’ at this ref position.]]
+
+tview_for_row352_sample1:
+TAAAC/TAAAC  (why does report.csv have TAAAC/CAAAT? Is it the same anyway?)
+[[looks at details, you majority of lines have TAAAC, but ~10 lines have ‘CAAAT’. Here is the question, how many percentage for minor sequence as the 2nd sequence (allele, or alt) to be picked up?]]
+
+tview_for_row359_sample2:
+ACA/ACA  (why does report.csv have ACA/AA?)
+[[It probably ‘ACA’ is majority in all lines, and ‘AAA’ is minority below the cut-off? You can calculate how lines have ‘ACA’ and how many lines have ‘AAA’ across all lines to majority (1st allele) and minority (2nd allele)]]
+
+tview_for_row359_sample3:
+ACA/ACA  (why does report.csv have ACA/AGA?)
+[[the same issue to be considered as the case of ‘row359_sample2’]]
+
+Thanks!
+
+Ben
+
+--
+[[
+The character immediately below the REF is a summary of all lines below the ref (based on majority, minority, cut-off of the minority). All lines below the ref are the actual sequences obtained for a special sample.
+
+For diploid samples, the majority and the 1st minority are picked up to present at most two potential for a seq position. For haploid samples, only the majority is picked up,  the 2nd potential is NOT allowed, all minorities are ignored..
+]]
+--
+
+Hi Jun-Jun, 
+
+Thanks for your feedback. Based on your responses, would you be comfortable with me implementing these rules: 
+
+(1) For indels, for each character position in the indel, I will be perfectly consistent with the rules for non-indels. In the case of W,S,M,K,R,Y, I'll put REF before the "/" and ALT after the "/" in that position.
+
+(2) In all cases I will assume the line immediately below the REF is an authoritative summary, and I will not check the lines below it, to save processing time. This might mean the results are a bit different than what might have been recorded by FreeBayes if FreeBayes had not returned NA. For example: 
+    - For the tview_for_row116_sample1 example, my result would be CAACC/CAACC. This would differ in this case from the results from FreeBayes reported in report.csv, which were TAACC/TAACC. If the line below the REF had recorded Y instead of C in the first position, my result would have been TAACC/CAACC.
+    - For the tview_for_row352_sample1 example, my result would be TAAAC/TAAAC. The result from FreeBayes was TAAAC/CAAAT, maybe because it had a different cutoff percentage for the minor sequence to use as the second sequence?
+
+After I've implemented these rules, I will search again for a way to customize the cutoff percentage for minor sequence for the samtools tview output, but at the moment I am not very hopeful.
+
+Ben
+
+--
+Hello, Ben:
+How do you know the l1st one or two lines immediately below the ref are summary line(s) of all individual seqs for a sample? The attached files your sent, the 1st line looks not the summary line.  If the 1st line is a summarized line of all lines for a sample by FreeBayes,  we need to use the data from the summary line(s).
+--
+Hello, Ben:
+In the file you showed below,  the 1st line below ref is a line summarized all individual seq lines from sample TB-322-41. But the attached file you sent looks not like this.
+--
+Hello, Ben:
+Sorry for my mis-understanding the attached file. I have checked it again. The 1st line did be the summary of all lines below it.
+
+I think that you only need to fix NA when comparing across individual samples inside the sample set based FreeBayes’ calling of the variation sites, especially Indel type is not too important to us at the current stage.
+--
+Jun-Jun's responses to my questions below are in [[ ]]:
+
+Hi Jun-Jun,
+
+Thanks for your feedback. Based on your responses, would you be comfortable with me implementing these rules:
+
+(1) For indels, for each character position in the indel, I will be perfectly consistent with the rules for non-indels. In the case of W,S,M,K,R,Y, I'll put REF before the "/" and ALT after the "/" in that position.
+
+[[In the case of W,S,M,K,R,Y, you put then the way as SNP, such Y for T/C or C/T, depending which is ref with ref letter first, If both are not as ref, it does not matter which is the first before /.]]
+
+(2) In all cases I will assume the line immediately below the REF is an authoritative summary, and I will not check the lines below it, to save processing time. This might mean the results are a bit different than what might have been recorded by FreeBayes if FreeBayes had not returned NA. For example:
+    - For the tview_for_row116_sample1 example, my result would be CAACC/CAACC. This would differ in this case from the results from FreeBayes reported in report.csv, which were TAACC/TAACC. If the line below the REF had recorded Y instead of C in the first position, my result would have been TAACC/CAACC.
+
+[[Yes, you are right. If Y is present, record as ‘TAACC/CAACC’ to show Y.]]
+
+    - For the tview_for_row352_sample1 example, my result would be TAAAC/TAAAC. The result from FreeBayes was TAAAC/CAAAT, maybe because it had a different cutoff percentage for the minor sequence to use as the second sequence?
+
+[[Your result with ‘ TAAAC/TAAAC’ is no polymorphism at all. FreeBayes was TAAAC/CAAAT, meaning Y polymorphism at the 1st position.]]
+--
+from Jun-Jun: 
+It is too complex when SNPs and Indels are considered at the same time. Presence of W,S,M,K,R,Y means SNPs, presenting two variations at the position. Indels means one or a few units are missed in some samples, but present in other samples. Of course, possible presence of SNPs at positions before or after the insertion/deletion (InDel) sites, 
+--
+
+Jun-Jun and I spoke over the phone, and Jun-Jun said that dealing with indels which contain SNPs is too complex, so:
+- leave indels containing W,S,M,K,R,Y as NA
+- but do treat pure indels containing AGCT
+- for snp or indel, just pick the most dominant two variations, so just use the summary row
+- * if there's a * in the indel, possibly treat it as one half with (find the most common variation) and one half without?? (No, see examples below)
+
+--
+Hi Jun-Jun, 
+
+Our conversation yesterday was very helpful. Can I just check again with you what I'm supposed to do if there is a * in an indel, such as with tview_for_row352_sample1? The REF is TAAAC. Here are the first two rows of the tview output. Below the *, every other position is also a star except one which is an A and another which is an a.  
+
+          211       221               231                241                    
+T*AAAC*AAAAGGGAGATTTTGGA*T*A**G*G*G*G*G**T*A**GTAA***CC*AACAA*T*G*C*CC*C*C*GCACG
+. .... ..........C.Y.... Y .  . . . . .  Y .  ....   .. .R... Y K . .. . . S.R..
+
+
+If I encounter a situation like this, which of these two possibilities should I put in the report?:
+TAAAC/TAAAC or
+TAAAC/TAAAAC 
+or something else?
+
+Thanks,
+
+Ben
+
+--
+Jun-Jun's reply (The REF is TAAAC):
+
+          211       221               231                241                    
+T*AAAC*AAAAGGGAGATTTTGGA*T*A**G*G*G*G*G**T*A**GTAA***CC*AACAA*T*G*C*CC*C*C*GCACG
+. .... ..........C.Y.... Y .  . . . . .  Y .  ....   .. .R... Y K . .. . . S.R..
+
+This case would be:
+TAAAC/TAAAC
+
+
+          211       221               231                241                    
+T*AAAC*AAAAGGGAGATTTTGGA*T*A**G*G*G*G*G**T*A**GTAA***CC*AACAA*T*G*C*CC*C*C*GCACG
+.A.... ..........C.Y.... Y .  . . . . .  Y .  ....   .. .R... Y K . .. . . S.R..
+
+This case would be:
+TAAAAC/TAAAAC
+
+
+What is heterozygous case in a sample for TAAAC/TAAAAC? Do you have an example for it?
+--
+Thanks Jun-Jun,
+
+I haven't found an example of a heterozygous case like that. I thought it might be possible though because 
+row 351 sample 3 has TAA/TA from FreeBayes (but I get TAA/TAA from tview), and row 359 sample 2 has ACA/AA from FreeBayes (but I get ACA/ACA from tview). 
+
+Ben
+--
+SNP heterozygous sites can be show in the summarized lines by ‘R, Y, K, M, S’. how to show InDel heterozygous sites in the summarized lines? It is a big question?
+--
+Ref ‘For row 359 sample 2 has ACA/AA from FreeBayes’. See enclosed pic.
+
+Summarized is … (three dots), means ACA based on ref, but below there are 8 lines with .*. (dot, star, dot), which meaning ‘AA’
+--
+Hi Jun-Jun,
+
+I think you told me yesterday to ignore any indels containing W,S,M,K,R,Y, and just leave those as NA. I'm not sure how many like that I'll encounter.
+
+For the row 359 sample 2 example that has ACA/AA from FreeBayes, it looks like this is an example of a situation which will get different results from the tview summary. Are you okay with this?
+
+Ben
+--
+Yes. If W,S,M,K,R,Y are present in the indel sites, ignore these indel sites, just look at pure indel sites that have A, T, C, G, only.
+--
+
+
+--
+Other interesting tview examples to check (one of which is mentioned in my above reply to Jun-Jun): 
+
+row 191 sample 3
+row 351 sample 3
+row 393 sample 1
+row 442 sample 1 & 2
+
+#samtools tview on sample 3 of row 191 (another heterozygous REF/ALT indel): 
+/work/SNPpipeline/tools/samtools-1.3.1/samtools tview /work/SNPpipeline/dataTemp/single/MI.M03992_0714.001.TSP0003---TSP200X.WP2001-08-15_sorted_markDup.bam /work/SNPpipeline/reference/formatted_output.fasta -d T -p "F2-4-T7-WPWR-EacTC-447bp:126" > 2tview_for_row191_sample3_MI.M03992_0714.001.TSP0003---TSP200X.WP2001-08-15_CHROM-F2-4-T7-WPWR-EacTC-447bp_POS-126.txt
+
+#samtools tview on sample 3 of row 351 (another heterozygous REF/ALT indel): 
+/work/SNPpipeline/tools/samtools-1.3.1/samtools tview /work/SNPpipeline/dataTemp/single/MI.M03992_0714.001.TSP0003---TSP200X.WP2001-08-15_sorted_markDup.bam /work/SNPpipeline/reference/formatted_output.fasta -d T -p "F2-4-T7-WPWR-EacTC-447bp:203" > 2tview_for_row351_sample3_MI.M03992_0714.001.TSP0003---TSP200X.WP2001-08-15_CHROM-F2-4-T7-WPWR-EacTC-447bp_POS-203.txt
+
+#samtools tview on sample 1 of row 393 (heterozygous REF/ALT indel): 
+/work/SNPpipeline/tools/samtools-1.3.1/samtools tview /work/SNPpipeline/dataTemp/single/MI.M03992_0714.001.TSP0001---TSP200X.WP19LTB-322-41_sorted_markDup.bam /work/SNPpipeline/reference/formatted_output.fasta -d T -p "F2-4-T7-WPWR-EacTC-447bp:219" > 2tview_for_row393_sample1_MI.M03992_0714.001.TSP0001---TSP200X.WP19LTB-322-41_CHROM-F2-4-T7-WPWR-EacTC-447bp_POS-219.txt
+
+#samtools tview on sample 1 of row 442 (heterozygous REF/ALT indel): 
+/work/SNPpipeline/tools/samtools-1.3.1/samtools tview /work/SNPpipeline/dataTemp/single/MI.M03992_0714.001.TSP0001---TSP200X.WP19LTB-322-41_sorted_markDup.bam /work/SNPpipeline/reference/formatted_output.fasta -d T -p "F2-4-T7-WPWR-EacTC-447bp:241" > 2tview_for_row442_sample1_MI.M03992_0714.001.TSP0001---TSP200X.WP19LTB-322-41_CHROM-F2-4-T7-WPWR-EacTC-447bp_POS-241.txt
+
+#samtools tview on sample 2 of row 442 (another heterozygous REF/ALT indel): 
+/work/SNPpipeline/tools/samtools-1.3.1/samtools tview /work/SNPpipeline/dataTemp/single/MI.M03992_0714.001.TSP0002---TSP200X.WP19LTB-322-35_sorted_markDup.bam /work/SNPpipeline/reference/formatted_output.fasta -d T -p "F2-4-T7-WPWR-EacTC-447bp:241" > 2tview_for_row442_sample2_MI.M03992_0714.001.TSP0002---TSP200X.WP19LTB-322-35_CHROM-F2-4-T7-WPWR-EacTC-447bp_POS-241.txt
+
+scp -J borealremote brancourt@borealjump.nfis.org:/public/genomics/junjun/Data-Dec2020/nanuq-2022/WWP-CA192-Fluidigm-Mar2022/2tview* .
+
+--
+After editing parallel_process.R to have the new functionality:
+
+scp -J borealremote SNPpipeline/scripts/parallel_process.R brancourt@borealjump.nfis.org:/public/genomics/junjun/Data-Dec2020/nanuq-2022/WWP-CA192-Fluidigm-Mar2022/
+
+--
+
+To test the new parallel_process.R, put these line at the bottom of the file: 
+
+#saveRDS(report, file = paste0(path, "/reporttemp/", substr(file, 0, nchar(file) - 4), "_filled.Rds"))
+write.csv(report, paste0(path,"/reports/report-1line-fromBAM.csv"), row.names=FALSE)
+
+And put these lines at the top of the file:
+
+#args <- commandArgs(trailingOnly = TRUE)
+#path <- args[1]
+#file <- args[2]
+#haploidOrDiploid <- args[3]
+
+path <- "/work/test"
+file <- "report_p432.Rds"
+haploidOrDiploid <- 2
+
+
+And put these lines at the top of where Execution code begins (near bottom):
+
+#report <- readRDS(paste0(path, "/reporttemp/", file))
+report <- read.csv(paste0(path,"/reports/report-1line.csv"),header=TRUE, check.names=FALSE)
+
+Then, after placing the test parallel_process-test.R in test/scripts, from within the test folder:
+Rscript scripts/parallel_process-test.R > test-1line.log
+
+--
+When I had finished testing the new parallel_process: 
+
+I moved all the generated files associated with the report generation of the first attempt to a folder called OLD-filledReportBug-Fixed, replaced the parallel_process.R, and then re-ran just the report generation part of the pipeline: 
+
+nohup ./start-pt2-regenerateReports.sh 2>&1 1>pipeline-pt2b-regenerateReports-newParallelProcess.log &
+
+--
+Hi Jun-Jun,
+
+I've updated the process to extract data from the samtools tview output according to our new specifications, and I've tested it quite thoroughly. It is working as expected. I'm now regenerating the reports on the CA192 WWP data.
+
+I still haven't found the answer to what the cutoff percentage is for the minor sequence for the samtools tview output, or found a way to customize it. I thought I should get the report generation process started anyway, and if I discover a way to do this I can stop and restart the report generation if necessary.
+
+By the way, my wife Beth is expecting to have our baby in the next week or two (due date is June 4). I should be able to continue working as I have been.
+
+Ben
+
+--
+ 
+
+
+

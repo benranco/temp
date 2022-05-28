@@ -1,0 +1,464 @@
+trimmomatic
+trinity
+transdecoder
+
+--
+
+nohup ./trimmomatic_ben_bask_script.sh 2>&1 1>trim_master_log.txt &
+
+
+  command="java -jar "$trimmomaticFolder"/trimmomatic-0.39.jar PE -threads "$ncore" "$inFolder"/"$f" "$inFolder"/"$r2InFilename" -baseout "$outFilenameBase" ILLUMINACLIP:"$trimmomaticFolder"/adapters/TruSeq3-PE-2.fa:2:30:10 LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:36"
+
+To create: trim_master_log-highlights.txt 
+grep -E "^(==.*|--.*|running.*|r1 in.*|Input Read.*)" trim_master_log.txt > trim_master_log-highlights.txt 
+- then manually edit the contents to create a .csv file with the following columns:
+Input file ID,Input Read Pairs (N),output-P (N),output-P (%),output-U1 (N),output-U1 (%),output-U2 (N),output-U2 (%),Dropped (N),Dropped (%)
+
+Trimmomatic statistics: 
+Input file ID,Input Read Pairs (N),output-P (N),output-P (%),output-U1 (N),output-U1 (%),output-U2 (N),output-U2 (%),Dropped (N),Dropped (%)
+NS.1805.003.NEBNext_dual_i7_177---NEBNext_dual_i5_177.H1,133078747,129674722,97.44,2064715,1.55,741385,0.56,597925,0.45
+NS.1805.003.NEBNext_dual_i7_178---NEBNext_dual_i5_178.H2,109587173,107161750,97.79,1551033,1.42,633580,0.58,240810,0.22
+NS.1805.003.NEBNext_dual_i7_179---NEBNext_dual_i5_179.H3,119792982,117120944,97.77,1645176,1.37,660528,0.55,366334,0.31
+NS.1805.003.NEBNext_dual_i7_180---NEBNext_dual_i5_180.T1,121366883,118515359,97.65,1875441,1.55,679439,0.56,296644,0.24
+NS.1805.003.NEBNext_dual_i7_181---NEBNext_dual_i5_181.T3,123198239,119435097,96.95,2572280,2.09,719420,0.58,471442,0.38
+NS.1805.003.NEBNext_dual_i7_183---NEBNext_dual_i5_183.B1,125912085,122357728,97.18,2624071,2.08,650291,0.52,279995,0.22
+NS.1805.003.NEBNext_dual_i7_184---NEBNext_dual_i5_184.B2,113120525,110337582,97.54,1907377,1.69,643792,0.57,231774,0.20
+NS.1805.003.NEBNext_dual_i7_185---NEBNext_dual_i5_185.B3,121442030,118708695,97.75,1763438,1.45,705663,0.58,264234,0.22
+NS.1805.003.NEBNext_dual_i7_186---NEBNext_dual_i5_186.U1,116147932,113104644,97.38,2052429,1.77,686519,0.59,304340,0.26
+NS.1805.003.NEBNext_dual_i7_187---NEBNext_dual_i5_187.U4,123822420,120640552,97.43,2158772,1.74,749704,0.61,273392,0.22
+NS.1805.003.NEBNext_dual_i7_188---NEBNext_dual_i5_188.U5,130264473,126618604,97.20,2582215,1.98,734255,0.56,329399,0.25
+NS.1812.001.NEBNext_dual_i7_A1---NEBNext_dual_i5_A1.T4,125388896,112524754,89.74,12178894,9.71,490603,0.39,194645,0.16
+
+--
+Hi Jun-Jun, 
+
+I've begun running Trimmomatic on the R1 and R2 raw files for the twelve samples of the Rust Tree503 mRNA sequence data. I used the same input parameters for Trimmomatic that I've used for previous datasets. Here's the command (with a few parameters such as file names removed to make it easier to read):
+
+java -jar trimmomatic-0.39.jar PE ... ILLUMINACLIP:adapters/TruSeq3-PE-2.fa:2:30:10 LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:36
+
+The Trimmomatic manual is available at http://www.usadellab.org/cms/?page=trimmomatic 
+
+Let me know if you'd like me to change any of the input parameters and restart the process.
+
+Ben
+
+--
+
+I had to shut down some VMs before creating the Trinity VM. Some notes. The contents of work2 and work3 folders in my VNC VM were: 
+[centos@ben-vnc ~]$ ls /work2
+blast-2.11  BLAST_README.TXT  ncbi-nr-db
+[centos@ben-vnc ~]$ ls /work3
+megan6
+
+
+--
+openstack server create \
+	--image CentOS7_BenWork5 \
+  --security-group default \
+	--key-name brancourt \
+	--nic net-id=Private \
+	--flavor x1.16xlarge \
+	ben_trin
+
+openstack server add floating ip ben_trin 10.20.0.88
+
+sudo mount -t nfs 10.20.0.6:/Public/genomics/junjun/Data-Dec2020/nanuq-2022/Rust-tree503-mRNA-seq-march2022 /work
+
+
+--
+Getting ready for Trinity run: 
+
+Based on:  https://github.com/trinityrnaseq/trinityrnaseq/issues/885
+The contents of the --samples_file (tree503_input_samples.txt):
+H1	H1	../trim/NS.1805.003.NEBNext_dual_i7_177---NEBNext_dual_i5_177.H1_filtered_R_1P.fastq.gz	../trim/NS.1805.003.NEBNext_dual_i7_177---NEBNext_dual_i5_177.H1_filtered_R_2P.fastq.gz
+H2	H2	../trim/NS.1805.003.NEBNext_dual_i7_178---NEBNext_dual_i5_178.H2_filtered_R_1P.fastq.gz	../trim/NS.1805.003.NEBNext_dual_i7_178---NEBNext_dual_i5_178.H2_filtered_R_2P.fastq.gz
+H3	H3	../trim/NS.1805.003.NEBNext_dual_i7_179---NEBNext_dual_i5_179.H3_filtered_R_1P.fastq.gz	../trim/NS.1805.003.NEBNext_dual_i7_179---NEBNext_dual_i5_179.H3_filtered_R_2P.fastq.gz
+T1	T1	../trim/NS.1805.003.NEBNext_dual_i7_180---NEBNext_dual_i5_180.T1_filtered_R_1P.fastq.gz	../trim/NS.1805.003.NEBNext_dual_i7_180---NEBNext_dual_i5_180.T1_filtered_R_2P.fastq.gz
+T3	T3	../trim/NS.1805.003.NEBNext_dual_i7_181---NEBNext_dual_i5_181.T3_filtered_R_1P.fastq.gz	../trim/NS.1805.003.NEBNext_dual_i7_181---NEBNext_dual_i5_181.T3_filtered_R_2P.fastq.gz
+B1	B1	../trim/NS.1805.003.NEBNext_dual_i7_183---NEBNext_dual_i5_183.B1_filtered_R_1P.fastq.gz	../trim/NS.1805.003.NEBNext_dual_i7_183---NEBNext_dual_i5_183.B1_filtered_R_2P.fastq.gz
+B2	B2	../trim/NS.1805.003.NEBNext_dual_i7_184---NEBNext_dual_i5_184.B2_filtered_R_1P.fastq.gz	../trim/NS.1805.003.NEBNext_dual_i7_184---NEBNext_dual_i5_184.B2_filtered_R_2P.fastq.gz
+B3	B3	../trim/NS.1805.003.NEBNext_dual_i7_185---NEBNext_dual_i5_185.B3_filtered_R_1P.fastq.gz	../trim/NS.1805.003.NEBNext_dual_i7_185---NEBNext_dual_i5_185.B3_filtered_R_2P.fastq.gz
+U1	U1	../trim/NS.1805.003.NEBNext_dual_i7_186---NEBNext_dual_i5_186.U1_filtered_R_1P.fastq.gz	../trim/NS.1805.003.NEBNext_dual_i7_186---NEBNext_dual_i5_186.U1_filtered_R_2P.fastq.gz
+U4	U4	../trim/NS.1805.003.NEBNext_dual_i7_187---NEBNext_dual_i5_187.U4_filtered_R_1P.fastq.gz	../trim/NS.1805.003.NEBNext_dual_i7_187---NEBNext_dual_i5_187.U4_filtered_R_2P.fastq.gz
+U5	U5	../trim/NS.1805.003.NEBNext_dual_i7_188---NEBNext_dual_i5_188.U5_filtered_R_1P.fastq.gz	../trim/NS.1805.003.NEBNext_dual_i7_188---NEBNext_dual_i5_188.U5_filtered_R_2P.fastq.gz
+T4	T4	../trim/NS.1812.001.NEBNext_dual_i7_A1---NEBNext_dual_i5_A1.T4_filtered_R_1P.fastq.gz	../trim/NS.1812.001.NEBNext_dual_i7_A1---NEBNext_dual_i5_A1.T4_filtered_R_2P.fastq.gz
+
+Real Trinity command: 
+nohup /home/centos/software/trinity/trinityrnaseq-Trinity-v2.8.5/Trinity --seqType fq --samples_file tree503_input_samples.txt --max_memory 944G --CPU 64 --output trinityOut 2>&1 1>trinity_run.log &
+
+
+--
+Hi Jun-Jun,
+
+Trimmomatic has finished running on the tree503 mRNA data, and I have begun running Trinity on the Trimmomatic paired reads output for all twelve samples.
+
+I've attached some statistics from the Trimmomatic log file.
+
+Ben
+tree503_mRNA_trimmomatic_stats.csv
+
+
+--
+Hi Jun-Jun,
+
+Trinity has completed successfully on the Limber Pine Trimmomatic output. Here is the output fasta file: 
+https://www.dropbox.com/s/5v0s6l16kr1miyy/tree503-mRNAseqs-Trimm-Trinity.zip?dl=1
+
+
+Here are some stats: 
+
+84499649 / 1416200431 = 5.97% reads selected during normalization.
+0 / 1416200431 = 0.00% reads discarded as likely aberrant based on coverage profiles.
+0 / 1416200431 = 0.00% reads discarded as below minimum coverage threshold=1
+
+Statistics:
+===========
+Trinity Version:      Trinity-v2.8.5
+Compiler:             GCC
+Trinity Parameters:   --seqType fq --samples_file tree503_input_samples.txt --max_memory 944G --CPU 64 --output trinityOut
+Paired mode
+ Input data
+  Left.fasta    11952 MByte
+  Right.fasta   11894 MByte
+  Number of unique KMERs: 1010397781
+  Number of reads:        168999298 Output data
+  Trinity.fasta 521 MByte
+
+--
+Hello, Ben:
+Great!
+
+The 2nd step, the assembled transcripts will be filtered by gene-level expression estimates with transcripts per million (TPM) ≥ 1 in at least one of 12 samples using RSEM v1.3.3 (Li and Dewey, 2011).
+
+The 3rd step, the assembled transcripts will be run using TransDecoder in the Trinity software package and filtered at a minimum protein length of 50.
+
+Thanks.
+--
+
+===================
+RSEM stuff for Tree503:
+
+-------------
+Running RSEM:
+
+Based on reading through my notes in ass6-pt6.txt and align_and_estimate_abundance.pl-USAGE.txt:
+
+I used the same parameters as the WWP18, WBP47, Hemlock30, LP36 runs, and using the same samples input file that I used for the Trinity run (in hindsight I should have copied the samples file and the Trinity.fasta output file into the RSEM folder first, since it creates files in the same directory): 
+Usage for bowtie2/RSEM (with samples file, default params):
+nohup perl $TRINITY_HOME/util/align_and_estimate_abundance.pl --transcripts ../step2-trinity/tree503-mRNAseqs-Trimm-Trinity.fasta --seqType fq --samples_file ../step2-trinity/tree503_input_samples.txt   --est_method RSEM --aln_method bowtie2 --bowtie2_RSEM "--no-mixed --no-discordant --gbar 1000 --end-to-end -k 200 " --trinity_mode --prep_reference --thread_count 62 --output_dir outRSEM 2>&1 1> tree503_align_and_estimate_abundance-rsem_bowtie2_end-to-end.log &
+
+--
+Hi Jun-Jun, 
+
+I've begun running RSEM/bowtie2 via the align_and_estimate_abundance.pl script that comes packaged with Trinity, using the same input parameters (the default suggestion for the --bowtie2_RSEM parameter string) for RSEM/bowtie2 as the WWP18, WBP47, Hemlock30 and LP36 datasets). I used the Trinity output fasta file and the Trimmomatic-processed read files as input.
+
+Here is the command I used: 
+perl $TRINITY_HOME/util/align_and_estimate_abundance.pl --transcripts ../step2-trinity/tree503-mRNAseqs-Trimm-Trinity.fasta --seqType fq --samples_file ../step2-trinity/tree503_input_samples.txt   --est_method RSEM --aln_method bowtie2 --bowtie2_RSEM "--no-mixed --no-discordant --gbar 1000 --end-to-end -k 200 " --trinity_mode --prep_reference --thread_count 62 --output_dir outRSEM
+
+Ben
+--
+
+Hi Jun-Jun,
+
+RSEM is progressing, but I'd forgotten it takes so long. It is about a quarter of the way through, so I expect it to finish around the end of next week. Is there something you'd like me to focus on in the meantime?
+
+Holly has asked me to help her with installing BUSCO and Translig on a Boreal Cloud image, so I've done a bit of work on that. I can also try again to understand the Linkage Disequilibrium paper, and investigate software that might do something similar either in R or Python.
+--
+You can try to run ‘Transdecoder’ on the Tree503 race assembly, as well as to pick up the longest isoform per gene.
+--
+[While waiting for RSEM to finish, I did some TransDecoder stuff, which is documented in its own section below under "TransDecoder stuff for Tree503".
+--
+After RSEM completed, I ran my scripts: 
+filter_RSEM_output-genes.R
+filter_RSEM_output-isoforms.R
+which use this sort of command to find all the RSEM output files that I'll be working with:
+find . -mindepth 2 -maxdepth 2 -name RSEM.isoforms.results -type f
+find . -mindepth 2 -maxdepth 2 -name RSEM.genes.results -type f
+
+First, make sure the RSEM process is all done:
+grep -c "Expression Results are written" wwp18-align_and_estimate_abundance-rsem_bowtie2_end-to-end.log
+
+Then created a folder RSEM_filtered.
+Then run my filtering scripts:
+nohup ./run_filter_RSEM.sh 2>&1 1>run.log &
+
+--
+Then created a backup of the results in RSEM_filtered before replacing all occurences of TRINITY with T503 in the output files (I should have done this with the original TRINITY output before running RSEM).
+Then: 
+sed -i 's/TRINITY/T503/g' *.*
+
+scp -J borealremote brancourt@borealjump.nfis.org:/public/genomics/junjun/Data-Dec2020/nanuq-2022/Rust-tree503-mRNA-seq-march2022/step3-ReadMapping/RSEM_filtered/T503_RSEM_results_filtered.zip .
+
+
+--
+Hi Jun-Jun,
+
+RSEM has also completed running on the Tree503 data. 
+I've run my script to combine the results of the bowtie2/RSEM read mapping process from all samples into a single file each for genes and isoforms, and then filter them by TPM >= 1 in at least one of the samples. I've also included total_expected_count, total_TPM and total_FPKM columns. Here's a link to the results:
+https://www.dropbox.com/s/j1ausy2wpqx787e/T503_RSEM_results_filtered.zip?dl=1
+
+The .selected.tab files just show the selected genes or isoforms after combining and then filtering the results.
+
+The .filtered.tab files are the combined results in tab-delimited format. I couldn't use comma-delimited because some of the fields contained commas. If you open it in Excel as a text or csv file, but choose tab as the delimiting field instead of comma, it should display properly. 
+
+There are more selected isoform ids (125491) than gene ids (73279) after filtering, but more isoform ids were filtered out, and I remember from the previous datasets there were some selected gene ids that weren't found in the selected isoform ids. So that might also be the case this time. 
+ 
+I ran my TPM filtering script on the RSEM.genes.results files and the RSEM.isoforms.results files separately, so if the TPM values were different in the genes vs isoforms files, or if the RSEM output recorded different gene selections in the genes vs isoforms files then there might have been a different set of ids selected after the filtering. Also, maybe the TMP values were generally lower per isoform than per gene, which might explain why more isoform ids were filtered out than gene ids. 
+
+Ben
+--
+
+
+
+
+
+
+===================
+TransDecoder stuff for Tree503:
+
+Getting ready to run TransDecoder in another VM: 
+
+(I moved this step3-ot2 folder down a level so as to not be writing to the same directory structures as the VM running RSEM):
+sudo mount -t nfs 10.20.0.6:/Public/genomics/junjun/Data-Dec2020/nanuq-2022/step3-opt2-TransDecoder /work
+
+
+Here's how I ran TransDecoder (in two steps, based on how I did it in ass6-pt6.txt), in a shell script called runTransDecoder.sh: 
+
+echo "======================================"
+echo "running LongOrfs"
+TransDecoder.LongOrfs -m 50 -t tree503-mRNAseqs-Trimm-Trinity.fasta 2>&1 1> tree503-TransDecoder.LongOrfs.log 
+echo "======================================"
+echo "done LongOrfs"
+echo "======================================"
+echo "======================================"
+echo "running Predict"
+TransDecoder.Predict --single_best_only -t tree503-mRNAseqs-Trimm-Trinity.fasta 2>&1 1> tree503-TransDecoder.Predict.log 
+echo "======================================"
+echo "done Predict"
+
+
+nohup ./runTransDecoder.sh 2>&1 1> runTransDecoder.log &
+
+After finishing running transdecoder, use my two scripts to select the longesr orfs, etc: 
+
+scp -J borealremote chooseLongestOrfs_fasta.R brancourt@borealjump.nfis.org:/public/genomics/junjun/Data-Dec2020/nanuq-2022/step3-opt2-TransDecoder/longestOrfs/
+scp -J borealremote choose_longest_orf_fasta-FAST.sh brancourt@borealjump.nfis.org:/public/genomics/junjun/Data-Dec2020/nanuq-2022/step3-opt2-TransDecoder/longestOrfs/
+
+chmod...
+
+nohup ./choose_longest_orf_fasta-FAST.sh 2>&1 1> choose_longest_orf_fasta-FAST.log &
+
+PROBLEM: When running on a VM based on BenWork4 I got this error: 
+package ‘seqinr’ was installed by an R version with different internals; it needs to be reinstalled for use with this R version
+
+I tried running R as sudo and installing the package, but got this error: 
+Error: package ‘ade4’ was installed by an R version with different internals; it needs to be reinstalled for use with this R version
+
+So I installed the ade4 package, then tried reinstalling seqinr. It seemed to work.
+I then restarted the above nohup command.
+
+--
+Hi Jun-Jun, my longest orfs scripts have finished processing. I just realized that I forgot to rename the "TRINITY" portion of the header in the Trinity fasta file. I can rename it in these output files if that is helpful. Would you like me to replace it with "tree503" or something like that before sending these files to you?
+
+Ben
+-
+Hello, Ben:
+
+Replace with ‘T503’ would be helpful. In addition to the longest, we also need all ORF seq with cut-off at aa50 in fast files. Thanks!
+--
+
+sed -i 's/TRINITY/T503/g' tree503-mRNAseqs-*
+
+scp -J borealremote brancourt@borealjump.nfis.org:/public/genomics/junjun/Data-Dec2020/nanuq-2022/step3-opt2-TransDecoder/longestOrfs/Tree503-longestOrf.zip .
+--
+Hi Jun-Jun,
+
+By "all ORF seq with cut-off at aa50", does aa50 mean a minimum protein length of 50? The parameter I used for TransDecoder.Longest, "-m 50" specified that. Here are the two TransDecoder commands I used:
+ 
+TransDecoder.LongOrfs -m 50 -t tree503-mRNAseqs-Trimm-Trinity.fasta
+TransDecoder.Predict --single_best_only -t tree503-mRNAseqs-Trimm-Trinity.fasta
+
+Here is a zip file containing the output data after processing it with my scripts. I've replaced all occurrences of "TRINITY" in the files with "T503".
+https://www.dropbox.com/s/iypzi27hgv4hf7m/Tree503-longestOrf.zip?dl=1
+
+Here's what my scripts do:
+  - for each gene, check which transcript has the longest ORF (in .pep file)
+  - if there is a tie for longest ORF, pick the transcript that has the longest DNA sequence (in .fasta file)
+  - if no good ORF is generated from TransDecoder, pick the transcript that has the longest DNA sequence (in .fasta file)
+
+The files that I generated are:
+
+-selected-longest.fasta  : final output
+-allGeneIds.txt  : all unique gene ids.
+-fastaData.csv  : some data extracted from the sequence headers in the Trinity fasta file.
+-pepData.csv  : some data extracted from the sequence headers in the TransDecoder .pep file.
+-longestDNASeqs-fromFasta.txt  : all sequence ids whose gene id didn't have a match in the .pep file, so the longest sequence for that gene was selected from the Trinity .fasta file.
+-longestOrfSeqs-all.txt  : all sequence ids that were selected either from the .pep file or (if not found in the .pep file) the .fasta file.
+-longestOrfSeqs-fromPep.txt  : all sequence ids that were selected from the .pep file.
+
+
+Ben
+
+--
+Hello, Ben:
+Yes. ‘LongOrfs -m 50 –t’ will filter pep length at 50. I’ll have a look at data. Thanks for your great progress.
+--
+Hello, Ben:
+Looks fine foe selection of the longest seqs. Can you send me the outcome files (DNA and protein seqs of ROFs) of “TransDecoder”? Thanks!
+
+longest_orfs.pep   : all ORFs meeting the minimum length criteria, regardless of coding potential.
+longest_orfs.gff3  : positions of all ORFs as found in the target transcripts
+longest_orfs.cds   : the nucleotide coding sequence for all detected ORFs
+--
+
+First, I had to replace all occurences of TRINITY with T503 in the /public/genomics/junjun/Data-Dec2020/nanuq-2022/step3-opt2-TransDecoder/ folder and its subfolders:
+
+cp -a tree503-* backup-before-TRINITY-replace/
+sed -i 's/TRINITY/T503/g' *.*
+
+scp -J borealremote brancourt@borealjump.nfis.org:/public/genomics/junjun/Data-Dec2020/nanuq-2022/step3-opt2-TransDecoder/TransDecoder-outcome.zip .
+--
+Hi Jun-Jun,
+
+Here are the TransDecoder output files:
+https://www.dropbox.com/s/9396456r95hpkhg/TransDecoder-outcome.zip?dl=1
+
+Ben
+--
+
+
+=====================
+
+
+https://www.wayfair.ca/filters/rugs/sb3/area-rugs-c215386-a1244~129719-a1245~2145-a95050~314301.html
+
+https://www.wayfair.ca/rugs/pdp/rosecliff-heights-lockhart-handwoven-flatweave-ivory-area-rug-rohe6022.html?piid=32138064&categoryid=215386&placement=1&slot=0&sponsoredid=17bdc0c74c371900d32db8c0f3ae76e11d28235968ba9bd952cda2262ec0563a&_txid=I%2FcmXGJmNEBdr6ShtnsWAg%3D%3D&isB2b=0&auctionId=726be3a8-10b3-4dc2-8888-be372ce5df93
+
+https://www.wayfair.ca/rugs/pdp/beachcrest-home-helton-handmade-flatweave-beige-area-rug-hidn2367.html?piid=31653800
+
+https://www.wayfair.ca/rugs/pdp/highland-dunes-cruise-hand-braided-jute-off-white-area-rug-c003185879.html?piid=691994563
+
+https://www.wayfair.ca/rugs/pdp/beachcrest-home-alois-geometric-handmade-flatweave-yellow-ivory-area-rug-c007332540.html?piid=520958445
+
+=====================
+
+Dan Worrall's (FabFilter) youtube video "Samplerates: the higher the better, right?" has also helped me understand better the issues at play with nyquist cutoffs and harmonics when mixing digitally. He didn't go into the accuracy vs filter issues with converters though, which I imagine would be a factor with Nebula. 
+
+---
+
+https://gearspace.com/board/so-much-gear-so-little-time/592292-creating-recording-mix-mytek-8x192.html
+- Behringer V-Verbpro
+- mytek cue mixer
+https://gearspace.com/board/high-end/1022822-whos-using-mytek-8x192-adc-upgrade.html#post11237338
+https://gearspace.com/board/music-computers/549193-mytek-8x192-vs-metric-halo-lio-8-a.html
+https://gearspace.com/board/high-end/1022822-whos-using-mytek-8x192-adc-upgrade.html#post11237338
+"I've since learned when using the FireWire card and the Fold Back mixer with the Mytek 8x192, you hear the audio before it hits your ADC when tracking so... you could have your latency at 2048 and it would sound instant in your Headphones so THAT's cool!"
+"I bought my second used Mytek 8x192 and it was already modified. In comparison to the original it sounded sweeter, less nervous in the transients and more focused. After listening to it, I sent my old 8x192 to Mytek for modification. Now I have 16 wonderful channels that sound sweet, detailed and true."
+https://gearspace.com/board/all-things-technical/1085564-do-mic-splitters-alter-sound.html
+https://www.radialeng.com/product/lx-2
+https://www.radialeng.com/product/js2  (and js3)
+
+
+====
+To research for Holly: 
+Translig
+Busco  https:busco.ezlab.org
+
+Installing Anaconda on CentOS 7: 
+https://linuxize.com/post/how-to-install-anaconda-on-centos-7/
+
+how large is anaconda platform
+https://docs.anaconda.com/anaconda-repository/admin-guide/install/requirements/
+
+====
+Steps I took to install stuff for Holly:
+
+- made a VM based on BenWork5
+yum makecache
+yum clean all
+sudo yum --obsoletes update
+sudo yum autoremove
+yum makecache
+sudo yum install screen
+
+- I then made a flavor from this called ben-temp
+
+--
+- in the below commands the "-c bioconda", etc, specifies an additional channel to search for packages
+
+To install Translig: 
+https://anaconda.org/bioconda/translig
+conda install -c bioconda translig
+- encountered errors, see output below
+
+====
+(base) [centos@ben-dev ~]$ conda install -c bioconda translig
+Collecting package metadata (current_repodata.json): done
+Solving environment: failed with initial frozen solve. Retrying with flexible solve.
+Solving environment: failed with repodata from current_repodata.json, will retry with next repodata source.
+Collecting package metadata (repodata.json): done
+Solving environment: failed with initial frozen solve. Retrying with flexible solve.
+Solving environment: / 
+Found conflicts! Looking for incompatible packages.
+This can take several minutes.  Press CTRL-C to abort.
+failed                                                                                                                                                                              
+
+UnsatisfiableError: The following specifications were found to be incompatible with each other:
+
+Output in format: Requested package -> Available versions
+
+Package libgcc-ng conflicts for:
+python=3.9 -> zlib[version='>=1.2.11,<1.3.0a0'] -> libgcc-ng[version='>=7.2.0']
+python=3.9 -> libgcc-ng[version='>=7.3.0|>=7.5.0']
+
+Package _openmp_mutex conflicts for:
+python=3.9 -> libgcc-ng[version='>=7.5.0'] -> _openmp_mutex[version='>=4.5']
+translig -> libgcc-ng[version='>=7.3.0'] -> _openmp_mutex[version='>=4.5']The following specifications were found to be incompatible with your system:
+
+  - feature:/linux-64::__glibc==2.17=0
+  - feature:|@/linux-64::__glibc==2.17=0
+  - translig -> libgcc-ng[version='>=7.3.0'] -> __glibc[version='>=2.17']
+
+Your installed version is: 2.17
+
+====
+
+(base) [centos@ben-dev ~]$ conda install -n test -c bioconda translig
+Collecting package metadata (current_repodata.json): done
+Solving environment: failed with initial frozen solve. Retrying with flexible solve.
+Solving environment: failed with repodata from current_repodata.json, will retry with next repodata source.
+Collecting package metadata (repodata.json): done
+Solving environment: failed with initial frozen solve. Retrying with flexible solve.
+Solving environment: | 
+Found conflicts! Looking for incompatible packages.
+This can take several minutes.  Press CTRL-C to abort.
+failed                                                                                                                                                                              
+
+UnsatisfiableError: The following specifications were found to be incompatible with each other:
+
+Output in format: Requested package -> Available versions
+
+Package libzlib conflicts for:
+translig -> zlib[version='>=1.2.11,<1.3.0a0'] -> libzlib==1.2.11=h166bdaf_1014
+python=3.9 -> libzlib[version='>=1.2.11,<1.3.0a0']
+python=3.9 -> zlib[version='>=1.2.11,<1.3.0a0'] -> libzlib==1.2.11=h166bdaf_1014
+
+Package libgcc-ng conflicts for:
+translig -> zlib[version='>=1.2.11,<1.3.0a0'] -> libgcc-ng[version='>=10.3.0|>=7.5.0|>=7.2.0']
+translig -> libgcc-ng[version='>=7.3.0']The following specifications were found to be incompatible with your system:
+
+  - feature:/linux-64::__glibc==2.17=0
+  - feature:|@/linux-64::__glibc==2.17=0
+  - python=3.9 -> libgcc-ng[version='>=7.5.0'] -> __glibc[version='>=2.17']
+
+Your installed version is: 2.17
+
+
+(base) [centos@ben-dev ~]$ 
+
+
+====
+
+
+
+

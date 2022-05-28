@@ -1,0 +1,256 @@
+--
+Hi Jun-Jun,
+
+The WWP18 BLASTx runs have all completed. I'll work on getting LP36 running next and then I'll combine and process the WWP18 results as we've done with the others.
+--
+
+
+------------------
+Following procedure from ass6-pt6c-wwp18.txt..
+
+[brancourt@jump BLASTx-LP36]$ wc -l LP36_longest190,519-TPM1ud.fasta 
+381038 LP36_longest190,519-TPM1ud.fasta
+[brancourt@jump BLASTx-LP36]$ grep -c "^>" LP36_longest190,519-TPM1ud.fasta 
+190519
+
+Initial split of main fasta file by line numbers (always must be an even number), assuming 4 x1, 6 mm2, 3 mm1. 
+Basic unit of 1 = 381038/(1*4+2*6+2.5*3) = 16214
+16214*2 = 32428
+16214*2.5 = 40536 (make sure it's an even number)
+
+Initial split:
+awk 'NR > 0 && NR <= 16214' LP36_longest190,519-TPM1ud.fasta > LP36_longest190,519-TPM1ud-pt01-x1.fasta
+awk 'NR > 16214 && NR <= 32428' LP36_longest190,519-TPM1ud.fasta > LP36_longest190,519-TPM1ud-pt02-x1.fasta
+awk 'NR > 32428 && NR <= 48642' LP36_longest190,519-TPM1ud.fasta > LP36_longest190,519-TPM1ud-pt03-x1.fasta
+awk 'NR > 48642 && NR <= 64856' LP36_longest190,519-TPM1ud.fasta > LP36_longest190,519-TPM1ud-pt04-x1.fasta
+awk 'NR > 64856 && NR <= 105392' LP36_longest190,519-TPM1ud.fasta > LP36_longest190,519-TPM1ud-pt05-mm1.fasta
+awk 'NR > 105392 && NR <= 145928' LP36_longest190,519-TPM1ud.fasta > LP36_longest190,519-TPM1ud-pt06-mm1.fasta
+awk 'NR > 145928 && NR <= 186464' LP36_longest190,519-TPM1ud.fasta > LP36_longest190,519-TPM1ud-pt07-mm1.fasta
+awk 'NR > 186464 && NR <= 218892' LP36_longest190,519-TPM1ud.fasta > LP36_longest190,519-TPM1ud-pt08-mm2.fasta
+awk 'NR > 218892 && NR <= 251320' LP36_longest190,519-TPM1ud.fasta > LP36_longest190,519-TPM1ud-pt09-mm2.fasta
+awk 'NR > 251320 && NR <= 283748' LP36_longest190,519-TPM1ud.fasta > LP36_longest190,519-TPM1ud-pt10-mm2.fasta
+awk 'NR > 283748 && NR <= 316176' LP36_longest190,519-TPM1ud.fasta > LP36_longest190,519-TPM1ud-pt11-mm2.fasta
+awk 'NR > 316176 && NR <= 348604' LP36_longest190,519-TPM1ud.fasta > LP36_longest190,519-TPM1ud-pt12-mm2.fasta
+awk 'NR > 348604' LP36_longest190,519-TPM1ud.fasta > LP36_longest190,519-TPM1ud-pt13-mm2.fasta
+
+
+Final split after some rebalancing:
+awk 'NR > 0 && NR <= 16214' LP36_longest190,519-TPM1ud.fasta > LP36_longest190,519-TPM1ud-pt01-x1.fasta
+awk 'NR > 16214 && NR <= 32428' LP36_longest190,519-TPM1ud.fasta > LP36_longest190,519-TPM1ud-pt02-x1.fasta
+awk 'NR > 32428 && NR <= 48642' LP36_longest190,519-TPM1ud.fasta > LP36_longest190,519-TPM1ud-pt03-x1.fasta
+awk 'NR > 48642 && NR <= 64856' LP36_longest190,519-TPM1ud.fasta > LP36_longest190,519-TPM1ud-pt04-x1.fasta
+awk 'NR > 64856 && NR <= 100326' LP36_longest190,519-TPM1ud.fasta > LP36_longest190,519-TPM1ud-pt05-mm1.fasta
+awk 'NR > 100326 && NR <= 138326' LP36_longest190,519-TPM1ud.fasta > LP36_longest190,519-TPM1ud-pt06-mm1.fasta
+awk 'NR > 138326 && NR <= 178862' LP36_longest190,519-TPM1ud.fasta > LP36_longest190,519-TPM1ud-pt07-mm1.fasta
+awk 'NR > 178862 && NR <= 213824' LP36_longest190,519-TPM1ud.fasta > LP36_longest190,519-TPM1ud-pt08-mm2.fasta
+awk 'NR > 213824 && NR <= 248786' LP36_longest190,519-TPM1ud.fasta > LP36_longest190,519-TPM1ud-pt09-mm2.fasta
+awk 'NR > 248786 && NR <= 283748' LP36_longest190,519-TPM1ud.fasta > LP36_longest190,519-TPM1ud-pt10-mm2.fasta
+awk 'NR > 283748 && NR <= 316176' LP36_longest190,519-TPM1ud.fasta > LP36_longest190,519-TPM1ud-pt11-mm2.fasta
+awk 'NR > 316176 && NR <= 348604' LP36_longest190,519-TPM1ud.fasta > LP36_longest190,519-TPM1ud-pt12-mm2.fasta
+awk 'NR > 348604' LP36_longest190,519-TPM1ud.fasta > LP36_longest190,519-TPM1ud-pt13-mm2.fasta
+
+--
+Then: 
+chmod 664 *.fasta
+- then made directories
+- then: chmod 777 LP36pt*
+- then moved files to directories
+- then copied the .ncbirc file to each directory, and preseve its permissions
+
+sudo mount -t nfs 10.20.0.6:/Public/genomics/junjun/Data-Dec2020/Bens-Trinity-assembly/BLASTxRuns/BLASTx-LP36/LP36pt0-x1 /work
+sudo mount -t nfs 10.20.0.6:/Public/genomics/junjun/Data-Dec2020/Bens-Trinity-assembly/BLASTxRuns/BLASTx-LP36/LP36pt0-mm2 /work
+sudo mount -t nfs 10.20.0.6:/Public/genomics/junjun/Data-Dec2020/Bens-Trinity-assembly/BLASTxRuns/BLASTx-LP36/LP36pt0-mm1 /work
+
+--
+Running the BLASTx command (the input file is not fully specified here): 
+
+LP36_longest190,519-TPM1ud-pt05-mm1.fasta
+
+x1:
+nohup time blastx -num_threads 8 -db nr -query LP36 -max_target_seqs 20 -outfmt 11 -out LP36_longest190,519-TPM1ud-blastx-11outfmt-pt0.out 2>&1 1> time-LP36_longest190,519-TPM1ud-blastx-11outfmt-pt0-x1.log &
+
+mm2:
+  nohup time blastx -num_threads 16 -db nr -query LP36 -max_target_seqs 20 -outfmt 11 -out LP36_longest190,519-TPM1ud-blastx-11outfmt-pt0.out 2>&1 1> time-LP36_longest190,519-TPM1ud-blastx-11outfmt-pt0-mm2.log &
+
+mm1: 
+nohup time blastx -num_threads 28 -db nr -query LP36 -max_target_seqs 20 -outfmt 11 -out LP36_longest190,519-TPM1ud-blastx-11outfmt-pt0.out 2>&1 1> time-LP36_longest190,519-TPM1ud-blastx-11outfmt-pt0-mm1.log &
+
+
+-----------
+
+sudo mount -t nfs 10.20.0.6:/Public/genomics/junjun/Data-Dec2020/Bens-Trinity-assembly/BLASTxRuns/BLASTx-WWP18 /work
+
+
+mkdir BLASTxResultAll
+chmod 777 BLASTxResultAll
+- copied the three scripts and the .ncbi file into it
+mv `find . -mindepth 2 -maxdepth 2 -name *.out -type f` BLASTxResultAll/
+
+cat LP36_longest190,519-TPM1ud-blastx-11outfmt-pt01.out >> LP36_longest190,519-TPM1ud-blastx-11outfmt.MASTER
+cat LP36_longest190,519-TPM1ud-blastx-11outfmt-pt02.out >> LP36_longest190,519-TPM1ud-blastx-11outfmt.MASTER
+cat LP36_longest190,519-TPM1ud-blastx-11outfmt-pt03.out >> LP36_longest190,519-TPM1ud-blastx-11outfmt.MASTER
+cat LP36_longest190,519-TPM1ud-blastx-11outfmt-pt04.out >> LP36_longest190,519-TPM1ud-blastx-11outfmt.MASTER
+cat LP36_longest190,519-TPM1ud-blastx-11outfmt-pt05.out >> LP36_longest190,519-TPM1ud-blastx-11outfmt.MASTER
+cat LP36_longest190,519-TPM1ud-blastx-11outfmt-pt06.out >> LP36_longest190,519-TPM1ud-blastx-11outfmt.MASTER
+cat LP36_longest190,519-TPM1ud-blastx-11outfmt-pt07.out >> LP36_longest190,519-TPM1ud-blastx-11outfmt.MASTER
+cat LP36_longest190,519-TPM1ud-blastx-11outfmt-pt08.out >> LP36_longest190,519-TPM1ud-blastx-11outfmt.MASTER
+cat LP36_longest190,519-TPM1ud-blastx-11outfmt-pt09.out >> LP36_longest190,519-TPM1ud-blastx-11outfmt.MASTER
+cat LP36_longest190,519-TPM1ud-blastx-11outfmt-pt10.out >> LP36_longest190,519-TPM1ud-blastx-11outfmt.MASTER
+cat LP36_longest190,519-TPM1ud-blastx-11outfmt-pt11.out >> LP36_longest190,519-TPM1ud-blastx-11outfmt.MASTER
+cat LP36_longest190,519-TPM1ud-blastx-11outfmt-pt12.out >> LP36_longest190,519-TPM1ud-blastx-11outfmt.MASTER
+cat LP36_longest190,519-TPM1ud-blastx-11outfmt-pt13.out >> LP36_longest190,519-TPM1ud-blastx-11outfmt.MASTER
+
+mkdir originalBLASTxOuts
+mv *.out originalBLASTxOuts/
+
+--
+
+Ran this blast_formatter command to get *TABULAR* data: 
+nohup blast_formatter -archive LP36_longest190,519-TPM1ud-blastx-11outfmt.MASTER -outfmt "6 qseqid stitle ssciname staxid evalue sacc" -out LP36_longest190,519-TPM1ud-blastx-6outfmt.MASTER.tab 2>&1 > blast_formatter.log &
+
+- then replace all instances of comma with semicolon:  
+    sed -i 's/,/;/g' LP36_longest190,519-TPM1ud-blastx-6outfmt.MASTER.tab
+- then replace all tab with comma:  
+    sed 's/\t/,/g' LP36_longest190,519-TPM1ud-blastx-6outfmt.MASTER.tab > LP36_longest190,519-TPM1ud-blastx-6outfmt.MASTER.csv 
+- then add header line (just using cat and >>): 
+query id,subject title,subject sci name,subject tax id,evalue,subject acc.
+
+Then ran the selectLowestEValueSeqsFromBlastxCsv.R to get the topPicks.
+
+--
+--
+
+MEGAN6:
+
+--
+Convert to 0 format for MEGAN6 input:
+cp -a ../WWP18pt01-x1/.ncbirc .
+blast_formatter -archive LP36_longest190,519-TPM1ud-blastx-11outfmt.MASTER -outfmt 0 -out LP36_longest190,519-TPM1ud-blastx-0outfmt.MASTER
+
+Opening it in MEGAN6: 
+
+Here are the LCA parameters I ended up with for the Hemlock30 data, so reusing these (all default except Min Support Percent): 
+Min Score: 50.0
+Max Expected: 0.01 
+Min Percent Identity: 0.0
+Top Percent: 10.0
+Min Support Percent: (custom) 0
+Min Support: 0
+Use Min-Complexity Filter: off
+LCA Algorithm: naive
+Percent to cover: 100%
+Read assignment mode: readCount
+Use 16S Percent Identity Filter: off
+
+Can try to try running parameter in case difference?  Min Support Percent: (custom) 0.01 down to 0.
+I can not find: Read assignment mode: readCount. We have NOT used raw NGS reads for BLAST, what we used is assembled seq from raw reads.
+
+
+Copying the images I exported from MEGAN6 to my computer: 
+scp -J borealremote brancourt@borealjump.nfis.org:/public/genomics/junjun/Data-Dec2020/Bens-Trinity-assembly/BLASTxRuns/BLASTx-LP36/BLASTxResultAll/megan6images/* .
+
+--
+
+For the MEGAN6 part, "maybe you just listed the specification (taxonomic-terms) under Node-1 to Node-6 based on the image you sent.":
+x- for non-leaf nodes, export only the assigned
+x- for leaf nodes, export both the assigned and the summarized
+x- the taxonomic term is in the filename
+x- for each file, update the filename to include its sequence of parents separated by a comma
+
+** This longest line of commas (including the names that needed to be cut out of the filenames) has 17 commas. 
+So ALL filenames need to have 17 commas total.
+
+- create a table of seq ids with taxonomic term
+    - for each file, export only the > rows, and replace the > with the filename plus comma
+          grep ">" filename > filename
+          sed -i 's/^>/filename,/g filename
+    - do I need to add commas at end of rows for non-leaf nodes? probably: 
+          sed -i 's/.*$/&,,,/g' tmp.txt
+          or: 
+          sed -i 's/$/,,,/g' tmp.txt
+
+For the above, see script: extractOnlySeqIdsFromFastaFilesAndPasteFilename.sh
+
+
+
+- join all files and add a header line:
+nano LP36_MEGAN6_seqCategories_all.txt, and add this header line:
+seq_id,level_01,level_02,level_03,level_04,level_05,level_06,level_07,level_08,level_09,level_10,level_11,level_12,level_13,level_14,level_15,level_16,level_17,level_18
+
+
+Then, contatenate all to it:
+cat `ls *.csv` >> LP36_MEGAN6_seqCategories_all.txt
+mv LP36_MEGAN6_seqCategories_all.txt LP36_MEGAN6_seqCategories_all.csv
+
+- then merge that table with my blastx table based on seq id: 
+mergeCsvFilesByColumn.R
+LP36_longest190,519-TPM1ud-blastx-6outfmt.MASTER-topPicks.csv
+LP36_MEGAN6_seqCategories_all.csv
+
+
+NCBI,
+NCBI,cellular_organisms,
+NCBI,cellular_organisms,Eukaryota,
+
+--
+Hi Jun-Jun,
+
+Here is the csv output of BLASTx and MEGAN6 for the LP36 data, both separate and combined. The BLASTx data has been filtered by lowest e-value.
+https://www.dropbox.com/s/eg1fx1k5qoh100e/LP36-BLASTx-MEGAN6-csvOutput.zip?dl=1
+
+Ben
+
+--
+
+
+
+
+
+====================================
+
+ben@node-1w7jr9ssykaaoacuzdzft9dpm TigerVNC]$ 
+[ben@node-1w7jr9ssykaaoacuzdzft9dpm TigerVNC]$ java -jar VncViewer-1.11.0.jar 
+
+TigerVNC Java Viewer v1.11.0 (20200908)
+Built on 2020-09-08 at 23:40:58
+Copyright (C) 1999-2020 TigerVNC Team and many others (see README.rst)
+See https://www.tigervnc.org for information on TigerVNC.
+Exception in thread "VncViewer Thread" java.awt.HeadlessException
+	at java.awt.GraphicsEnvironment.checkHeadless(GraphicsEnvironment.java:204)
+	at java.awt.Window.<init>(Window.java:536)
+	at java.awt.Frame.<init>(Frame.java:420)
+	at java.awt.Frame.<init>(Frame.java:385)
+	at javax.swing.SwingUtilities$SharedOwnerFrame.<init>(SwingUtilities.java:1763)
+	at javax.swing.SwingUtilities.getSharedOwnerFrame(SwingUtilities.java:1838)
+	at javax.swing.JDialog.<init>(JDialog.java:272)
+	at javax.swing.JDialog.<init>(JDialog.java:206)
+	at javax.swing.JDialog.<init>(JDialog.java:154)
+	at com.tigervnc.vncviewer.Dialog.<init>(Dialog.java:48)
+	at com.tigervnc.vncviewer.ServerDialog.<init>(ServerDialog.java:47)
+	at com.tigervnc.vncviewer.VncViewer.run(VncViewer.java:415)
+	at java.lang.Thread.run(Thread.java:750)
+[ben@node-1w7jr9ssykaaoacuzdzft9dpm TigerVNC]$ ^C
+[ben@node-1w7jr9ssykaaoacuzdzft9dpm TigerVNC]$ ^C
+[ben@node-1w7jr9ssykaaoacuzdzft9dpm TigerVNC]$ 
+[ben@node-1w7jr9ssykaaoacuzdzft9dpm TigerVNC]$ 
+[ben@node-1w7jr9ssykaaoacuzdzft9dpm TigerVNC]$ which java
+/usr/bin/java
+[ben@node-1w7jr9ssykaaoacuzdzft9dpm TigerVNC]$ java --version
+Unrecognized option: --version
+Error: Could not create the Java Virtual Machine.
+Error: A fatal exception has occurred. Program will exit.
+[ben@node-1w7jr9ssykaaoacuzdzft9dpm TigerVNC]$ 
+[ben@node-1w7jr9ssykaaoacuzdzft9dpm TigerVNC]$ java -version
+openjdk version "1.8.0_322"
+OpenJDK Runtime Environment (build 1.8.0_322-b06)
+OpenJDK 64-Bit Server VM (build 25.322-b06, mixed mode)
+[ben@node-1w7jr9ssykaaoacuzdzft9dpm TigerVNC]$ 
+
+
+
+https://forums.fedoraforum.org/showthread.php?323134-Can-t-run-a-java-program-java-awt-HeadlessException
+https://groups.io/g/jmriusers/topic/73106823?p=Created,,,20,1,0,0
+
+https://stackoverflow.com/questions/5362512/unable-to-run-java-gui-programs-with-ubuntu
+
+
