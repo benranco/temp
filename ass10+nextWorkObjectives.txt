@@ -1,0 +1,586 @@
+Possible upgrades to SNPpipeline:
+x- add fourth option to whatToRun, to resume after filled_report
+x- test possible bug in reference generation when dealing with multiple references (deletes them?)
+- update it to work with modern R version
+- update the bundled tools
+x- make order of filled_report match report
+- see Jun-Jun's request about more data for depth stats
+
+
+======
+
+
+--
+As we discussed on phone, the bioinformatics working priorities include as:
+
+
+
+1.       Using updated newest pipeline to check SNP calling on those datasets that might be affected by the computing bugs in your previous outcomes.  Please confirmed by your records, those datasets that were possibly affected by the bugs may include 
+(a) limber pine RNA-seq data-33 samples; 
+(b) limber pine Miseq received in  March 2021, with two substes of data (Cr4CM5-192 samples, and LG12-192 samples); 
+(c) WWP_exome-seq data-192 samples.
+
+2.       To run a largest Trinity assembly of rust transcriptome using all available RNA-seq data, and then calling SNPs using this assembly as reference to detect Tree503 race-specific markers
+
+3.       To analyze new datasets from western redcedar (WRC) for ITS-based mycotoxicology, as well as potential data sets from Douglas-fir for association study. These are our new projects and last to year 2025.
+
+
+
+Let us keeping work at them one by one.
+
+ 
+
+Jun-Jun
+--
+Ok, thanks Jun-Jun,
+I was not able to work my full-time hours Mon-Wed this week. I can make up the time if that's easier than adjusting the dates. Maybe we should wait until after the baby comes to decide what to do about it, since I might need to miss a few days because of that too.
+
+The Boreal Cloud servers are currently down due to power issues last night, but I'll search through our data records again once I have access. 
+
+From my previous search, I identified these SNPpipeline datasets that have been affected by the bug (they share the exact same code): 
+/public/genomics/junjun/192gDNA_pipeline  (Liu_Conifer_192gDNA) (Sept/Oct 2019)
+/public/genomics/junjun/33sampleRNA_pipeline/  (Nov 2019)
+Do these correspond to (a) and (c) from your list? 
+
+I must have missed the data for (b) when I was searching, but I will take a careful look at it as well. I'm sure it also was affected by the same bug.
+
+This pipeline from 2017 has what I think is Fupan's original code. Would you like me to re-run it as well with the new code?:
+public/genomics/junjun/Data-Dec2020/fluidigm-SNPpipelineBen
+
+This one from Jan-March2019 has two different versions of parallel_process.R, where I'm making changes. The first one I've already changed some indexing in the substring function parameters from 0 to 1, and the second one where I've begun to make the changes that include the searchBAMfile function and the try-catch block:
+/public/genomics/junjun/storage/jj_vol/SNPpipeline-42sampleSet/
+There seems to be an earlier attempt at this pipeline in: 
+/public/genomics/junjun/storage/jj_big_vol/SNPpipeline-42sampleSetPartial
+and 
+/public/genomics/junjun/storage/jj_big_vol/SNPpipeline-28samples
+
+
+Once the Boreal Cloud is back up I plan to run multiple pipelines concurrently on different VM's in the cloud.
+
+Ben
+--
+Hello, Ben:
+33-sampleRNA_pipeline  (Nov 2019) and Liu_Conifer_192gDNA  (Sept/Oct 2019) probably correspond to (a) and (c).
+ 
+Fuidigm-SNPpipelineBen correspond to (b), as two subsets of (b) both are Fluidigm data. Once you can access Boreal Cloud and get the file ID and sample IDs, we can be sure if we are talking about the same things.
+
+--
+
+Turns out I had overlooked some new/recent SNPpipeline runs, and as Jun-Jun said, these are for (b):
+/public/genomics/junjun/Data-Dec2020/Fluidigm-May2021/LG12_Fluidigm/LG12_Fluidigm_raw/
+/public/genomics/junjun/Data-Dec2020/Fluidigm-May2021/Cr4cM5_Fluidigm/Cr4cM5_Fluidigm_raw/
+
+--
+Running SNPpipeline for Cr4cM5_Fluidigm:
+
+sudo mount -t nfs 10.20.0.6:/Public/genomics/junjun/Data-Dec2020/Fluidigm-May2021/Cr4cM5_Fluidigm/ work/
+
+git clone https://github.com/benranco/SNPpipeline.git
+
+- set up the pipeline, including copying the reference fasta file, symbolically linking data, and setting the start.sh parameters
+
+sudo nohup ./start.sh 2>&1 1>pipeline-new-parallelProcess-functionality.log &
+
+--
+Running SNPpipeline for LG12_Fluidigm (THIS IS A PRETTY FAST ONE, AND IT WOULD BE GOOD FOR TESTING FUTURE UPDATES TO THE SNPPIPELINE):
+
+sudo mount -t nfs 10.20.0.6:/Public/genomics/junjun/Data-Dec2020/Fluidigm-May2021/LG12_Fluidigm/ work/
+
+git clone https://github.com/benranco/SNPpipeline.git
+
+- set up the pipeline, including copying the reference fasta file, symbolically linking data, and setting the start.sh parameters
+
+sudo nohup ./start-pt2.sh 2>&1 1>pipeline-pt2-resumeAfterEditedReport.log &
+
+Copying the finished reports: 
+scp -J borealremote brancourt@borealjump.nfis.org:/public/genomics/junjun/Data-Dec2020/Fluidigm-May2021/LG12_Fluidigm/SNPpipeline-NEW/Pt1and2Reports-backup/Fluidigm-LG12-updatedSNPpipeline-reports.zip .
+
+--
+
+Hi Jun-Jun,
+
+I found the recent SNPpipeline runs from 2021 for the datasets you mentioned in item (b), as you suggested. I had just overlooked those before. I've attached .txt files of the sample names of all four datasets for you to look at.
+
+I have begun the SNPpipelines for both the Fluidigm Cr4CM5-192 and LG12-192 datasets, using the newest code.
+
+The pipelines for both Liu_Conifer_192gDNA (Sept/Oct 2019) and 33sampleRNA_pipeline (Nov 2019) required me to run ten instances of the pipeline in parallel on separate VMs, so I think I should wait until the two pipelines that I'm currently running are finished and then start one of those. I seem to remember the Cr4CM5-192 and LG12-192 pipelines didn't take long.
+
+Ben
+
+--
+
+With both the above pipelines, I ran into the same problem as in ass9 that there were lines with a "/" value instead of NA in edited_report.csv (also filled_report).
+
+I updated the code again to once and for all fix the bug that caused that, but in the meantime, I can set that field to NA and finish generating the reports:
+sed -i 's/\"\/\"/NA/g' edited_report.csv
+
+sudo nohup ./start-pt2.sh 2>&1 1>pipeline-pt2-resumeAfterEditedReport.log &
+
+
+--
+
+After finishing pt2 of the pipeline on the (LG12?) data, I tried regenerating all reports from scratch to test my latest parallel_process.sh bug fix:
+
+sudo nohup ./start-pt2.sh 2>&1 1>pipeline-pt2b-regenAllReportsAfterFixingFilledBug.log &
+
+--
+Hi Jun-Jun,
+
+The updated SNPpipeline has finished for the Fluidigm LG12 192 dataset. The Cr4cM5 dataset is still processing.
+
+Here are the reports from the updated pipeline: 
+https://www.dropbox.com/s/r65f0n8k3alctwz/Fluidigm-LG12-updatedSNPpipeline-reports.zip?dl=1
+
+Ben
+
+--
+Hi Jun-Jun,
+
+The updated Cr4cM5 SNPpipeline has also finished now. Here are the reports: 
+https://www.dropbox.com/s/tjlm498wv9qepqk/Fluidigm-Cr4cM5-192-updatedSNPpipeline-reports.zip?dl=1
+
+And if you haven't download the LG12 reports yet, here's their link: 
+https://www.dropbox.com/s/r65f0n8k3alctwz/Fluidigm-LG12-updatedSNPpipeline-reports.zip?dl=1
+
+Shall we chat sometime tomorrow about the reference file for the next datasets?
+
+Btw, We're still waiting for the baby to arrive. Maybe I can get those pipelines running before things get crazy here!
+
+Ben
+
+--
+[pasted from ass9, and augmented]:
+
+Hello, Ben:
+As for the pipelines for both Liu_Conifer_192gDNA (Sept/Oct 2019) and 33sampleRNA_pipeline (Nov 2019), you can use the latest Trinity assembly (that have inputs of all available RNA-seq reads of 19 samples from western white pine and 33 samples of limber pine) as references for Bowtide mapping.
+
+We will discuss these reference templates once you have done both the Fluidigm Cr4CM5-192 and LG12-192 datasets.
+
+[original ref for Liu_Conifer_192gDNA: WWP-HBref-total16,059-full-length.fa ]
+new ref (actually, only some ids from this): /public/genomics/junjun/Data-Dec2020/Bens-Trinity-assembly/trin-assemblies-renamedSeqIds/WWP18-nt675,367-Trinity.fasta
+
+[original ref for 33sampleRNA_pipeline (LP36): Trinity_RS_SS_ALL20.fasta ]
+new ref (actually, only some ids from this): /public/genomics/junjun/Data-Dec2020/Bens-Trinity-assembly/trin-assemblies-renamedSeqIds/LP36-nt884,751-Trinity.fasta
+
+Both the new ones are too big. So filter ids' by using the RSEM output, and filtering by total_expected_count >= 100 in:
+/public/genomics/junjun/Data-Dec2020/Bens-Trinity-assembly/ReadMapping/RSEM_results_filtered/isoforms/LP36_ALLsamples.RSEM.isoforms.results.filtered.tab
+/public/genomics/junjun/Data-Dec2020/Bens-Trinity-assembly/ReadMapping/RSEM_results_filtered/isoforms/WWP18_ALLsamples.RSEM.isoforms.results.filtered.tab
+
+The total gene numbers should be:
+LP36: 142156
+WWP: similar to original
+Jun-Jun will send me the sequence ids, and I will filter the above new Trinity output files by those ids.
+
+
+--
+new LP36 reference file from Jun-Jun (more to add later): 
+142,156 IDs for LP36 Trinity seq: 
+LP36-mID142,156-total-exp-count100.txt
+--
+Hello, Ben:
+
+Actually, you will use reads from all 36 limber pine samples you used for Trinity assembly (Not 33 samples used in previous SNP pipeline run) for the SNP calling as discussed today.
+
+Jun-Jun
+
+--
+Hi Jun-Jun,
+
+That means I'll just use all the read ids that you sent me, right?
+
+What samples should I use for the pipeline? The first time I ran the pipeline, I pooled all ten RS samples into one big sample, and all eleven SC samples into one big sample, and I didn't use the twelve C samples at all. Should I do the same this time?
+--
+Yes, to use 142,156 seqs as mapping references. Please map those 36 samples individually, NOT to pool them as two bulks. Let us see them individually first. If necessary, go to bulked samples at a later stage.
+--
+Okay. Would you like me to just use the RS and SC samples, or should I also include the C samples?
+--
+Yes. 36 samples include:
+
+10 Res (RS) samples
+10 Sus (SC)  samples
+13 C samples
+3 N samples
+
+They are used for Trinity All-36 assembly.
+
+Also please add enclosed 67 seqs into those 142,156 seq as reference for read mapping.
+All-67-NBS5-extract-from-RNAseq-All36-Trinity.fa
+
+--
+Yes, I'll add those 67 seqs.
+
+There are two sets of data for the LP data on the Boreal Cloud.
+This one doesn't have the Needle data (just 33 samples):
+/public/genomics/junjun/33sampleRNA_pipeline/
+
+This one has all 36 samples, including the Needle:
+/public/genomics/junjun/Data-Dec2020/LP-NGS-RawData/LP-RNAseq-2015-raw
+I assume you want me to use this second set of the data. There's also a version of these 36 samples after being filtered with Trimmomatic. Would you like me to use the raw versions or the trimmomatic versions?
+
+Btw, the hospital called Beth to begin her induction this afternoon. Usually labour doesn't begin the same day, but between taking her to the hospital this afternoon and whenever labour begins (tomorrow?) I may or may not have time to start this pipeline.
+
+--
+Great, you find them! Please use all 36 samples, including the Needle:
+
+/public/genomics/junjun/Data-Dec2020/LP-NGS-RawData/LP-RNAseq-2015-raw. The trimmomatic version would work best as they are clean and have removal of reads with bad quality and contamination. IT does not matter when you start. Please Prepare yourself well to welcome your baby. Thanks!
+
+--
+LP36 pipeline TODO:
+- extract seqs (see above for criteria, list of ids from Jun-Jun) from the fasta file to make a new smaller ref
+- add 67 seqs to list of seq ids to the bottom or top of it
+- split the new ref into 3 pieces
+- run pipeline on three VMs
+
+The total seqs and their IDs should be ‘142,156 + 67 = 142,223’ for the mapping reference used in the pipeline.
+
+
+sudo mount -t nfs 10.20.0.6:/Public/genomics/junjun/Data-Dec2020/LP-NGS-RawData /work2
+
+nohup Rscript selectSeqsFromFasta.R . LP36-mID142,156-total-exp-count100-seqIds.txt LP36-nt884,751-Trinity.fasta LP36-Trinity-RSEM-142156_total_expected_count_100+.fasta 2>&1 1>select.log
+
+cp -a LP36-Trinity-RSEM-142156_total_expected_count_100+.fasta LP36-142,223-ref.fasta
+cat All-67-NBS5-extract-from-RNAseq-All36-Trinity.fa >> LP36-142,223-ref.fasta
+
+Using ./split_fasta_into_n_parts.sh to split the ref into three parts based on num sequences resulted in imbalanced sizes, so:
+
+
+First, use a command like this to make sure the places where I want to split the file are between seq reads: 
+awk 'NR >= 59999 && NR <= 60001' LP36-142,223-refForPipeline2022.fasta
+awk 'NR >= 129999 && NR <= 130001' LP36-142,223-refForPipeline2022.fasta
+
+Final split:
+awk 'NR > 0 && NR <= 60000' LP36-142,223-refForPipeline2022.fasta > LP36-142,223-refForPipeline2022.pt01_1-60000.fasta
+awk 'NR > 60000 && NR <= 130000' LP36-142,223-refForPipeline2022.fasta > LP36-142,223-refForPipeline2022.pt02_60001-130000.fasta
+awk 'NR > 130000' LP36-142,223-refForPipeline2022.fasta > LP36-142,223-refForPipeline2022.pt03_130001-end.fasta
+
+
+sudo mount -t nfs 10.20.0.6:/Public/genomics/junjun/Data-Dec2020/LP-NGS-RawData/LP-RNAseq-2015-trimmomatic/LP36_trimmomatic_all /work2
+sudo mount -t nfs 10.20.0.6:/Public/genomics/junjun/Data-Dec2020/LP-NGS-RawData/LP36-SNPpipeline2022/pipeline1 /work
+
+
+openstack server create \
+	--image CentOS7_SNPpipeline \
+  --security-group default \
+	--key-name brancourt \
+	--nic net-id=Private \
+	--flavor mm1.8xlarge \
+	benmm1-pip
+
+Had to rename the trimmomatic files: 
+rename _R_1P _R1 *_1P.*
+rename _R_2P _R2 *_2P.*
+
+
+sudo nohup ./start.sh 2>&1 1>pipeline-LP36-2022.log &
+
+--
+Hi Jun-Jun,
+
+I'm  ready to start the pipeline for the LP36 data. Looking at the parameters from the last time we ran it, the MAF cutoff was set to 0.0001. Do you want to keep the same?
+--
+Yes. We need to pick variants at 1 out 36. Here, 36 is the number of total samples. Thanks.
+--
+Hi Jun-Jun,
+
+I've started three pipelines in parallel on the LP36 trimmomatic data. I'll work on the WWP18 pipelines next.
+
+Ben
+--
+
+Ran into an error in extract.sh in the MarkDuplicates command. See links for troubleshooting.
+
+Dealing with the MAX_FILE_HANDLES_FOR_READ_ENDS_MAP issue:  
+https://www.biostars.org/p/54694/
+https://github.com/broadinstitute/picard/issues/1360
+Dealing with the potential TMP_DIR issue: 
+https://www.biostars.org/p/42613/
+
+java -jar ./SNPpipeline/tools/picard-2.20.7/picard.jar MarkDuplicates
+
+This command works:
+java -Djava.io.tmpdir=./picard_tmp -jar ./SNPpipeline/tools/picard-2.20.7/picard.jar MarkDuplicates TMP_DIR=./picard_tmp MAX_FILE_HANDLES_FOR_READ_ENDS_MAP=1000 I=./dataTemp/single/xC9_filtered_sorted.bam O=./dataTemp/single/xC9_filtered_sorted_markDup.bam M=./dataTemp/single/xC9_filtered_sorted_markDup_metrics.txt > ./dataTemp/single/xC9_filtered_sorted_markDup_log.txt
+
+
+MAX_FILE_HANDLES_FOR_READ_ENDS_MAP=Integer
+MAX_FILE_HANDLES=Integer      Maximum number of file handles to keep open when spilling read ends to disk. Set this
+                              number a little lower than the per-process maximum number of file that may be open. This
+                              number can be found by executing the 'ulimit -n' command on a Unix system.  Default value:
+                              8000. This option can be set to 'null' to clear the default value. 
+
+
+
+I've updated the extract.sh script.
+
+--
+Hi Jun-Jun,
+
+I've had to restart the LP36 pipelines because I noticed an error in the Picard MarkDuplicates stage causing the output at that point to fail. I checked our original pipeline for this dataset, and I found out that our solution last time was to skip the MarkDuplicates stage (I remember this was code that I had recently added at the time). 
+
+This time I've been able to resolve the problem (there were some environment settings preventing it from handling the number of temporary files it needed to generate for these datasets), and I'm expecting the MarkDuplicates to work. I'll keep monitoring it.
+
+Tomorrow I will be attending a friend's wedding, but I'll make up the time over the weekend.
+
+Ben
+
+--
+Hello, Ben:
+
+Thanks for updating. Do you activate ‘--REMOVE_DUPLICATES / NA ‘, and ‘--REMOVE_SEQUENCING_DUPLICATES/NA’ following ‘MarkDuplicates’. If you activate both, it would help in this case. Last time you tried remove_duplicates on WWP-192 samples, it looks no big difference.
+
+Thanks!
+
+--
+Hi Jun-Jun,
+
+Sorry, I did not see your reply about removing duplicates. Currently neither the REMOVE_DUPLICATES or the REMOVE_SEQUENCING_DUPLICATES is activated. Would you like me to activate them and restart the pipeline? 
+
+Ben
+
+
+
+The program can take either coordinate-sorted or query-sorted inputs, however the behavior is slightly different.  When
+the input is coordinate-sorted, unmapped mates of mapped records and supplementary/secondary alignments are not marked
+as duplicates.  However, when the input is query-sorted (actually query-grouped), then unmapped mates and
+secondary/supplementary reads are not excluded from the duplication test and can be marked as duplicate reads.
+
+If desired, duplicates can be removed using the REMOVE_DUPLICATE and REMOVE_SEQUENCING_DUPLICATES options.
+
+
+
+REMOVE_DUPLICATES=Boolean     If true do not write duplicates to the output file instead of writing them with
+                              appropriate flags set.  Default value: false. This option can be set to 'null' to clear
+                              the default value. Possible values: {true, false} 
+
+
+
+REMOVE_SEQUENCING_DUPLICATES=Boolean
+                              If true remove 'optical' duplicates and other duplicates that appear to have arisen from
+                              the sequencing process instead of the library preparation process, even if
+                              REMOVE_DUPLICATES is false. If REMOVE_DUPLICATES is true, all duplicates are removed and
+                              this option is ignored.  Default value: false. This option can be set to 'null' to clear
+                              the default value. Possible values: {true, false} 
+
+
+--
+WORKING ON the WWP18 SNPpipeline:
+
+
+scp -J borealremote WWP18_ALLsamples.RSEM.isoforms-FILTERED-total_expected_count100+-seqIds.txt brancourt@borealjump.nfis.org:/public/genomics/junjun/Data-Dec2020/WWP-NGS/WWP18-SNPpipeline2022/
+
+WWP18_ALLsamples.RSEM.isoforms-FILTERED-total_expected_count100+-seqIds.txt
+WWP18-nt675,367-Trinity.fasta
+
+sudo mount -t nfs 10.20.0.6:/Public/genomics/junjun/Data-Dec2020/WWP-NGS /work
+
+nohup Rscript selectSeqsFromFasta.R . WWP18_ALLsamples.RSEM.isoforms-FILTERED-total_expected_count100+-seqIds.txt WWP18-nt675,367-Trinity.fasta WWP18-Trinity-RSEM-total_expected_count_100+.fasta 2>&1 1>select.log 
+
+--
+Hi Jun-Jun,
+
+I'm preparing the reference for the WWP18 pipeline. I filtered the RSEM isoform results for all samples by total_expected_count >= 100, and I got 83240 seq ids. Is this what you expect? I then filtered the WWP18-nt675,367-Trinity.fasta file by this list of seq ids. One of the seq ids seems to not be in the fasta file, because it returned only 83239 seqs.
+
+If this looks alright to you, I will use this as the reference for the WWP18 pipeline.
+
+Ben
+
+--
+Hello, Ben:
+
+I’ll send the WWP18 reference IDs to you tomorrow. Its selection is different from LP36. Thanks.
+--
+Hi Jun-Jun,
+
+Sorry, I did not see your reply about removing duplicates. Currently neither the REMOVE_DUPLICATES or the REMOVE_SEQUENCING_DUPLICATES is activated. Would you like me to activate them and restart the pipeline?
+
+Ben
+--
+
+Hello, Ben:
+Let the LP36 run be completed first!
+
+If necessary you can re-run it with removal of duplicates later. MarkDuplicates is usually for removal of duplicates at the next step in the pipeline, especially useful for some types of input data.
+
+Enclosed is 14,817 isoform IDs for WWP18. Its fasta file is 36 Mb, I’ll try to send it in a separate file. If it does not go to you, please extract them as the reference for SNP pipeline run of WWP-megaganeophyte-192 (haploid, N=1) exome-seq data generated before 2019. Please not confuse it with the WWP-CA-192 Fluidigm (diploid, N=2) data you run recently. We are still discussing the WWP-CA-192 Fluidigm (diploid, N=2) data with Genome-Quebec due to big contaminations in it.
+
+Thanks!
+Jun-Jun
+
+--
+Hi Jun-Jun,
+
+I've downloaded your new ref for the WWP18 data. Would you like me to activate REMOVE_DUPLICATES or REMOVE_SEQUENCING_DUPLICATES for this pipeline, or just mark the duplicates?
+
+I've looked at the processing that happens after Picard MarkDuplicates, and I can't see any indication that it makes use of the marked duplicates. After running MarkDuplicates, the pipeline runs freebayes using the .bam and the ref to produce a .vcf file. Then it uses vcftools to remove indels (if that was specified in the input parameters), then it uses vcftools/src/perl/vcf-annotate to filter using cutoffs, then it converts the vcf data to tabular form which we use to generate the report.csv.
+
+Ben
+
+--
+Hello, Ben:
+Not necessary to activate ‘REMOVE_DUPLICATES or REMOVE_SEQUENCING_DUPLICATES’ for this pipeline work.  Last time before bug fix, you have run this set of data using either activation or not-activation, without significant difference between them.
+
+--
+I looked at the code for this pipeline from last time, and I think it might have just been marking the duplicates, not removing them, (compared to not running Picard MarkDupicates at all) which might explain the lack of difference. I can do a quick test with one of the bam files by running Picard MarkDuplicates on it twice, once with REMOVE_DUPLICATES and once without.
+--
+
+sudo mount -t nfs 10.20.0.6:/Public/genomics/junjun/192gDNA_pipeline /work3
+
+I created a test in /public/genomics/junjun/192gDNA_pipeline/testRemDup2022/  using some sorted bams and the reference from pipe10. The test starts after the sort bam step, and continues for the rest of the data processing portion of the pipeline.
+
+nohup ./runTests.sh 2>&1 1> test.log &
+
+
+--
+
+openstack server create \
+	--image CentOS7_SNPpipeline \
+  --security-group default \
+	--key-name brancourt \
+	--nic net-id=Private \
+	--flavor mm2.4xlarge \
+	benwwp1-mm2
+
+openstack server create \
+	--image CentOS7_SNPpipeline \
+  --security-group default \
+	--key-name brancourt \
+	--nic net-id=Private \
+	--flavor x1.4xlarge \
+	benwwp7-x1
+
+benwwp1-mm2 10.20.0.207
+benwwp2-mm2 10.20.0.245
+benwwp3-mm2 10.20.0.249
+benwwp4-mm2 10.20.0.183
+benwwp5-mm2 10.20.0.88
+benwwp6-mm2 10.20.0.54
+benwwp7-x1 10.20.0.71
+benwwp8-x1 10.20.0.203
+benwwp9-x1 10.20.0.134
+benwwp10-x1 10.20.0.200
+
+
+--
+Hi Jun-Jun,
+
+I've started the SNPpipeline on ten different VMs for the WWP18 data, using the WWP18nt-mID14817-for-Exone-seq-ref_E-50.fasta reference you sent me and dividing it into ten equal parts. 
+
+For the input data, I used the trimmomatic paired output from all 18 samples in the public/genomics/junjun/Data-Dec2020/WWP-NGS data. I've specified that this is haploid data and the MAFcutoff is 0.05, like the old pipeline that we ran on this data. 
+
+I'll keep checking the progress.
+
+Ben
+
+--
+Hello, Ben:
+WWP work will use Exome-seq raw data of 192 samples. NOT 18 samples of RNA-seq data. Please look at the data files we discussed a while ago, and make sure right input data are used. Thanks!
+--
+Hello, Ben:
+Please see file ‘Liu_Conifer_192gDNA-sampleNames’. These data are for WWP SNP calling, here make sure N=1 (NOT N=2 as that in LP SNP calling  using 36 RNA-seq samples).
+--
+Hello, Ben:
+Nice to know that the same SNPs are called by removing duplicates and not removing duplicates. But I believe that the coverages/depths of the called SNPs , as well as relative ratios of the 1st vs. 2nd allele at most SNP loci may be changed (decreased) after removing duplicates. Thanks!
+--
+Hi Jun-Jun,
+
+Sorry about that, I thought that because we used the new data for LP36 it would be the same for this. I've stopped all the pipelines and I'm going to restart them using the raw data in /public/genomics/junjun/192gDNA_pipeline/Liu_Conifer_192gDNA.
+
+Would you like me to simply mark duplicates, or remove them?
+
+I will be setting the pipeline as haploid (N=1), and with a MAFcutoff of 0.05.
+
+Ben
+--
+Please mark duplicates, and remove them!
+
+--
+
+sudo mkdir /work3
+sudo mount -t nfs 10.20.0.6:/Public/genomics/junjun/Data-Dec2020/WWP-NGS/WWP18-SNPpipeline2022/ /work3
+
+benwwp1-mm2 10.20.0.207
+benwwp2-mm2 10.20.0.245
+benwwp3-mm2 10.20.0.249
+benwwp4-mm2 10.20.0.183
+benwwp5-mm2 10.20.0.88
+benwwp6-mm2 10.20.0.54
+benwwp7-x1 10.20.0.71
+benwwp8-x1 10.20.0.203
+benwwp9-x1 10.20.0.134
+benwwp10-x1 10.20.0.200
+
+split_fasta_into_n_parts.sh
+
+git clone https://github.com/benranco/SNPpipeline.git
+
+sudo mount -t nfs 10.20.0.6:/Public/genomics/junjun/192gDNA_pipeline/Liu_Conifer_192gDNA/ /work2
+sudo mount -t nfs 10.20.0.6:/Public/genomics/junjun/192gDNA_pipeline2022/pipeline0 /work
+
+
+- cp the ref to reference folder
+- symbolic link the /work2 to data
+
+nohup ./start.sh 2>&1 1>pipeline0-192gDNA-2022.log &
+
+--
+Okay, I have restarted all ten pipelines, using the WWP18nt-mID14817-for-Exone-seq-ref_E-50.fasta reference divided it into ten equal parts, and using the data in /public/genomics/junjun/192gDNA_pipeline/Liu_Conifer_192gDNA/, and using haploid (N=1), MAFcufoff=0.05, and removing duplicates.
+
+Ben
+
+--
+Hi Jun-Jun,
+
+In your list of objectives you said the next big priority is to run a large Trinity assembly of rust transcriptome using all available RNA-seq data, which I won't be able to do until the WWP pipeline is finished, since it is using the required Boreal resources.
+
+While the pipelines on both datasets are running, do you have anything else for me to work on? 
+
+I've also made a list of updates which I can make to the SNPpipeline in the meantime:  
+- enabling the report generation to work with a modern version of R (I think it currently depends on some libraries which need to be updated first) (this would not affect the outcomes)
+- add more flexibility to the parameters, for example: so I can easily choose whether to remove duplicates or just mark them, or adding more flexibility to resume the pipeline from partway through (these updates would not affect the outcomes). 
+- check for updates of the bundled tools used by the pipeline, suchas bowtie2, samtools, etc, and replace them with the newest versions (this might affect the outcomes).
+
+Another possibility is that I could take some time to help Holly with installing and figuring out how to use the EvidentialGene software, which she's having difficulty with (she said she is getting help from Don from SFU today). 
+
+Ben
+
+--
+Hello, Ben:
+
+Nice to see your progress.
+
+If Holly needs your help, please try your best.
+
+Another you can look after is SNP coverage/depth, as well as the depths and their relative ratios of the 1st vs 2nd alleles at the SNP loci. I know your previous report from SAMTOOLs has the SNP coverage/depth. A further look at the allelic depths and their relative ratios of the 1st vs 2nd alleles at the SNP loci will help. These data would be available in the output files of SNP pipeline, but you need to extract them and think how to present a txt or csv file.
+
+Thanks!
+
+--
+Hi Jun-Jun, 
+
+
+
+
+
+--
+benwwp1-mm2 10.20.0.207
+benwwp2-mm2 10.20.0.245
+benwwp3-mm2 10.20.0.249
+benwwp4-mm2 10.20.0.183
+benwwp5-mm2 10.20.0.88
+benwwp6-mm2 10.20.0.54
+benwwp7-x1 10.20.0.71
+benwwp8-x1 10.20.0.203
+benwwp9-x1 10.20.0.134
+benwwp10-x1 10.20.0.200
+
+nohup ./start.sh 2>&1 1>pipeline0-192gDNA-2022-pt2-redoFilledReport.log &
+
+
+
+Recent FB friend requests:
+Miranda Varghese
+Janet Trelogan
+Jennifer Brantley
+Lynda Williams
+Stephanie Frasier
+Jude Chestnutt Orr
+
