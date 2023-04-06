@@ -1,0 +1,582 @@
+...continuing on from work in tmp.txt and todo_oct27_oct29.txt, and also in email conversations not recorded in these files.
+This continues right after having competed generatinga a VCF file containing all 36 samples of the LP36 data for each of its three pipelines.
+
+--
+Hi Jun-Jun,
+
+Freebayes has finished generating the VCF file for all 36 samples combined, on all three pipelines of the LP36 data. The three final VCF files are between 3.9 GB and 6.4 GB in size each.
+
+What should be the next step? 
+
+--
+Hi, Ben:
+Great to know the progress!
+As we discussed previously, we need genotypic data, as well as the count numbers of Ref allele and the Alt allele at each SNP locus.
+Genotypic data allows a direct comparison with previous outcomes.
+
+--
+For each sample, to get a ratio value of (RO/(RO+AO) for each SNP locus (raw). This will make out come tab simpler. 
+
+--
+Ok, I'll work on that. I'll need to modify my scripts to extract the data because now the VCF file has multiple samples. I'll also calculate a ratio value of (RO/(RO+AO) for each SNP locus, as you recommend.
+
+--
+Hi Jun-Jun, I've finished generating the .csv files from the three .vcf files (one for each pipeline) containing all 36 samples.
+The number of rows are:
+2006948 + 2671327 + 3514205 = 8192480 in total.
+
+What is the next step that you'd like me to do? Should I filter the rows down in any way?
+I'll be out for the rest of the afternoon, so might not be able to reply quickly.
+
+--
+Hi, Ben:
+IT looks similar number of SNPs are called.
+
+Maybe you write a script to calculate correlation of ratios of (RO/(RO+AO)) with resistance levels across 36 samples for each row (SNPs). As I mentioned previously, here we sign Res samples with resistance level at 1, and Sus samples with resistance level at 0. Then, for row/SNP, we will get a p-value of correlation, and correct P-values by FDR or other adjustment across all rows/SNPs.
+
+Let us have a discussion if you have any questions.
+
+--
+Also, you filter the data by DP = 4, before processing. If DP =1, 2, 3, then rows are removed.
+
+Filter rows by keeping SNPs/removing indels, as well as with DP => 4
+--
+Hi Jun-Jun, it will be simple to remove the rows with indels, but for DP >= 4, for each row, how many samples need to have DP >= 4 to keep the row?
+- actually, instead of DP, just look at the 10 RS and 10 SS data, and if each have more than two missing data, remove the row
+
+Also, I've already calculated the ratios of (RO/(RO+AO)) and saved it in the .csv file.
+--
+Also, should I filter out rows that don't seem to be SNPs? For example, if the genotypes are all REF/REF?
+- actually, calculate the MAF cutoff, and remove all rows with less than 30% MAF
+
+
+From talking on the phone with Jun-Jun, some info I may or may not need late:
+ratio ~ 0.5 for RS data
+ratio ~ 1.0 for SS data
+
+--
+Summary of filtering:
+- remove indels
+- look at the 10 RS and 10 SS data, and if each have more than two missing data, remove the row
+- calculate the MAF cutoff for each row, and remove all rows with less than 30% MAF
+
+After filtering, then calculate Pearson correlations.
+--
+Jun-Jun wants me to calculate a Pearson correlation (R value and p-value) for each SNP (row). 
+Jun-Jun sent me "A row as example for correlation analysis:"
+
+SS-9,SS-8,SS-7,SS-6,SS-5,SS-4,SS-3,SS-2,SS-10,SS-1,RS-9,RS-8,RS-7,RS-6,RS-5,RS-4,RS-3,RS-2,RS-10,RS-1,SN1,SN2,RN1,C1,C2,C3,C4,C5,C6,C7,C8,C9,C10,C11,C12,C13
+0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0
+0.1,0.125,0.15,0.175,0.2,0.225,0.25,0.275,0.3,0.325,0.35,0.375,0.4,0.425,0.45,0.475,0.5,0.525,0.55,0.575,0.6,0.625,0.65,0.675,0.7,0.725,0.75,0.775,0.8,0.825,0.85,0.875,0.9,0.925,0.95,0.975
+
+For this row: 
+R=-0.148
+p-0.389007
+"It indicate this SNP not associated with disease resistan..."
+
+I'm not sure if the second set of data values are MAF values or RO/(RO+AO).
+
+--
+Hi Jun-Jun, I'm still not sure how you calculated the R and p value for this row. Can you send me the formula you used as well?
+--
+R-value calculator:
+https://www.socscistatistics.com/tests/pearson/
+p-value calculator:
+https://www.socscistatistics.com/pvalues/pearsondistribution.aspx
+https://www.danielsoper.com/statcalc/formulas.aspx?id=44
+
+--
+Hi Jun-Jun,
+I'm working on understanding the formulas now using those calculators you sent me. Thanks.
+
+Just to make sure I understand, are the SNP ratios in your example (0.1, 0.125, 0.15, 0.175, etc...) calculated from RO/(RO-AO) ?
+[It is not a real data. But, anyway, RO/(RO-AO) is a range from 0 to 1.]
+
+Also, to make sure I understand my next steps, this is what I think I should do:
+
+- remove indels
+- for reach row, look at the 10 RS and 10 SS data, and if each have more than two missing data, remove the row
+- calculate the MAF cutoff for each row, and remove all rows with less than 30% MAF
+- after filtering, then calculate Pearson correlations
+[Correct!]
+
+--
+Hello, Ben:
+
+I consider again. Let us still keep MAF at 0.01 (1%), Not 30% as proposed below.
+
+MAF is extracted from allele frequency, count numbers of alt and ref alleles, but more depending on the set up of homozygous (such as ref/ref) and heterozygous (ref/alt) calling. I forget what is this setting in Freebayes, but I did ask you about it. From publications, if wanting homozygous genotypes as more accurate as possible, the allele frequency was set at 0.1 ~ 0.9 as heterozygous genotypes while homozygous genotypes have allele frequency larger than 0.9 or less than 0.1. If wanting heterozygous genotypes as more accurate as possible, their allelic frequency was set up in a range of 0.3~0.7 to call as heterozygous genotypes.
+
+Have a nice weekend!
+
+Jun-Jun
+
+--
+It is not a real data. But, anyway, RO/(RO + AO) is a range from 0 to 1. RO/(RO + AO) is allelic frequency of ref. the alt allelic frequency would be 1-allelic frequency of ref. therefor, calculating one (ref) would be enough.
+
+--
+Hi Jun-Jun, to filter the data by MAF cutoff at 0.01, I'm basing my MAF calculations on how it is done in the SNPpipeline. Is this still how you'd like me to do it:
+For each row, calculate the snp percentages by counting the occurrences of A, C, T, G, then find which of these are the max and second_max values. Then, MAF = second_max / (second_max + max).
+
+Also, should I do the MAF calculation (and snp percentages) just for those 20 RS and SS samples, or for all 36 samples?
+
+Thanks,
+
+Ben
+
+--
+Yes, MAF calculation is right. Please try to include all 36 samples. Thanks!
+
+--
+
+
+
+
+nohup ./filter_csv_from_multi_sample_vcf.sh 2>&1 1>filter-v2-pipe1.log &
+nohup ./filter_csv_from_multi_sample_vcf.sh 2>&1 1>filter-v2-pipe2.log &
+nohup ./filter_csv_from_multi_sample_vcf.sh 2>&1 1>filter-v2-pipe3.log &
+
+-- 
+Hi Jun-Jun,
+
+I've finished filtering the csv results from the multi-sample vcf file (one for each of the three LP36 pipelines).
+
+The vcf data was filtered by:
+- remove all rows with indels
+- remove all rows whose missing RS + missing SS > 4  (this was a bit different from what you specified, which was missing RS > 2 and missing SS > 2)
+- remove all rows whose MAF < 0.01
+
+I've generated a few different versions of the .csv data containing different columns for convenience. I have a statistics file containing the totals of each allele, the sum, total missing data, and the MAF. I also have a file containing the genotype, DP, RO, AO, ratio of RO/(RO+AO), and several files containing subsets of these data.
+
+Which data would you like me to send you?
+
+
+The previous numbers before filtering were: 
+2006948 + 2671327 + 3514205 = 8192480
+
+Now the new total number of data lines for all three pipelines are: 
+1035951 + 1295945 + 1403644 = 3735540
+
+
+Here's some information from my log files on the lines that were removed:
+
+Pipeline1: 
+970997 lines skipped in total.
+442860 lines skipped because of indels.
+132038 lines skipped because of too much missing data.
+396099 lines skipped because their MAF was below the MAF cutoff.
+
+Pipeline2: 
+1375382 lines skipped in total.
+732288 lines skipped because of indels.
+231208 lines skipped because of too much missing data.
+411886 lines skipped because their MAF was below the MAF cutoff.
+
+Pipeline3:
+2110561 lines skipped in total.
+1114993 lines skipped because of indels.
+652599 lines skipped because of too much missing data.
+342969 lines skipped because their MAF was below the MAF cutoff.
+
+
+--
+Hi, Ben:
+Great! Please go ahead for correlation analysis.
+
+BTW, please send me the genotypic data of SNP/row 3,735,540, as well as their ref frequency (RO/(RO+AO).
+
+--
+Hi Jun-Jun, 
+
+Here's a zip file containing the .csv files. I've kept the three pipelines in separate files to make them easier to open. I've also included a version containing both the genotype and RO ratio, and versions containing only either genotype or RO ratio, for ease of viewing.
+
+https://www.dropbox.com/s/uxgo3cnzixhgikl/LP36_results_from_multisample_vcf.zip?dl=1
+
+I'll let you know if I have questions about the correlation analysis. I think I probably will have some.
+
+Ben
+
+--
+
+OK, BEGINNING TO FIGURE OUT HOW TO DO THE CORRELATION ANALYSIS.
+Below are some useful detail copied from several posts up above:
+
+
+Maybe you write a script to calculate correlation of ratios of (RO/(RO+AO)) with resistance levels across 36 samples for each row (SNPs). As I mentioned previously, here we sign Res samples with resistance level at 1, and Sus samples with resistance level at 0. Then, for row/SNP, we will get a p-value of correlation, and correct P-values by FDR or other adjustment across all rows/SNPs.
+
+From talking on the phone with Jun-Jun, some info I may or may not need late:
+ratio ~ 0.5 for RS data
+ratio ~ 1.0 for SS data
+
+Jun-Jun wants me to calculate a Pearson correlation (R value and p-value) for each SNP (row). 
+Jun-Jun sent me "A row as example for correlation analysis:"
+
+SS-9,SS-8,SS-7,SS-6,SS-5,SS-4,SS-3,SS-2,SS-10,SS-1,RS-9,RS-8,RS-7,RS-6,RS-5,RS-4,RS-3,RS-2,RS-10,RS-1,SN1,SN2,RN1,C1,C2,C3,C4,C5,C6,C7,C8,C9,C10,C11,C12,C13
+0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0
+0.1,0.125,0.15,0.175,0.2,0.225,0.25,0.275,0.3,0.325,0.35,0.375,0.4,0.425,0.45,0.475,0.5,0.525,0.55,0.575,0.6,0.625,0.65,0.675,0.7,0.725,0.75,0.775,0.8,0.825,0.85,0.875,0.9,0.925,0.95,0.975
+
+For this row: 
+R=-0.148
+p=0.389007  (36 pairs, same for all three of 0.01, 0.05, 0.1 significance levels)
+"It indicate this SNP not associated with disease resistan..."
+
+I'm not sure if the second set of data values are MAF values or RO/(RO+AO). [Can't be MAF, because there's only one MAF per row].
+
+Just to make sure I understand, are the SNP ratios in your example (0.1, 0.125, 0.15, 0.175, etc...) calculated from RO/(RO-AO) ?
+[It is not a real data. But, anyway, RO/(RO-AO) is a range from 0 to 1. RO/(RO + AO) is allelic frequency of ref. the alt allelic frequency would be 1-allelic frequency of ref. therefor, calculating one (ref) would be enough.]
+
+
+Here are some online R and p value calculators:
+R-value calculator:
+https://www.socscistatistics.com/tests/pearson/
+p-value calculator:
+https://www.socscistatistics.com/pvalues/pearsondistribution.aspx
+https://www.danielsoper.com/statcalc/formulas.aspx?id=44
+
+
+--
+This seems like a decent simple explanation of Correlation and P-value: 
+https://dataschool.com/fundamentals-of-analysis/correlation-and-p-value/
+
+For testing, I made my own test data, assigning 1 to RN and RS data, and 0 to everything else, then using the first four data rows of LP36_pipe1_filtered-ratio.csv: 
+
+C10,C11,C12,C13,C1,C3,C4,C5,C6,C7,C8,C9,LP-C2,RN1,RS10,RS1,RS2,RS3,RS4,RS5,RS6,RS7,RS8,RS9,SN1,SN2,SS10,SS1,SS2,SS3,SS4,SS5,SS6,SS7,SS8,SS9
+0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0
+
+1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0.977778,1,1,1,0.342857,1,1,1,1,0.892857,1,1,1,1,1,0.971429,1,1,1,1,1
+1,1,1,1,1,1,1,1,1,1,1,0.430769,0.495575,0.836066,0.820755,0.390625,1,0.793103,0.659574,0.78,0.984848,0.730159,0.844828,0.492063,1,1,1,0.971831,1,0.673077,1,1,0.913043,0.697368,1,0.578947
+0.970149,1,1,1,1,0.525,1,1,1,0.595238,1,0.52,0.990654,0.894737,1,1,0.885246,0.701754,1,1,0.517857,0.838235,0.931818,0.84375,0.5,0.883721,1,0.783133,0.981818,0.965517,0.357143,0.531915,0.868421,1,1,1
+-,1,0.5,1,1,1,-,0.5,1,-,-,1,1,1,0.666667,1,-,-,1,1,1,1,1,1,-,1,-,1,0.6,1,1,1,-,1,1,1
+
+For the above four rows, in the same order:
+R is: -0.2385, p = .161272
+R is: -0.3728, p = .025138  The result is significant at p < .05.
+R is: 0.0363, p = .833525
+R is: 0.1336 (after deleting all pairs with NA, R=0.1229), p = .437276 (using R=0.1229 and N=27, p=0.541391), (using R=0.1229 and N=36, p=0.475172)
+
+Here's the fourth row above (and resistence levels row) after deleting all pairs with NA: 
+0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0
+1,0.5,1,1,1,0.5,1,1,1,1,0.666667,1,1,1,1,1,1,1,1,1,0.6,1,1,1,1,1,1
+
+Calculate the t-value for a Pearson correlation: 
+t <- r / sqrt( (1-r**2)/(n-2) ) 
+same as:
+t <- r / sqrt(1-r**2)) * sqrt(n-2)
+[1] -2.342657  # for r == -0.3728
+[1] -2.342585  # for r == -0.3727902
+
+
+Pearson correlation calculation in R:
+http://www.sthda.com/english/wiki/correlation-test-between-two-variables-in-r
+http://www.sthda.com/english/wiki/t-distribution-table
+
+Using data row two above:
+x <- c(0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0)
+y <- c(1,1,1,1,1,1,1,1,1,1,1,0.430769,0.495575,0.836066,0.820755,0.390625,1,0.793103,0.659574,0.78,0.984848,0.730159,0.844828,0.492063,1,1,1,0.971831,1,0.673077,1,1,0.913043,0.697368,1,0.578947)
+
+#For data row two above (R is: -0.3728, p = .025138): 
+mean(x) = 0.3055556
+mean(y) = 0.8636842
+
+#Calculate the R coefficient: 
+cor(x, y,  method = "pearson", use = "na.or.complete") 
+[1] -0.3727902
+
+
+from: finding p-value in pearson correlation in R: 
+https://stats.stackexchange.com/questions/153937/finding-p-value-in-pearson-correlation-in-r
+
+Calculate the p-value (still need to figure out how to tell it what to do for NA values, see documentation): 
+cor.test(x, y,  method = "pearson")$p.value
+[1] 0.02514233
+
+
+cor.test(x, y,  method = "pearson")
+[Results:
+	Pearson's product-moment correlation
+
+data:  x and y
+t = -2.3426, df = 34, p-value = 0.02514
+alternative hypothesis: true correlation is not equal to 0
+95 percent confidence interval:
+ -0.62480319 -0.05043094
+sample estimates:
+       cor 
+-0.3727902 
+]
+
+
+How to manually calculate the p-value given the t value/score (their online calculator using a two-sided test yields the same p-value as above):
+https://statkat.com/find-p-value/t-value.php
+https://statkat.com/online-calculators/p-value-given-t-value.php
+https://statkat.com/degrees-of-freedom-t-test.php
+
+From above, for the t test for the Pearson correlation coefficient, the degrees of freedom is sample size (N) minus 2, so 34 in this case.
+
+Based on the above info, how do I find the critical value of t in R?: 
+(this one didn't give me the expected results (and wasn't what I wanted since I wanted to use my known t value to calculate p), but the statology link below did):
+https://www.scribbr.com/frequently-asked-questions/critical-value-of-t-in-r/
+"You can use the qt() function to find the critical value of t in R. The function gives the critical value of t for the one-tailed test. If you want the critical value of t for a two-tailed test, divide the significance level by two."
+"Example: Calculating the critical value of t in R
+To calculate the critical value of t for a two-tailed test with df = 29 and α = .05:
+qt(p = .025, df = 29)"
+
+So, for my t value of -2.342657, degrees of freedom = 34 (36-2), doing a two-sided/tailed test with a desired significance level of 0.05: 
+qt(p=.025, df=34)
+Q: should I try using t instead of p in the above qt function?
+
+
+Another description of how to calculate p given t in R (this one worked): 
+https://www.statology.org/p-value-of-t-score-r/
+
+# if using a negative t value, I get the proper results using lower.tail=TRUE:
+pt(q=t, df=34, lower.tail=TRUE)*2  # the *2 is for the two-sided test
+[1] 0.02513818  # for r == -0.3728,    t == -2.342657
+[1] 0.02514231  # for r == -0.3727902, t == -2.342585
+
+# if using a positive t value, I get the proper results using lower.tail=FALSE:
+pt(q=t, df=34, lower.tail=TRUE)*2  # the *2 is for the two-sided test
+[1] 0.8335252  # for r == 0.0363, t == 0.2118031
+[1] 0.4372755  # for r == 0.1336, t == 0.786062
+
+# this will always work, whether t is positive or negative: 
+pt(q=abs(t), df=34, lower.tail=FALSE)*2
+
+It worked, these are the correct p values !!
+
+--
+To summarize the process of finding R an p value for a single row: 
+
+
+Before processing rows: 
+Assuming this is the order of the sample columns: 
+C10,C11,C12,C13,C1,C3,C4,C5,C6,C7,C8,C9,LP-C2,RN1,RS10,RS1,RS2,RS3,RS4,RS5,RS6,RS7,RS8,RS9,SN1,SN2,SS10,SS1,SS2,SS3,SS4,SS5,SS6,SS7,SS8,SS9
+Assign Res samples with resistance level at 1, and Sus samples with resistance level at 0, and C samples with resistance level at 0: 
+x <- c(0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0)
+Assign n <- 36  # number of samples
+Assign degFree <- n-2
+
+Now, for each row:
+Step 1: Assign y == the RO/(RO + AO) ratio (which is the allelic frequency of ref) for each sample in that row.
+Step 2: Calculate R: 
+r <- cor(x, y,  method = "pearson", use = "na.or.complete")  # TODO: check on whether to set use = "na.or.complete"
+Step 3: Calculate t using either of these (whichever is faster): 
+t <- r / sqrt( (1-r**2)/(n-2) ) 
+same as:
+t <- r / sqrt(1-r**2)) * sqrt(n-2)
+Step 4: Calculate p-value: 
+pVal <- pt(q=abs(t), df=34, lower.tail=FALSE)*2  # the *2 is for the two-sided test, the abs(t) ensures lower.tail=FALSE will always give the correct result)
+
+
+
+For testing, I made my own test data, assigning 1 to RN and RS data, and 0 to everything else, then using the first four data rows of LP36_pipe1_filtered-ratio.csv: 
+
+--
+Q's for Jun-Jun:
+
+If there are NA's, do you want me to remove those pairs before calculating R.
+If so, do I adjust the N (number of samples) accordingly, or use the original N?
+
+
+--
+Hi Jun-Jun,
+
+I'm just finishing up a script to calculate the R and Pearson p-values. I have a question about how I should handle rows with missing data.
+
+Currently, when calculating R, the missing values are deleted before calculating R. Then, to calculate p based on R, I also need to know the number of samples N. For rows that have missing data, should I still set N=36, or should I subtract the number of missing values from 36?
+
+Thanks,
+
+Ben
+
+--
+Hello, Ben:
+Yes. Missing values will be deleted before calculating R.  The number of samples with missing values will be subtracted from 36 when the number of samples N is used for p calculation.
+
+Happy New Year!
+
+--
+
+nohup Rscript correlation_analysis.R 2>&1 1>correlation-pipe1.log &
+
+After running correlation_analysis on all three pipes successfully: 
+scp -J borealremote brancourt@borealjump.nfis.org:/public/genomics/junjun/Data-Dec2020/LP-NGS-RawData/LP36-SNPpipeline2022/bamsWithSNs/LP36_correlation.zip .
+
+--
+Hi Jun-Jun,
+
+Here are the statistics files again with the Pearson correlations added on. I've included R, p, and also n (sample size after romving NAs) and t, which were used to calculate p.
+
+https://www.dropbox.com/s/fv5osh0rmf54vqw/LP36_correlation.zip?dl=1
+
+Ben
+
+--
+Hi, Ben:
+Thank you for great progress! This outcome of dataset is highly consistent with your previous one, indicating your script to combine data sample per sample is very effective.
+I wonder if you can also exact genotypes and their Ref allelic ratios of indels with same filtering as in the latest effort on 3,735,540 SNPs. 
+
+--
+Hi Jun-Jun,
+
+Just to be clear on what you want me to do, you want me to apply the same filtering on the VCF multisample output, except keep only indels rather than non-indels, then calculate the correlation statistics?
+
+The filtering would be like this, for each row:
+- remove row if it is not an indel
+- remove row if the combined missing data from RS and SS is > 4
+- remove row if the MAF is < 0.01
+
+Then, calculate the correlations.
+
+Is this right? 
+
+Ben
+
+--
+To apply the same filtering on the VCF multisample output, except keep only indels rather than non-indels, to extract their genotype data and Ref allelic ratios of indels first.
+I’ll check your correlation statistics of SNPs first, and let you know if I can understand them well. 
+
+--  
+According my understand standing, as R approaching 1, its p value approaching 0.
+
+Currently when R values increase from 0.727 to 0.730, the p values jump from e-6 to 0. It looks that our formula of p calculation is not right, no p values in a range from e-6 to 0.
+
+
+(Ben: some examples from pipe1):
+
+"CHROM","POS","REF","ALT","R","p","n","t"
+464322:"LP36_DN4753_c0_g1_i1",735,"T","A",-0.732048,0,36,-6.265714
+464409:"LP36_DN4753_c0_g1_i1",2905,"A","G",-0.751931,0,36,-6.650776
+464419:"LP36_DN4753_c0_g2_i1",537,"C","G",-0.73746,0,36,-6.36682
+464454:"LP36_DN4753_c0_g2_i1",1393,"A","C",-0.740046,0,35,-6.32102
+
+464578:"LP36_DN4753_c0_g2_i6",236,"T","C",-0.728157,0,36,-6.194616
+Corresponding line from the ratios file: 
+464578:"LP36_DN4753_c0_g2_i6",236,T,C,
+1,1,1,1,1,1,1,1,1,1,1,1,1,0.375,0.578947,0.461538,0.692308,0.619048,0.928571,0.653846,0.642857,0.846154,0.615385,0.538462,1,1,0.818182,0.952381,0.888889,1,1,0.428571,0.9,1,1,0.666667
+
+464600:"LP36_DN4753_c0_g2_i6",1139,"C","T",0.73616,0,36,6.342295
+537243:"LP36_DN5785_c0_g1_i10",3019,"G","A",-0.770854,0,36,-7.056097
+546314:"LP36_DN5940_c0_g1_i2",4194,"T","A",-0.782334,0,31,-6.76396
+560259:"LP36_DN6149_c2_g2_i2",157,"T","C",-0.811154,0,36,-8.087445
+
+
+--
+Hi Jun-Jun, I think I've figured out the problem.
+I had set my script to round the decimal values to 6 decimal places when creating the csv file. So anything that is smaller than e-6 was rounded to 0.
+I will re-generate the correlation statistics and send them to you without any rounding.
+
+--
+Hi, Ben:
+Great to know it! Bioinformatics usually set p value of 0 as e-287, avoiding 0 for any analysis (such as log P) at next steps.
+Thanks.
+
+--
+Hi Jun-Jun,
+
+Here are the new correlations, without rounding: 
+https://www.dropbox.com/s/s3r83yt4dcbl5yj/LP36_correlation.zip?dl=1
+
+Ben
+
+--
+Hello, Ben:
+The p correction looks great! Outcome of p values makes sense, consistent with genotypic data. Thanks!
+--
+What ‘t’ means here?
+--
+t is the "t-Value for a Pearson correlation", the last formula on this page:
+https://www.danielsoper.com/statcalc/formulas.aspx?id=44
+
+It can be used to calculate the p-Value. Here's a page that describes how to do it manually, given the t-Value and the degrees of freedom:
+https://statkat.com/find-p-value/t-value.php
+
+I used the R function pt() to calculate p using t and the degrees of freedom (n-2). I used the two-tailed test (multiplying by two):
+https://www.statology.org/p-value-of-t-score-r/
+
+Ben
+
+--
+Nice to know it!
+Here the genotypic data is qualitative, and the ref frq data is quantitative. Nice to confirm consistency between both!
+
+--
+
+nohup ./filter_csv_from_multi_sample_vcf-INDELS.sh 2>&1 1> filter-indels-pipe1.log &
+
+scp -J borealremote brancourt@borealjump.nfis.org:/public/genomics/junjun/Data-Dec2020/LP-NGS-RawData/LP36-SNPpipeline2022/bamsWithSNs/LP36_indels_from_multisample_vcf.zip .
+
+--
+Hi Jun-Jun,
+Here are the results from filtering the indels of the LP36 multisample vcf. I also added the correlations to the statistics files, since that didn't require any additional code customization to do.
+
+https://www.dropbox.com/s/ptvqzsp8qcd7qky/LP36_indels_from_multisample_vcf.zip?dl=1
+
+Ben
+--
+Hello, Ben:
+Great progress!
+Please code the indel genotypes of 36 samples using ‘R’ to represent “ref’ alleles, and “A’ to represent ‘alt’ alleles across all indels/rows. This will make all genotypes (R/R, R/A, A/A) comparable across all samples and all rows.
+
+Thanks!
+--
+Hi Jun-Jun, will do. If there are any other indels besides the REF and the ALT, what label would you like me to give to them? I could do something like X for anything else.
+
+Ben
+--
+If alt is more than one, all other alt alleles, with less freq than the main one, would be treated them as missing data in the samples. 
+--
+Hi Jun-Jun,
+
+I've just finished testing my updates to the script to enable replacing the REF indel with R and ALT indel with A. There are some cases where either the REF or the ALT value in the vcf file doesn't match the actual indels found in the row. For example: 
+
+One row records ref=GGTGT and alt=AGTGC, but instead of the alt, the row uses AGTGT.
+
+Another row records ref=CAA and alt=CTAAATTA, but instead of the ref, the row uses CTA.
+
+What should I do in these cases? Should I change the ref and alt values to match what is actually being used? Or should I leave the ref and alt values as recorded by the vcf file, and make a decision about which indel to replace with R and A, even if they aren't the actual ref or alt? 
+
+Thanks,
+
+Ben
+
+"LP36_DN1_c0_g1_i4",2590,GGTGT,AGTGC,R/R,R/R,AGTGT/AGTGT,AGTGT/AGTGT,R/R,R/R,R/R,R/R,AGTGT/AGTGT,R/R,AGTGT/AGTGT,AGTGT/AGTGT,AGTGT/AGTGT,R/R,R/R,AGTGT/AGTGT,AGTGT/AGTGT,R/R,R/R,R/R,R/R,R/R,R/R,AGTGT/AGTGT,AGTGT/AGTGT,R/R,R/R,R/R,R/R,AGTGT/AGTGT,R/R,R/R,R/R,R/AGTGT,R/AGTGT,AGTGT/AGTGT
+
+"LP36_DN1_c0_g1_i7",964,CAA,CTAAATTA,CTA/CTA,CTA/CTA,A/A,CTA/CTA,CTA/CTA,CTA/CTA,CTA/CTA,CTA/CTA,CTA/CTA,CTA/CTA,CTA/CTA,CTA/CTA,CTA/CTA,CTA/CTA,CTA/CTA,CTA/CTA,CTA/CTA,CTA/CTA,CTA/CTA,CTA/CTA,CTA/CTA,CTA/CTA,CTA/CTA,CTA/CTA,CTA/CTA,CTA/CTA,CTA/CTA,CTA/CTA,CTA/CTA,CTA/CTA,CTA/CTA,CTA/CTA,CTA/CTA,CTA/CTA,CTA/CTA,CTA/CTA
+
+--
+Hello, Ben:
+For these cases, you just treat those rows as missing data. A revisit of data details does not make too sense for our objectives as we are doing statistics of the big data set.
+
+Thanks!
+Jun-Jun
+
+--
+
+scp -J borealremote brancourt@borealjump.nfis.org:/public/genomics/junjun/Data-Dec2020/LP-NGS-RawData/LP36-SNPpipeline2022/bamsWithSNs/LP36_indels_replaced_from_multisample_vcf.zip .
+
+--
+Hi Jun-Jun,
+
+Here are the new versions of the indel reports for LP36, both replaced and unreplaced. The number of rows might be a little different from the previous version since I changed the filtering a little bit based on setting all indels which don't match the ref or the alt to missing data. I've included the correlations in the stats file.
+
+https://www.dropbox.com/s/m4qbtstf3x91m0v/LP36_indels_replaced_from_multisample_vcf.zip?dl=1
+
+Ben
+
+--
+Hi Jun-Jun,
+Is there a next step that you'd like me to work on?
+
+--
+Hello, Ben:
+I’m checking the indel data you sent. Although not completing yet, it appears very consistent with SNP data you generated in the same way. It looks that this task is done. I’m considering CLC pan-transcriptome assembly of all available rust RNA-seq data, such as you did on limber pine, western white pine, and whitebark pine. I’ll check out the rust raw RNA-seq data files, and let you know what RNA-seq raw will be included very soon. I believe that you have done them separately, this time we need to do it in a combination.
+
+--
+...CONTINUED IN FILE todo_starting2023-01-20.txt
+
+
+
+
+
+

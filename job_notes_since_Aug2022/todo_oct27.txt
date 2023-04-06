@@ -1,0 +1,91 @@
+- try DeepBSA with 10 samples and ~ 10000 SNPs
+- email DeepBSA team
+- send Jun-Jun latest MAF report (split into partitions of less than 1 million)
+- send Jun-Jun 20-sample depth files for DeepBSA (all rows with > 4 NAs removed)
+- a more careful look at DeepBSA docs
+- confirm bug in MAF report generation
+- check genotype results from vcf files to report.csv and filled_report.csv
+- possibly incorporate new depth stats method (and filled_report?) into pipeline
+- see my list of items to improve on the SNPpipeline
+- As discussed, please send me the vcf file of count values of all ~2.5 M rows, but including all 36 samples (not only 20 RR1-10 and SS1-10 samples). Please combine the data across 36 samples based on the first four column: chrom, positions, ref, alt. As there are ~2.5 million rows, please split them into three sub cvs files. As you found that some SNP have alt more than one. In these case, those minority alt will be changed as NA (-, as missing data).
+
+
+
+In Order:
+- create 10 sample ~10000 SNP csv file for DeepBSA (no NAs, no quotes)
+- create both 36 sample 23 sample files for DeepBSA (no quotes):
+	- all rows
+	- without rows which have > 4 NAs
+	- no NAs
+	- split into sets of < 1000000
+- a more careful look at DeepBSA docs
+- test DeepBSA with 10 sample file
+- email DeepBSA team
+x- confirm whether there's a difference in both my recent MAF report filtered files and the version I originally sent to Jun-Jun
+- send Jun-Jun new 36 sample, 20 sample DeepBSA files, lastest MAF report files
+
+- confirm bug in MAF report generation
+- check genotype results from vcf files to report.csv and filled_report.csv
+- possibly incorporate new depth stats method (and filled_report?) into pipeline
+- see my list of items to improve on the SNPpipeline
+
+----------------
+
+#!/bin/bash
+
+reportNameBase="MAF_cutoff_report.csv"
+prefix="pipe1_"
+tempPostfix=".tmp.noIndels"
+finalPostfix=".noIndels.max4NAs"
+
+# remove lines with indels in the REF
+grep -v -E '".*",[0-9]*,"[ACTG][ACTG][ACTG]*",' $prefix$reportNameBase >> $prefix$reportNameBase$tempPostfix
+
+# remove lines with at least 5 NA occurences in the sample columns
+grep -v -E '.*,.*,.*,NA.*,NA.*,NA.*,NA.*,NA' $prefix$reportNameBase$tempPostfix >> $prefix$reportNameBase$finalPostfix
+
+---
+
+# replace ,NA with ,-
+sed 's/,NA/,-/g' MAF_cutoff_depth_forDeepBSA.csv > MAF_cutoff_depth_forDeepBSA-NAasDash.csv
+
+# remove lines with at least 9 NA occurences in the RO and AO columns
+grep -v -E '.*,.*,.*,.*,NA.*,NA.*,NA.*,NA.*,NA.*,NA.*,NA.*,NA.*,NA' MAF_cutoff_depth_forDeepBSA.csv > MAF_cutoff_depth_forDeepBSA-max8NAs.csv
+grep -v ",NA" MAF_cutoff_depth_forDeepBSA.csv > MAF_cutoff_depth_forDeepBSA-noNAs.csv 
+
+---
+
+# replace ,NA with ,-
+sed 's/,NA/,-/g' MAF_cutoff_depth_forDeepBSA.csv > MAF_cutoff_depth_forDeepBSA-NAasDash.csv
+
+# remove lines with at least 9 NA occurences in the RO and AO columns
+grep -v -E '.*,.*,.*,.*,-.*,-.*,-.*,-.*,-.*,-.*,-.*,-.*,-' MAF_cutoff_depth_forDeepBSA-NAasDash.csv > MAF_cutoff_depth_forDeepBSA-NAasDash-max8NAs.csv
+grep -v ",-" MAF_cutoff_depth_forDeepBSA-NAasDash.csv > MAF_cutoff_depth_forDeepBSA-NAasDash-noNAs.csv 
+
+grep -v -E '.*,.*,.*,.*,-.*,-.*,-.*,-.*,-.*,-.*,-.*,-.*,-.*,-.*,-.*,-.*,-.*,-.*,-.*,-.*,-.*,-.*,-.*,-.*,-.*,-.*,-.*,-.*,-.*,-.*,-.*,-.*,-.*,-.*,-.*,-.*,-.*,-.*,-.*,-.*,-' MAF_cutoff_depth_forDeepBSA-NAasDash.csv > MAF_cutoff_depth_forDeepBSA-NAasDash-maxHalfNAs.csv
+
+
+head -n 1 MAF_cutoff_depth_forDeepBSA-NAasDash.csv > MAF_cutoff_depth_forDeepBSA-NAasDash-PT1.csv
+head -n 1 MAF_cutoff_depth_forDeepBSA-NAasDash.csv > MAF_cutoff_depth_forDeepBSA-NAasDash-PT2.csv
+head -n 1 MAF_cutoff_depth_forDeepBSA-NAasDash.csv > MAF_cutoff_depth_forDeepBSA-NAasDash-PT3.csv
+
+awk 'NR > 1 && NR <= 835108' MAF_cutoff_depth_forDeepBSA-NAasDash.csv >> MAF_cutoff_depth_forDeepBSA-NAasDash-PT1.csv
+awk 'NR > 835108 && NR <= 1670215' MAF_cutoff_depth_forDeepBSA-NAasDash.csv >> MAF_cutoff_depth_forDeepBSA-NAasDash-PT2.csv
+awk 'NR > 1670215' MAF_cutoff_depth_forDeepBSA-NAasDash.csv >> MAF_cutoff_depth_forDeepBSA-NAasDash-PT3.csv
+
+---
+# remove lines with at least 9 NA occurences in the RO and AO columns
+grep -v -E '.*,.*,.*,.*,NA.*,NA.*,NA.*,NA.*,NA.*,NA.*,NA' MAF_cutoff_depth_forDeepBSA.csv > MAF_cutoff_depth_forDeepBSA-max6NAs.csv
+grep -v ",NA" MAF_cutoff_depth_forDeepBSA.csv > MAF_cutoff_depth_forDeepBSA-noNAs.csv 
+
+
+----
+
+awk 'NR > 1' MAF_cutoff_depth_forDeepBSA.csv > MAF_cutoff_depth_forDeepBSA-noHeader.csv 
+grep -v ",NA" MAF_cutoff_depth_forDeepBSA-noHeader.csv > MAF_cutoff_depth_forDeepBSA-noHeader-noNA.csv 
+sed 's/\"//g' MAF_cutoff_depth_forDeepBSA-noHeader-noNA.csv > MAF_cutoff_depth_forDeepBSA-noHeader-noNA-noQuote.csv 
+sed 's/\"//g' MAF_cutoff_depth_forDeepBSA-noHeader.csv > MAF_cutoff_depth_forDeepBSA-noHeader-noQuote.csv 
+
+
+
+

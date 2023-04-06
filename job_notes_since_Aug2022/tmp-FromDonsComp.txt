@@ -1,0 +1,721 @@
+ssh 205.250.122.76 -p 37654
+
+
+============
+
+
+
+/public/genomics/junjun/Data-Dec2020/LP-NGS-RawData/LP36-SNPpipeline2022
+sudo mount -t nfs 10.20.0.6:/Public/genomics/junjun/Data-Dec2020/LP-NGS-RawData/LP36-SNPpipeline2022 /work3
+cp -a pipeline1/SNPpipeline/reports reports-master2022/
+
+reports-master2022
+inputFolders=(pipeline2/SNPpipeline/reports pipeline3/SNPpipeline/reports)
+
+nohup ./concat_reports.sh 2>&1 1> concat.log &
+
+scp -J borealremote brancourt@borealjump.nfis.org:/public/genomics/junjun/Data-Dec2020/Fluidigm-May2021/LG12_Fluidigm/SNPpipeline-NEW/Pt1and2Reports-backup/Fluidigm-LG12-updatedSNPpipeline-reports.zip .
+
+THESE WORKED:
+scp -J jason brancourt@borealremote.nfis.org:~/iodine.txt .
+scp -J jason,brancourt@borealremote.nfis.org brancourt@borealjump.nfis.org:~/brancourt.pem .
+
+scp -J jason,brancourt@borealremote.nfis.org brancourt@borealjump.nfis.org:/public/genomics/junjun/Data-Dec2020/LP-NGS-RawData/LP36-SNPpipeline2022/LP36-SNPpipeline2022-reports-master-MAF.zip .
+scp -J jason,brancourt@borealremote.nfis.org brancourt@borealjump.nfis.org:/public/genomics/junjun/192gDNA_pipeline2022/WWP_192gDNA_pipeline2022_reports_master.zip .
+
+scp -J jason,brancourt@borealremote.nfis.org ./pipelinescripts.zip brancourt@borealjump.nfis.org:~/
+
+
+===================================================
+
+https://borealcloud.slack.com
+benrancourt@gmail.com
+simple
+"New line was just added, saying: Could not chdir to home directory /export/home/hwilliams: Permission denied"
+"Hi Holly - when that happens, you'll need to type kinit and enter your password, then you should be able to cd ~ into your home directory again"
+
+
+TODO: 
+x- merge reports for 192 data
+- run KmerGO for junjun that he wanted me to test
+- write script to modify the depth stats tables (and update the depth stats script for future)
+- test updates to the SNPpipeline
+- make filled_report generate in the same order as report
+- make option to resume generating filled_report at current point (have to update cleanup.sh)
+- include option for edited_report to remove all lines containing at least one NA?
+- update reports in report_gen_p2 to use NA instead of -?
+- check for updates of the bundled tools used by the pipeline, suchas bowtie2, samtools, etc, and replace them with the newest versions (this might affect the outcomes).
+
+
+--
+KmerGO:
+When you have time you can try KmerGO, using RNA-seq read data of limber pine samples. Not 36 samples, may try 23 samples (RS1~10, SS1~10, RN1, SN1-2), not including C1 –C13. Here RS1-10, and RN1 are 11 case (Resistant) samples, and take SS1~10, SN1~2 as 12 control (Susceptible) samples.
+--
+Hi Jun-Jun, here's the github page for the software:
+https://github.com/ChnMasterOG/KmerGO
+--
+Hi Jun-Jun, I've installed KmerGO2 (a newer faster version) from:
+https://github.com/ChnMasterOG/KmerGO2
+
+I'll wait until some of my currently running VMs finish before testing it on the LP data.
+--
+
+===========================================
+
+Hi Jun-Jun,
+
+The SNPpipelines for the WWP-192 sample data have all finished except for two, which look like they'll finish in the next couple days. Nice to know they don't need the depth stats reports. When those last two pipelines have finished I'll combine the reports from all ten into a single set.
+
+The three pipelines for the LP36 data have all finished their reports except for the depth stats reports, and except for an indels report on one of the pipelines which should finish soon. I don't know when the depth stats reports will finish, but I think it will take a while, maybe a few weeks, since it requires looking up data for each locus similar to the filled_report, which took a long time. I can combine the reports that have already finished though and send them to you.
+
+Since most of the WWP pipelines are no longer using boreal resources, I can test KmerGO2 for you in the meantime as well. You said to test it "using RNA-seq read data of limber pine samples. Not 36 samples, may try 23 samples (RS1~10, SS1~10, RN1, SN1-2), not including C1 –C13. Here RS1-10, and RN1 are 11 case (Resistant) samples, and take SS1~10, SN1~2 as 12 control (Susceptible) samples."
+
+Is there anything else you'd like me to begin working on soon?
+
+Ben
+
+--
+Hello, Ben:
+Thanks for updating. We need ‘depth statistics report’ only for those diploid (N = 2) samples (Limber pine needles), not from haploid (N=1) samples (western white pine megagametophytes), because the latter only calling one allele, not two alleles.
+
+Have a nice and safe trip!
+
+--
+Hi Jun-Jun, 
+
+Since the depth stats for the LP36 pipelines probably won't be finished for a while, here are the other reports that have been generated so far, each combined into one master file. I've excluded report.csv, filled_report.csv and edited_report.csv from this download to keep the file size down. The MAF_cutoff_report.csv has the exact same data as the edited_report.csv since our MAF cutoff parameter was set to 0.0001. 
+https://www.dropbox.com/s/8c1cexc26oas0w7/LP36-SNPpipeline2022-reports-master-MAF.zip?dl=1
+
+I'll send you the master reports for the 192 sample WWP piplines when the remaining VM has finished generating its final report, probably tomorrow.
+
+Ben
+
+--
+Ben:
+It looks that the ‘MAF_cutoff-Report.csv’ contains 6,257,732 rows(SNPs/Indels). Can you split it 7 subfiles, each with < 1,000,000 rows. Also, please generate a file from it without missing data [i.e. remove all rows containing NA for at least one sample].Thanks!
+
+--
+
+grep -v -E ",NA|,\"NA\"" MAF_cutoff_report.csv > MAF_cutoff_report_noNAs.csv
+grep -v -E ",-|,\"-\"" MAF_cutoff_report_indels.csv > MAF_cutoff_report_indels_noNAs.csv
+
+
+head -n 1 MAF_cutoff_report.csv > MAF_cutoff_report-pt1.csv 
+head -n 1 MAF_cutoff_report.csv > MAF_cutoff_report-pt2.csv 
+head -n 1 MAF_cutoff_report.csv > MAF_cutoff_report-pt3.csv 
+head -n 1 MAF_cutoff_report.csv > MAF_cutoff_report-pt4.csv 
+head -n 1 MAF_cutoff_report.csv > MAF_cutoff_report-pt5.csv 
+head -n 1 MAF_cutoff_report.csv > MAF_cutoff_report-pt6.csv 
+head -n 1 MAF_cutoff_report.csv > MAF_cutoff_report-pt7.csv 
+
+awk 'NR > 1 && NR <= 893970' MAF_cutoff_report.csv >> MAF_cutoff_report-pt1.csv
+awk 'NR > 893970 && NR <= 1787939' MAF_cutoff_report.csv >> MAF_cutoff_report-pt2.csv
+awk 'NR > 1787939 && NR <= 2681908' MAF_cutoff_report.csv >> MAF_cutoff_report-pt3.csv
+awk 'NR > 2681908 && NR <= 3575877' MAF_cutoff_report.csv >> MAF_cutoff_report-pt4.csv
+awk 'NR > 3575877 && NR <= 4469846' MAF_cutoff_report.csv >> MAF_cutoff_report-pt5.csv
+awk 'NR > 4469846 && NR <= 5363815' MAF_cutoff_report.csv >> MAF_cutoff_report-pt6.csv
+awk 'NR > 5363815' MAF_cutoff_report.csv >> MAF_cutoff_report-pt7.csv
+
+--
+Hi Jun-Jun,
+
+Here is the full MAF report divided into seven parts:
+https://www.dropbox.com/s/1ztrzclneapr0z9/LP36-SNPpipeline2022-reports-master-MAF-7parts.zip?dl=1
+
+And here is a version of both MAF reports with all rows containing missing data for at least one sample removed. I've also split the big one into three files of roughly 1 million rows each:
+https://www.dropbox.com/s/e5rr97rkv6kp39e/LP36-SNPpipeline2022-reports-master-noNAs.zip?dl=1
+
+--
+Hello,. Ben:
+About genotypic data in the subsets 1-7, or 1-3 without ‘na’ data, please replace NA into NN, and N/N into NN (by removing ‘/’’ in original data subsets) when N=A, T, C. G. Thanks!
+
+--
+Hi Jun-Jun, 
+
+Do you only want me to do this for rows 1-7 in the full MAF report, and rows 1-3 in the MAF report without NAs? 
+
+I've done what I think you mean in the attached files, except I left the NAs as NAs since I didn't know how to pick which NN to replace them with. The last row in the noNAs file has indels, so I left it unchanged.
+
+Let me know if this isn't what you expected me to do. I can also do it for the whole dataset if you prefer.
+
+Ben
+
+--
+Hi Jun-Jun,
+
+All the SNPpipelines for the WWP 192gNDA data have completed. Here are the combind reports: 
+https://www.dropbox.com/s/bspemx5ojgwxegy/WWP_192gDNA_pipeline2022_reports_master.zip?dl=1
+
+Ben
+
+
+
+--
+
+cp -a pipeline01/SNPpipeline/reports/* WWP_192gDNA_pipeline2022_reports_master/
+
+masterFolder="WWP_192gDNA_pipeline2022_reports_master"
+
+inputFolders=(pipeline02/SNPpipeline/reports pipeline03/SNPpipeline/reports pipeline04/SNPpipeline/reports pipeline05/SNPpipeline/reports pipeline06/SNPpipeline/reports pipeline07/SNPpipeline/reports pipeline08/SNPpipeline/reports pipeline09/SNPpipeline/reports pipeline10/SNPpipeline/reports)
+
+--
+
+-----
+Hello, Ben:
+I have a look at data you sent below. If you access Boreal Cloudy, can you further filter data of “the full MAF report divided into seven parts” by using MAF cut-off at 0.05 (removing all SNP rows with MAF < 0.05), ‘empty’ cut-off at 4 (removing all SNP rows with ‘NA’ in 5 or more samples of the 36 total samples), only keep SNPs by removing all rows of InDels.
+
+As Estimated, after filtering by these three steps, we will get ~2.5 millions of SNPs and you can split them into three subsets.
+
+Thanks!
+Jun-Jun
+
+--
+Also SNP depth and allelic frequencies of LP36 can be mined by these three steps of data filtering.
+
+--
+Ok, I will do that in the morning.
+
+Would you like me to continue with testing that new pipeline software you emailed to me as well? I've been doing some organizing on the cloud before starting that and was going to start that tomorrow. 
+
+--
+Yes. Please ‘new pipeline software’ as the priority as it would simplify phenotype-genotype association analysis using SNP depth and their allelic frequencies !
+
+--
+To accomplish the above requests, based on above, regenerate full reports for LP36 full combined SNP pipeline data by doing this:
+- rename full edited_report as filled_report
+- clone a new SNPpipeline
+- edit start.sh to match the original but to have MAF cutoff at 0.05, and to start after filled_report
+- replace the standard report_gen_p2.R with my custom one which has these two customizations in the edited_report stage: 
+  - remove all rows with REF having an indel (then sets HAS_INDELS to FALSE)
+  - remove rows with > 4 NAs
+
+sudo mount -t nfs 10.20.0.6:/Public/genomics/junjun/Data-Dec2020/LP-NGS-RawData/LP36-SNPpipeline2022/LP36-RegenerateFullReportsCustom /work
+
+--
+head -n 1 MAF_cutoff_report.csv > MAF_cutoff_report_filtered-pt1.csv 
+head -n 1 MAF_cutoff_report.csv > MAF_cutoff_report_filtered-pt2.csv 
+head -n 1 MAF_cutoff_report.csv > MAF_cutoff_report_filtered-pt3.csv 
+
+awk 'NR > 1 && NR <= 826995' MAF_cutoff_report.csv >> MAF_cutoff_report_filtered-pt1.csv
+awk 'NR > 826995 && NR <= 1653989' MAF_cutoff_report.csv >> MAF_cutoff_report_filtered-pt2.csv
+awk 'NR > 1653989' MAF_cutoff_report.csv >> MAF_cutoff_report_filtered-pt3.csv
+
+I also wrote a little script to filter the percentage_snps report.
+
+--
+
+scp -J jason,brancourt@borealremote.nfis.org brancourt@borealjump.nfis.org:/public/genomics/junjun/Data-Dec2020/LP-NGS-RawData/LP36-SNPpipeline2022/LP36-RegenerateFullReportsCustom/filtered_MAF.zip .
+
+--
+Hi Jun-Jun, here is the MAF_cutoff_report filtered as you specified. I've also included the percentage_snps report.
+https://www.dropbox.com/s/rq2cbbiug813ycv/filtered_MAF.zip?dl=1
+The depth stats are still being retrieved for all three pipelines for LP36. If I try to retrieve depth stats based only on this attached filtered data, I don't think it'll complete any sooner than the current pipelines which are running, since they've been running for so much longer. I would also first need to find out how to combine the .BAM files and .vcf file from those three pipelines for each sample in order to retrieve depth stats for this filtered data, since they were created from each pipeline each using 1/3 of the reference, and this filtered data combines the results of all three pipelines. 
+
+Ben
+
+--
+
+
+
+===========================================================================
+===========================================================================
+Jun-Jun found a new pipeline which we might be able to use instead of the calculating depth statistics from our SNPpipeline on the LP36 data:
+
+--
+DeepBSA
+--software--
+We developed a BSA method driven by deep learning (DL) —DeepBSA for QTL mapping and functional gene cloning, which is compatible with a variable number of bulked pools and performed well in both animals and plants. A user-friendly graphical user interface (GUI) for DeepBSA was produced, which integrated five widely used BSA algorithms and our two newly developed algorithms. The DeepBSA software is freely available to non-commercial users at http://zeasystemsbio.hzau.edu.cn/tools.html and https://github.com/lizhao007/DeepBSA.
+--cite--
+Li Z., Chen X., Shi S., Zhang H., Wang X., Chen H., Li W., and Li L. (2022). DeepBSA: A deep-learning algorithm improves bulked segregant analysis for dissecting complex traits. Mol. Plant. doi: https://doi.org/10.1016/j.molp.2022.08.004.
+--version--
+2022.08.30 version1.3
+(Newly added PDF file of mapping results and CSV file of algorithm values.)
+2022.08.16 version1.2
+2022.07.25 version1.1
+Download v1.3
+--
+
+If DeepBSA works in our work, no need to calculate/extract SNP depth and their allelic frequencies, which is running now.
+
+--
+Ok, I will install it and experiment with it.
+
+--
+When you test it, two vcf files you generated for limber pine 36 sets of RNA-seq data can be used: one from RS samples, another from SS samples.
+
+--
+
+sudo mount -t nfs 10.20.0.6:/Public/genomics/junjun/Data-Dec2020/LP-NGS-RawData/ /work
+LP36-SNPpipeline2022
+
+scp -J jason,brancourt@borealremote.nfis.org brancourt@borealjump.nfis.org:/public/genomics/junjun/Data-Dec2020/LP-NGS-RawData/LP36-SNPpipeline2022/pipeline1/pipe1VcfSamples.zip .
+
+--
+Hi Jun-Jun,
+
+I've installed and tested DeepBSA on my Windows laptop. The test with their provided test files worked as expected, but when I tested using some .vcf files from the LP36 pipelines as you suggested, it said there was a problem with the file. I will research VCF file formats and try to figure out what is wrong.
+
+Ben
+
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	unknown
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	unknown
+
+--
+I think that a big issue is the size of input vcf files, and if necessary, the input vcf files may be required to re-generate by reference mapping as recommended by this pipeline.
+
+--
+Hi Jun-Jun,
+I've installed and tested DeepBSA on my Windows laptop. The test with their provided test files worked as expected, but when I tested using some .vcf files from the LP36 pipelines as you suggested, it said there was a problem with the file. I will research VCF file formats and try to figure out what is wrong.
+
+--
+Hi, Ben:
+A nice testing. It looks that vcf formatting is a key step to run this pipeline. You may try two samples from 26 samples first: one RS sample (N1) and one SS sample (N2). According to theirs paper, at most it runs 10 samples/pools (N1 to N10).
+
+In our 36 samples, 23 are pools, each pooled 10 trees by seed families except C1-C13. C1-C13 are 13 single individual trees, may not be suitable for this pipeline.
+
+--
+
+brief overview of the VCF file format:
+http://www.htslib.org/doc/vcf.html
+
+CSV (based on row 2 of the provided test.vcf and row 1 of the provided test.csv):
+CHROM,POS,  REF,ALT,sample1_AD(a),sample1_AD(b),sample2_AD(a),sample2_AD(b)
+1,    34959,T,  C,  89,           85,           76,           55
+
+From row 2 of the provided test.vcf:
+FORMAT:
+GT:AD:DP:GQ:PL	
+SAMPLE 1:
+0/1:89,85:174:99:3373,0,10965	
+SAMPLE 2:
+0/1:76,55:131:99:2158,0,8183
+
+From data row 1 of my RS1_filtered_cutoff.vcf:
+FORMAT:
+GT:DP:DPR:RO:QR:AO:QA:GL
+SAMPLE (only one):
+0/0:7:7,2:5:166:2:60:0,-1.91748,-0.269501
+
+- my vcf files don't have AD.
+
+GT - genotypes?
+"The GT in the FORMAT column tells us to expect genotypes in the following columns. ... The genotype is in the form 0|1, where 0 indicates the reference allele and 1 indicates the alternative allele, i.e it is heterozygous. The vertical pipe | indicates that the genotype is phased, and is used to indicate which chromosome the alleles are on. If this is a slash / rather than a vertical pipe, it means we don’t know which chromosome they are on." https://www.ebi.ac.uk/training/online/courses/human-genetic-variation-introduction/variant-identification-and-analysis/understanding-vcf-format/
+
+from: https://samtools.github.io/hts-specs/VCFv4.3.pdf
+AD: Total read depth (forward and reverse) for each allele
+DP: Read depth
+GL: Genotype likelihoods
+GQ (Integer): Conditional genotype quality, encoded as a phred quality −10log10 p(genotype call is wrong, conditioned on the site’s being variant).
+GT (String): Genotype, encoded as allele values separated by either of / or |. The allele values are 0 for the reference allele (what is in the REF field), 1 for the first allele listed in ALT, 2 for the second allele list in ALT and so on. For diploid calls examples could be 0/1, 1 | 0, or 1/2, etc.
+PL (Integer): The phred-scaled genotype likelihoods rounded to the closest integer, and otherwise defined in the same way as the GL field.
+
+from my getDepthStats script: 
+# Here are the definitions from the VCF file of the depth data we've extracted:
+#   DP  = "Total read depth at the locus"
+#   DPB = "Total read depth per bp at the locus; bases in reads overlapping / bases in haplotype"
+#   RO  = "Reference allele observation count, with partial observations recorded fractionally"
+#   AO  = "Alternate allele observations, with partial observations recorded fractionally"
+
+##INFO=<ID=DP,Number=1,Type=Integer,Description="Total read depth at the locus">
+##INFO=<ID=DPB,Number=1,Type=Float,Description="Total read depth per bp at the locus; bases in reads overlapping / bases in haplotype">
+##INFO=<ID=RO,Number=1,Type=Integer,Description="Reference allele observation count, with partial observations recorded fractionally">
+##INFO=<ID=AO,Number=A,Type=Integer,Description="Alternate allele observations, with partial observations recorded fractionally">
+##INFO=<ID=QR,Number=1,Type=Integer,Description="Reference allele quality sum in phred">
+##INFO=<ID=QA,Number=A,Type=Integer,Description="Alternate allele quality sum in phred">
+
+##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
+##FORMAT=<ID=GQ,Number=1,Type=Float,Description="Genotype Quality, the Phred-scaled marginal (or unconditional) probability of the called genotype">
+##FORMAT=<ID=GL,Number=G,Type=Float,Description="Genotype Likelihood, log10-scaled likelihoods of the data given the called genotype for each possible genotype generated from the reference and alternate alleles given the sample ploidy">
+##FORMAT=<ID=DP,Number=1,Type=Integer,Description="Read Depth">
+##FORMAT=<ID=DPR,Number=A,Type=Integer,Description="Number of observation for each allele">
+##FORMAT=<ID=RO,Number=1,Type=Integer,Description="Reference allele observation count">
+##FORMAT=<ID=QR,Number=1,Type=Integer,Description="Sum of quality of the reference observations">
+##FORMAT=<ID=AO,Number=A,Type=Integer,Description="Alternate allele observation count">
+##FORMAT=<ID=QA,Number=A,Type=Integer,Description="Sum of quality of the alternate observations">
+##FORMAT=<ID=MIN,Number=1,Type=Integer,Description="Minimum depth in gVCF output block.">
+
+--
+Hi Jun-Jun,
+
+Based on the test files provided with DeepBSA, it creates a .csv from the VCF data which contains this information in columns:
+
+CHROM,POS,REF,ALT, then total read depth for each allele of each sample
+
+If we already have the data in this format, we can use this as the input instead of the VCF files.
+
+To create the .csv file, it retrieves the total read depth of each allele from a VCF field called AD="Total read depth for each allele", which contains the read depth for the REF and ALT separated by a comma. I think our problem is that the VCF files produced by our SNPpipeline don't contain the AD field, but they do contain RO="Reference allele observation count" and AO="Alternate allele observation count". Would these reliably be the same thing? If so, I can write a script to use RO and AO to provide the information to DeepBSA in the .csv format it expects. The depth statistics script that I'm currently running basically already extracts this information, and it also searches in the BAM file for situations where it doesn't find the read depths in the VCF file (but this doesn't give the read depth per allele). I think I might be able to come up with a more efficient way to extract this information than the current script, particularly from the VCF file.
+
+If I understand you correctly, to run DeepBSA, I should provide it with read depth info for REF and ALT for up to ten samples at a time, but should first test it with just two samples.
+
+Another possibility instead of extracting data from the current VCF files would be to regenerate the VCF files using a different process.
+
+Ben
+
+--
+Hello, Ben:
+
+I think that your understanding is right.  AD, RO and AO are the same thing. But DeepBAS has AD for reference allele and alternative allele separately? And How it distinguish AD for the each SNP locus? If its cvs file contains four column (CHROM,POS,REF,ALT), it would be simple, making sense; here each row present one SNP site.
+
+BTW, if you can use our vcf files as input, we compare and any difference if present when vcf or a csv file is used as input. To regenerate the VCF files using their recommendation would be the last option for us
+
+--
+After trying two samples first, our 10 RS and 10 SS can be run in two times. Each time using 5 RS and 5 SS samples.
+
+--
+Hi Jun-Jun, the AD field records two values separated by commas, like this: 7,2. I assume the first number is for the REF and the second is for the ALT. Each data row in the VCF file contains this information separated by tabs:
+CHROM   POS   ID   REF   ALT   QUAL   FILTER   INFO   FORMAT  SAMPLE(can be more than one sample fields)
+
+The INFO field can contain many key=value pairs separated by semicolons.
+The FORMAT field identifies which information is recorded in the SAMPLE fields. Each SAMPLE might have several values separated by colons, and the SAMPLES are separated from each other by tabs. For example, one of the rows in the test.vcf file provided with DeepBSA contains this for FORMAT and two SAMPLES:
+GT:AD:DP:GQ:PL   0/1:89,85:174:99:3373,0,10965   0/1:76,55:131:99:2158,0,8183
+
+The AD values in this example for sample one are 89,85 and for sample two are 75,55.
+
+DeepBSA takes this information and converts it to a .csv file containing these columns:
+CHROM,POS  ,REF,ALT,sample1_AD(1),sample1_AD(2),sample2_AD(1),sample2_AD(2)
+    1,34959,  T,  C,           89,           85,           76,           55
+
+Does this answer your question about how it distinguishes AD for different SNP loci?
+
+DeepBSA can accept either a csv file in this format or a .vcf file which it converts to this format. I tested it with both the provided example csv and vcf files (same data except the vcf file had additional data which DeepBSA doesn't need) and it produced the same results.
+
+I will work on trying to extract the information we need in a more efficient way than the current depth statistics script is doing it.
+
+Ben
+
+--
+
+
+
+===========
+Pseduocode for extracting depth data from vcf file created by our SNPpipeline:
+
+/*
+VCF format:
+CHROM   POS   ID   REF   ALT   QUAL   FILTER   INFO   FORMAT  SAMPLE(can be more than one sample fields)
+
+The INFO field can contain many key=value pairs separated by semicolons.
+The FORMAT field identifies which information is recorded in the SAMPLE fields. Each SAMPLE might have several values separated by colons, and the SAMPLES are separated from each other by tabs. For example, one of the rows in the test.vcf file provided with DeepBSA contains this for FORMAT and two SAMPLES:
+GT:AD:DP:GQ:PL   0/1:89,85:174:99:3373,0,10965   0/1:76,55:131:99:2158,0,8183
+
+DeepBSA takes this information and converts it to a .csv file containing these columns:
+CHROM,POS  ,REF,ALT,sample1_AD(1),sample1_AD(2),sample2_AD(1),sample2_AD(2)
+
+From data row 1 of my RS1_filtered_cutoff.vcf:
+FORMAT:
+GT:DP:DPR:RO:QR:AO:QA:GL
+SAMPLE (only one):
+0/0:7:7,2:5:166:2:60:0,-1.91748,-0.269501
+
+*/
+
+
+#       remove all rows beginning with #
+#       for each data line, extract in the following format:
+#               CHROM,POS,REF,ALT,GT,DP,RO,AO
+
+
+After having created _cutoff.csv files from the VCF data:
+For each pipeline:
+
+First, prepare the MAF report:
+if FILTER_MAF:
+	R:
+		read percentage_snps.csv
+		create percentage_snps_filtered.csv (MAF >= 0.05)
+		read MAF report
+		select MAF rows based on "CHROM","POS","REF" of percentage_snps_filtered
+	BASH:
+		remove rows from MAF where REF has an indel
+		remove rows from MAF that have >= 5 NA
+sanity check: the total rows (not including headers) of all three final filtered MAF reports should == 2480984
+
+696157 pipe1_MAF_cutoff_report_filtered.csv.final
+852510 pipe2_MAF_cutoff_report_filtered.csv.final
+897027 pipe3_MAF_cutoff_report_filtered.csv.final
+
+696157+852510+897027-2 = 2445692
+
+BASH:
+use the V1 version of the csv files
+for each csv file
+	remove rows with 2 in the GT field
+	add header to each csv file
+R:
+read MAF_cutoff_report.csv
+set MAF report "CHROM","POS","REF" as master
+for each vcf report
+	read report
+	(replace all 0/1 etc with REF/ALT etc)
+	if first report
+		merge with master (left-join, keeping only rows occurring in master) by "CHROM","POS","REF", adding cols "ALT","GT","DP","RO","AO"
+		make master using "CHROM","POS","REF","ALT","GT","DP","RO","AO"
+		make masterAltCheck using "CHROM","POS","REF","ALT", and renane "ALT" to "sample-ALT"
+	else 
+		merge with master (left-join, keeping only rows occurring in master) by "CHROM","POS","REF","ALT", adding cols "GT","DP","RO","AO"
+		merge with masterAltCheck (left-join, keeping only rows occurring in master) by "CHROM","POS","REF", adding col "ALT"
+done
+if num rows of master != num rows of masterAltCheck:
+	get row nums, and rows, that contain non-uniform ALTs
+	??add these rows to the master???
+split the master report into separate reports according to use
+finally, concat final reports from all three pipelines
+
+
+--
+ssh connection:
+205.250.122.76 -p 37654
+
+--
+
+echo '"CHROM","POS","REF","ALT","GT","DP","RO","AO"' > out
+grep -v -E ',"[0-9]/[2-9]",|,"[2-9]/[0-9]",' in.csv >> out
+
+
+sed -i '/.*[0-9]\/[2-9].*\|.*[2-9]\/[0-9].*/d'
+
+from: https://stackoverflow.com/questions/10587615/unix-command-to-prepend-text-to-a-file
+sed -i.old '1s;^;to be prepended;' inFile
+-i writes the change in place and take a backup if any extension is given. (In this case, .old)
+1s;^;to be prepended; substitutes the beginning of the first line by the given replacement string, using ; as a command delimiter.
+
+sed -i.old '1s;^;"CHROM","POS","REF","ALT","GT","DP","RO","AO"\n;' tw2.csv
+
+
+===========
+Pseudocode for creating new report from depth_stats_detailed:
+
+for header row
+	replace name-A;B;C;D with name-A,name-B,name-C,name-D
+for each row
+	replace ; with ,
+
+
+===========================================================================
+===========================================================================
+TESTING the SNPPIPELINE: 
+
+
+openstack server create \
+	--image CentOS7_BenWork6 \
+  --security-group default \
+	--key-name brancourt \
+	--nic net-id=Private \
+	--flavor mm2.8xlarge \
+	bentest
+	
+sudo mount -t nfs 10.20.0.6:/Public/genomics/junjun/Data-Dec2020/Fluidigm-May2021 /work
+
+git clone https://github.com/benranco/SNPpipeline.git
+
+yum makecache
+yum clean all
+sudo yum --obsoletes update
+
+sudo yum remove R
+sudo yum remove R-core
+sudo yum remove R-devel
+sudo yum remove R-core-devel
+
+sudo yum-builddep R
+
+./configure --prefix=/home/centos/software/R/installed/4.2.1 --enable-R-shlib --with-blas --with-lapack
+make
+make install  # (don't use sudo unless installing in a root location)
+
+cd /usr/local/bin  # or cd ~/bin, if it exists
+sudo ln -s /home/centos/software/R/installed/4.1.2/bin/R R4
+sudo ln -s /home/centos/software/R/installed/4.1.2/bin/Rscript Rscript4
+sudo ln -s R4 R
+sudo ln -s Rscript4 Rscript
+
+
+
+
+I need to: 
+- copy the column names as a new row
+- transform the data.frame so columns become rows
+- sort it
+- either transform it again and assign col names, or extract the info that I need in the form that I need it
+
+https://www.google.com/search?channel=fs&client=ubuntu&q=sort+Warning+in+xtfrm.data.frame%28x%29+%3A+cannot+xtfrm+data+frames
+https://www.r-bloggers.com/2021/02/it-has-always-been-wrong-to-call-order-on-a-data-frame/
+http://www.markvanderloo.eu/yaRb/2014/08/15/sort-data-frame/
+
+ 
+===========================================================================
+===========================================================================
+=======================================================
+
+https://www.canadavpns.com/vpn/best-vpn-for-linux/
+https://www.expressvpn.com/vpn-software/vpn-linux
+
+
+lightest green: 
+#d6ff75
+light green:
+#82db5c
+darker green:
+#5a8e42
+#02675f
+
+my original green: 
+#27706B
+
+
+cream:
+#f2f4f5
+
+peachy: 
+#f7815b
+#f8b195
+#f9d9cd
+#f9eeea  good background
+#f7f0ed  good background
+#f7f3f1  good background
+
+blues: 
+#b6ddff
+#9fe4ff
+#d0e6f2  blue circle
+
+orange:
+#f6744a
+#e37f62
+#e4785b
+#c64736
+#b84132
+#e95420   highlighter
+
+yellow: 
+#eab254
+#f5bf4d
+
+purple: 
+#5c6568
+#4f5655
+#484e4e
+#534666
+
+creamy yellow: 
+#e7e5d6
+
+neutrals: 
+#f7f7f7  good background
+
+10 Clock Tower Court
+Bexhill-on-Sea
+E. Sussex
+TN39 3HP
+
+
+89.2
+94.1
+
+In Gimp, to convert any colour to black, isolate it in a layer, then, in the Colors menu:
+- in Saturation, set Scale to 0
+- in Exporsure, set Black level to 100 (I chose 96).
+
+============================
+Google fonts list: 
+
+https://www.oberlo.com/blog/google-fonts
+https://www.w3schools.com/cssref/css_websafe_fonts.asp
+
+SERIF (MOST OF THESE):
+Bitter
+Arvo
+Roboto Slab
+Zilla Slab
+Bree Serif
+Unna
+Neuton
+Alegreya
+
+SANS SERIF:
+Cabin
+Alegreya Sans
+Fira Sans
+Ropa Sans
+Montserrat
+Velera Round
+Source Sans Pro
+Open Sans
+Helvetica Neue
+Roboto Condensed
+Roboto
+
+HANDWRITING:
+Architects Daughter
+Sue Ellen Fransisco
+
+MONOSPACE:
+Anonymous Pro
+Cousine
+Nanum Gothic Coding
+
+
+<link href='http://fonts.googleapis.com/css?family=Bitter:800,700,600,500,400,300,400italic' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Arvo:800,700,600,500,400,300,400italic' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Roboto+Slab:800,700,600,500,400,300,400italic' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Zilla+Slab:800,700,600,500,400,300,400italic' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Bree+Serif:800,700,600,500,400,300,400italic' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Unna:800,700,600,500,400,300,400italic' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Neuton:800,700,600,500,400,300,400italic' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Alegreya:800,700,600,500,400,300,400italic' rel='stylesheet' type='text/css'>
+
+<link href='http://fonts.googleapis.com/css?family=Cabin:800,700,600,500,400,300,400italic' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Alegreya+Sans:800,700,600,500,400,300,400italic' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Fira+Sans:800,700,600,500,400,300,400italic' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Ropa+Sans:800,700,600,500,400,300,400italic' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Montserrat:800,700,600,500,400,300,400italic' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Velera+Round:800,700,600,500,400,300,400italic' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:800,700,600,500,400,300,400italic' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Open+Sans:800,700,600,500,400,300,400italic' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Roboto:800,700,600,500,400,300,400italic' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Roboto+Condensed:800,700,600,500,400,300,400italic' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Helvetica+Neue:800,700,600,500,400,300,400italic' rel='stylesheet' type='text/css'>
+
+<link href='http://fonts.googleapis.com/css?family=Architects+Daughter:800,700,600,500,400,300,400italic' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Sue+Ellen+Fransisco:800,700,600,500,400,300,400italic' rel='stylesheet' type='text/css'>
+
+<link href='http://fonts.googleapis.com/css?family=Anonymous+Pro:800,700,600,500,400,300,400italic' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Cousine:800,700,600,500,400,300,400italic' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Nanum+Gothic+Coding:800,700,600,500,400,300,400italic' rel='stylesheet' type='text/css'>
+
+
+============================
+
+https://stackoverflow.com/questions/9601357/placing-border-inside-of-div-and-not-on-its-edge
+https://www.w3schools.com/cssref/css3_pr_box-shadow.asp
+
+============================
+
+https://www.expressvpn.com/
+https://www.expressvpn.com/signup/success
+https://www.expressvpn.com/support/vpn-setup/app-for-linux/#install
+https://www.expressvpn.com/support/vpn-setup/manual-config-for-linux-with-openvpn/
+
+https://www.reddit.com/r/linuxquestions/comments/mendoy/how_to_ssh_into_a_linux_server_with_a_vpn_running/
+
+uHmVwhBQ
+uHmVwhBQ
+Activation code: 
+ENJLOXKDHKWRDECBTHMPEQW
+ENJLOXKDHKWRDECBTHMPEQW
+
+https://ubuntu.com/tutorials/install-ubuntu-desktop#1-overview
+
+https://www.fullhost.com/hosting-in-canada/hosting-in-vancouver-bc/
+https://www.fullhost.com/cloud-vps-hosting/
+
+https://islandhosting.com/vpshosting.php
+https://islandhosting.com/knowledgebase/16/FAQ
+
+https://www.esecuredata.com/virtual-servers
+https://www.esecuredata.com/datacentre
+
+https://www.whtop.com/directory/country/ca/category/vps/state/bc
+
+
+

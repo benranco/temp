@@ -1,0 +1,1098 @@
+
+Lillian - prayer
+Lillian - how was your week
+Ben - songs
+Ben - review the past few weeks (what do they remember about the story of Ruth, Naomi and Boaz)
+Ben - bible reading and questions
+    Possible Scripture passages to read, depending on what the kids can remember: 
+        Ruth 1:16-19, Ruth 2:8-16, Ruth 3:1-13
+        Other parts of the story I think we can just describe ourselves.
+    Some questions:
+        How did God provide for the poor in that society?
+        How do we know Boaz was a good man?
+        What does it mean that Boaz was their redeemer? 
+        How is Jesus our redeemer? 
+        What did Ruth do to show Boaz that she wanted to be redeemed by him?
+        What does this have to do with Bethlehem?
+        What does this have to do with Jesus?
+        What stands out to you from this story? What's your favourite part?
+        What do you think God is asking you to do?   
+Lillian - memory verse, Ruth 2:11-12 (esp. v12)
+
+
+
+
+--
+from Ben, a petition
+
+--
+Marcus
+
+People who might sign:
+Ben
+Beth
+Mom
+Dad
+Lorna
+Adam
+Cindy
+Grant
+Becky
+Mark
+Kate
+Jason
+Heidi
+Ryan
+Alison
+Rebecca
+Arnold
+Ayrton
+Lillian
+Mike
+Errol
+Betty
+Stan
+Rutn
+Marius & his parents
+John 
+Maureen
+Andrew Davison
+James & Heather
+
+search: british columbia bill 36
+
+https://bc.ctvnews.ca/now-is-not-the-time-b-c-faces-growing-backlash-from-health-care-professionals-over-bill-36-1.6210733
+
+
+
+--
+Hi Jun-Jun,
+Is there a next step that you'd like me to work on?
+
+--
+Hello, Ben:
+I’m checking the indel data you sent. Although not completing yet, it appears very consistent with SNP data you generated in the same way. It looks that this task is done. I’m considering CLC pan-transcriptome assembly of all available rust RNA-seq data, such as you did on limber pine, western white pine, and whitebark pine. I’ll check out the rust raw RNA-seq data files, and let you know what RNA-seq raw will be included very soon. I believe that you have done them separately, this time we need to do it in a combination.
+--
+Hello, Ben:
+Enclosed is the file list for trinity assembly of pan-rust transcriptome. You have used most of these files in other separate assemblies, and they have been trimmed after quality-filtering. If you have any question, please let me know.
+
+[Rust-RNA-seq-sample-list.xlsx]
+--
+
+find . -maxdepth 15 -iname * -type f
+
+find . -maxdepth 15 -iname S001-AB3_ATCACG_L002* -type f 
+find . -maxdepth 15 -iname NEBNext_dual_i5_177* -type f
+find . -maxdepth 15 -iname S008-F3_GGCTAC_L002* -type f
+find . -maxdepth 15 -iname HI.2380.005.Index_2.C1* -type f
+find . -maxdepth 15 -iname HI.3428.006.Index_2.1* -type f
+
+
+
+find . -maxdepth 15 -iname NEBNext_dual_i5_177* -type f
+
+
+
+find . -maxdepth 15 -iname S008-F3_GGCTAC_L002* -type f
+
+
+
+find . -maxdepth 15 -iname HI.3428.006.Index_2.1* -type f
+
+
+
+
+
+
+
+
+find . -maxdepth 15 -iname HI.2380.005.Index_2.C1* -type f
+
+
+
+find . -maxdepth 15 -iname S001-AB3_ATCACG_L002* -type f 
+
+
+
+--------------
+[brancourt@jump ~]$ cd /public/genomics/junjun/
+[brancourt@jump junjun]$ 
+[brancourt@jump junjun]$ 5_177
+[brancourt@jump junjun]$ 
+[brancourt@jump junjun]$ 
+[brancourt@jump junjun]$ 
+[brancourt@jump junjun]$ find . -maxdepth 30 -iname S001-AB3_ATCACG_L002* -type f
+find: ‘./Data-Dec2020/Bens-Trinity-assembly/BLASTxRuns/BLASTx-Hemlock30/BLASTxResultsAll/tabularTest’: Permission denied
+find: ‘./trash/reference/.gitignore’: Permission denied
+find: ‘./trash/reference/formatted_output.fasta.fai’: Permission denied
+find: ‘./trash/reference/formatted_output.fasta’: Permission denied
+find: ‘./trash/reference/originalFastaFiles’: Permission denied
+[brancourt@jump junjun]$ 
+[brancourt@jump junjun]$ 
+[brancourt@jump junjun]$ find . -maxdepth 15 -iname HI.2380.005.Index_2.C1* -type f
+./komendja_backup2/RNA-seq_Liu/HI.2380.005.Index_2.C1_R2.fastq.gz
+./komendja_backup2/RNA-seq_Liu/HI.2380.005.Index_2.C1_R1.fastq.gz
+./komendja_backup2/RNA-seq_Liu-out/HI.2380.005.Index_2.C1_filtered_R_2P.fastq.gz
+./komendja_backup2/RNA-seq_Liu-out/HI.2380.005.Index_2.C1_filtered_R_1U.fastq.gz
+./komendja_backup2/RNA-seq_Liu-out/HI.2380.005.Index_2.C1_filtered_R_2U.fastq.gz
+./komendja_backup2/RNA-seq_Liu-out/HI.2380.005.Index_2.C1_filtered_R_1P.fastq.gz
+find: ‘./Data-Dec2020/Bens-Trinity-assembly/BLASTxRuns/BLASTx-Hemlock30/BLASTxResultsAll/tabularTest’: Permission denied
+find: ‘./trash/reference/.gitignore’: Permission denied
+find: ‘./trash/reference/formatted_output.fasta.fai’: Permission denied
+find: ‘./trash/reference/formatted_output.fasta’: Permission denied
+find: ‘./trash/reference/originalFastaFiles’: Permission denied
+./komendja_trinity/RNA-seq_Liu-out/HI.2380.005.Index_2.C1_filtered_R_2P.fastq.gz
+./komendja_trinity/RNA-seq_Liu-out/HI.2380.005.Index_2.C1_filtered_R_1U.fastq.gz
+./komendja_trinity/RNA-seq_Liu-out/HI.2380.005.Index_2.C1_filtered_R_2U.fastq.gz
+./komendja_trinity/RNA-seq_Liu-out/HI.2380.005.Index_2.C1_filtered_R_1P.fastq.gz
+./komendja_trinity/RNA-seq_Liu/HI.2380.005.Index_2.C1_R2.fastq.gz
+./komendja_trinity/RNA-seq_Liu/HI.2380.005.Index_2.C1_R1.fastq.gz
+./komendja_trinity/Data_submitted_to_GeneBank/SRA_PRJNA315892/HI.2380.005.Index_2.C1_R1.fastq.gz
+./komendja_trinity/Data_submitted_to_GeneBank/SRA_PRJNA315892/HI.2380.005.Index_2.C1_R2.fastq.gz
+./komendja_trinity/Data_submitted_to_GeneBank/SRA_PRJNA315892_2/HI.2380.005.Index_2.C1_R1.fastq.gz
+./komendja_trinity/Data_submitted_to_GeneBank/SRA_PRJNA315892_2/HI.2380.005.Index_2.C1_R2.fastq.gz
+./komendja_trinity/RNA-seq_GeneBank/RNA-seq_Liu/HI.2380.005.Index_2.C1_R2.fastq.gz
+./komendja_trinity/RNA-seq_GeneBank/RNA-seq_Liu/HI.2380.005.Index_2.C1_R1.fastq.gz
+./komendja_trinity/RNA_seq_clean_raw/HI.2380.005.Index_2.C1_filtered_R_1P.fastq.gz
+./komendja_trinity/RNA_seq_clean_raw/HI.2380.005.Index_2.C1_filtered_R_2P.fastq.gz
+./33sampleRNA_pipeline/RNA_seq_unused_C_data/HI.2380.005.Index_2.C1_R2.fastq.gz
+./33sampleRNA_pipeline/RNA_seq_unused_C_data/HI.2380.005.Index_2.C1_R1.fastq.gz
+[brancourt@jump junjun]$ 
+[brancourt@jump junjun]$ 
+[brancourt@jump junjun]$ 
+[brancourt@jump junjun]$ 
+[brancourt@jump junjun]$ 
+[brancourt@jump junjun]$ 
+[brancourt@jump junjun]$ 
+[brancourt@jump junjun]$ 
+[brancourt@jump junjun]$ 
+[brancourt@jump junjun]$ 
+[brancourt@jump junjun]$ 
+[brancourt@jump junjun]$ 
+[brancourt@jump junjun]$ 
+[brancourt@jump junjun]$ 
+[brancourt@jump junjun]$ find . -maxdepth 15 -iname NEBNext_dual_i5_177* -type f
+find: ‘./Data-Dec2020/Bens-Trinity-assembly/BLASTxRuns/BLASTx-Hemlock30/BLASTxResultsAll/tabularTest’: Permission denied
+find: ‘./trash/reference/.gitignore’: Permission denied
+find: ‘./trash/reference/formatted_output.fasta.fai’: Permission denied
+find: ‘./trash/reference/formatted_output.fasta’: Permission denied
+find: ‘./trash/reference/originalFastaFiles’: Permission denied
+[brancourt@jump junjun]$ 
+[brancourt@jump junjun]$ 
+[brancourt@jump junjun]$ 
+[brancourt@jump junjun]$ find . -maxdepth 15 -iname S008-F3_GGCTAC_L002* -type f
+find: ‘./Data-Dec2020/Bens-Trinity-assembly/BLASTxRuns/BLASTx-Hemlock30/BLASTxResultsAll/tabularTest’: Permission denied
+find: ‘./trash/reference/.gitignore’: Permission denied
+find: ‘./trash/reference/formatted_output.fasta.fai’: Permission denied
+find: ‘./trash/reference/formatted_output.fasta’: Permission denied
+find: ‘./trash/reference/originalFastaFiles’: Permission denied
+[brancourt@jump junjun]$ 
+[brancourt@jump junjun]$ 
+[brancourt@jump junjun]$ 
+[brancourt@jump junjun]$ find . -maxdepth 15 -iname HI.3428.006.Index_2.1* -type f
+find: ‘./Data-Dec2020/Bens-Trinity-assembly/BLASTxRuns/BLASTx-Hemlock30/BLASTxResultsAll/tabularTest’: Permission denied
+./Data-Dec2020/WBP-NGS-rawData/WBP-rust-Jan-2016/HI.3428.006.Index_2.1_R1.fastq.gz
+./Data-Dec2020/WBP-NGS-rawData/WBP-rust-Jan-2016/HI.3428.006.Index_2.1_R2.fastq.gz
+./Data-Dec2020/WBP-NGS-trimmomatic/rust/HI.3428.006.Index_2.1_filtered_R_1P.fastq.gz
+./Data-Dec2020/WBP-NGS-trimmomatic/rust/HI.3428.006.Index_2.1_filtered_R_2P.fastq.gz
+./Data-Dec2020/WBP-NGS-trimmomatic/rust/unpaired/HI.3428.006.Index_2.1_filtered_R_1U.fastq.gz
+./Data-Dec2020/WBP-NGS-trimmomatic/rust/unpaired/HI.3428.006.Index_2.1_filtered_R_2U.fastq.gz
+find: ‘./trash/reference/.gitignore’: Permission denied
+find: ‘./trash/reference/formatted_output.fasta.fai’: Permission denied
+find: ‘./trash/reference/formatted_output.fasta’: Permission denied
+find: ‘./trash/reference/originalFastaFiles’: Permission denied
+[brancourt@jump junjun]$ 
+[brancourt@jump junjun]$ 
+[brancourt@jump junjun]$ 
+[brancourt@jump junjun]$ 
+[brancourt@jump junjun]$ 
+[brancourt@jump junjun]$ 
+[brancourt@jump junjun]$ 
+[brancourt@jump junjun]$ 
+[brancourt@jump junjun]$ find . -maxdepth 15 -iname HI.2380.005.Index_2.C1* -type f
+./komendja_backup2/RNA-seq_Liu/HI.2380.005.Index_2.C1_R2.fastq.gz
+./komendja_backup2/RNA-seq_Liu/HI.2380.005.Index_2.C1_R1.fastq.gz
+./komendja_backup2/RNA-seq_Liu-out/HI.2380.005.Index_2.C1_filtered_R_2P.fastq.gz
+./komendja_backup2/RNA-seq_Liu-out/HI.2380.005.Index_2.C1_filtered_R_1U.fastq.gz
+./komendja_backup2/RNA-seq_Liu-out/HI.2380.005.Index_2.C1_filtered_R_2U.fastq.gz
+./komendja_backup2/RNA-seq_Liu-out/HI.2380.005.Index_2.C1_filtered_R_1P.fastq.gz
+find: ‘./Data-Dec2020/Bens-Trinity-assembly/BLASTxRuns/BLASTx-Hemlock30/BLASTxResultsAll/tabularTest’: Permission denied
+find: ‘./trash/reference/.gitignore’: Permission denied
+find: ‘./trash/reference/formatted_output.fasta.fai’: Permission denied
+find: ‘./trash/reference/formatted_output.fasta’: Permission denied
+find: ‘./trash/reference/originalFastaFiles’: Permission denied
+./komendja_trinity/RNA-seq_Liu-out/HI.2380.005.Index_2.C1_filtered_R_2P.fastq.gz
+./komendja_trinity/RNA-seq_Liu-out/HI.2380.005.Index_2.C1_filtered_R_1U.fastq.gz
+./komendja_trinity/RNA-seq_Liu-out/HI.2380.005.Index_2.C1_filtered_R_2U.fastq.gz
+./komendja_trinity/RNA-seq_Liu-out/HI.2380.005.Index_2.C1_filtered_R_1P.fastq.gz
+./komendja_trinity/RNA-seq_Liu/HI.2380.005.Index_2.C1_R2.fastq.gz
+./komendja_trinity/RNA-seq_Liu/HI.2380.005.Index_2.C1_R1.fastq.gz
+./komendja_trinity/Data_submitted_to_GeneBank/SRA_PRJNA315892/HI.2380.005.Index_2.C1_R1.fastq.gz
+./komendja_trinity/Data_submitted_to_GeneBank/SRA_PRJNA315892/HI.2380.005.Index_2.C1_R2.fastq.gz
+./komendja_trinity/Data_submitted_to_GeneBank/SRA_PRJNA315892_2/HI.2380.005.Index_2.C1_R1.fastq.gz
+./komendja_trinity/Data_submitted_to_GeneBank/SRA_PRJNA315892_2/HI.2380.005.Index_2.C1_R2.fastq.gz
+./komendja_trinity/RNA-seq_GeneBank/RNA-seq_Liu/HI.2380.005.Index_2.C1_R2.fastq.gz
+./komendja_trinity/RNA-seq_GeneBank/RNA-seq_Liu/HI.2380.005.Index_2.C1_R1.fastq.gz
+./komendja_trinity/RNA_seq_clean_raw/HI.2380.005.Index_2.C1_filtered_R_1P.fastq.gz
+./komendja_trinity/RNA_seq_clean_raw/HI.2380.005.Index_2.C1_filtered_R_2P.fastq.gz
+./33sampleRNA_pipeline/RNA_seq_unused_C_data/HI.2380.005.Index_2.C1_R2.fastq.gz
+./33sampleRNA_pipeline/RNA_seq_unused_C_data/HI.2380.005.Index_2.C1_R1.fastq.gz
+[brancourt@jump junjun]$ 
+[brancourt@jump junjun]$ 
+[brancourt@jump junjun]$ 
+
+
+
+--------------
+
+find . -maxdepth 15 -iname S001* -type f 
+
+
+
+find . -maxdepth 15 -iname *AB3* -type f 
+
+
+
+find . -maxdepth 15 -iname *i5_177* -type f
+
+
+
+find . -maxdepth 15 -iname *U4* -type f
+
+
+
+find . -maxdepth 15 -iname S008* -type f
+
+
+
+find . -maxdepth 15 -iname *F3* -type f
+
+
+
+find . -maxdepth 15 -iname *2380.005* -type f
+
+
+
+find . -maxdepth 15 -iname *2391.007* -type f
+
+
+
+find . -maxdepth 15 -iname *3428.006* -type f
+
+
+
+find . -maxdepth 15 -iname *3429.001* -type f
+
+
+--
+Hi Jun-Jun,
+
+Am I right in understanding that you want me to run Trinity on this collection of files?
+
+It took me a while to sort through our past data, but I think I've found all the files in your spreadsheet. I will confirm later once I've organized them all into a single folder. There are post-Trimmomatic versions as well. Would you like me to use the raw data pre-Trimmomatic or post-Trimmomatic? If there are any files without Trimmomatic versions, would you like me to run Trimmomatic on them first?
+
+--
+Hi, Ben:
+Nice to know you find all files we wanted. Please process them from trimmed files with post-Trimmomatic versions. Trimmomatic filtering is the necessary step to remove all reads with bad quality, and then followed by Trinity assembly.
+
+Yes.  If any files without Trimmomatic versions, please run Trimmomatic on them first!
+
+--
+
+Gathering the files for all 47 samples to use for Jun-Jun's panRust dataset:
+
+pwd
+/public/genomics/junjun/Data-Dec2020
+cp RUST_Raw-data-2013/Rust-data/BC-Aec/* panRust
+cp RUST_Raw-data-2013/Rust-data/BC-Ure/* panRust
+cp RUST_Raw-data-2013/Rust-data/OR-Aec/* panRust
+cp nanuq-2022/Rust-tree503-mRNA-seq-march2022/step1-trim/* panRust-trim
+cd panRust-trim/
+rm NS.1805.003.NEBNext_dual_i7_17*
+cd ..
+cp WWP-NGS/WWP-NGS-trimmomatic/SB/* panRust-trim
+cp WWP-NGS/WWP-NGS-trimmomatic/H-Canker/* panRust-trim
+cp LP-NGS-RawData/LP-RNAseq-2015-trimmomatic/LP36_trimmomatic_all/LP-C2* panRust-trim
+cp LP-NGS-RawData/LP-RNAseq-2015-trimmomatic/LP36_trimmomatic_all/C* panRust-trim
+cp WBP-NGS-trimmomatic/rust/*Index_18.6* panRust-trim
+cp WBP-NGS-trimmomatic/rust/*Index_16.9* panRust-trim
+cp WBP-NGS-trimmomatic/rust/*Index_4.10* panRust-trim
+cp WBP-NGS-trimmomatic/rust/*Index_5.11* panRust-trim
+cp WBP-NGS-trimmomatic/rust/*Index_3.15* panRust-trim
+cp WBP-NGS-trimmomatic/rust/*Index_9.16* panRust-trim
+cp WBP-NGS-trimmomatic/rust/*Index_8.17* panRust-trim
+cp WBP-NGS-trimmomatic/rust/*Index_10.18* panRust-trim
+cp WBP-NGS-trimmomatic/rust/*Index_11.19* panRust-trim
+cp WBP-NGS-trimmomatic/rust/*Index_20.20* panRust-trim
+
+
+
+
+Qs:
+- copy i7---i5 files from nanuq-2022/Rust-tree503-mRNA-seq-march2022/step1-trim instead of i5 from RUST-raw-data-2013?
+- don't include files with "No"?
+
+--
+Hi Jun-Jun,
+
+I've collected the files together and will begin running Trimmomatic on the ones which haven't had that done it. 
+I have a couple question:
+
+1) Am I right in understanding that the files listed in the Excel file with a "No" in the "Pan-transcriptom-assembly (inclusion-Yes)" column shouldn't be included?
+
+2) For the files listed in RUST-Raw-data-2013, I've copied them from nanuq-2022/Rust-tree503-mRNA-seq-march2022 instead. Is this Okay. The raw filenames are, for example: 
+NS.1805.003.NEBNext_dual_i7_180---NEBNext_dual_i5_180.T1_R1.fastq.gz
+
+Thanks,
+
+Ben
+
+--
+Yes. Please exclude those file with ‘No’.
+
+Maybe your folder IDs are different as those in my PC. The big issue is the file names and file number. Below 9 files are pretty old generated in year 2013..
+
+S001-AB3_ATCACG_L002
+S001-AB4_CGATGT_L002
+S001-AB6_TTAGGC_L002
+S001-AA3-CTACAG_L002
+S001-AA8-ACTTGA_L002
+S001-AAF-CAGATC_L002
+S001-AA5-GCCAAT_L002
+S001-AAA-ACATGT_L002
+S001-AAD-TGACCA_L002
+
+--
+Yes, I did find those files listed in the  RUST_Raw-data-2013 folder. I forgot to mention that the ones I didn't find in the RUST_Raw-data-2013 folder were from the Tree503 dataset. You listed their filenames as, for example:
+NEBNext_dual_i5_180.T1
+
+The nearest filenames I could find to the ones you listed were from a dataset I downloaded from Nanuq in 2022, in nanuq-2022/Rust-tree503-mRNA-seq-march2022. The raw filenames are, for example:
+NS.1805.003.NEBNext_dual_i7_180---NEBNext_dual_i5_180.T1
+So the filenames are the same except they begin with NS.1805.003.NEBNext_dual_i7_180---
+
+Are these okay to use?
+
+I don't think I have the Tree503 files from 2013 on the Boreal Cloud. They're probably on the Z800 computer in room 349. I haven't been able to log into that computer in almost a year for some reason. Back in March 2022 I asked Arezoo to make sure it was on, but I couldn't determine what the problem was from home. Maybe someone has unplugged it from the network, or moved it.
+
+Ben
+
+--
+I believe they are equal, such as:
+NEBNext_dual_i5_180.T1 = NS.1805.003.NEBNext_dual_i7_180---NEBNext_dual_i5_180.T1.
+
+Also each sample should has two reads files in pairs: xxx-R1 and xxx-R2.
+
+--
+Yes, I have R1 and R2 for each sample. So if you're okay with it, I'll use these files.
+
+--
+Please go ahead using them. Thanks!
+
+--
+
+
+sudo mount -t nfs 10.20.0.6:/Public/genomics/junjun/Data-Dec2020 /work4
+cd /work4
+nohup ./trimmomatic_ben_bash_script.sh 2>&1 1>trimmomatic.log &
+
+--
+openstack server create \
+	--image CentOS7_BenWork7 \
+  --security-group default \
+	--key-name brancourt \
+	--nic net-id=Private \
+	--flavor x1.16xlarge \
+	ben_x
+	
+openstack server add floating ip ben_x 10.20.0.207
+ssh -i brancourt.pem centos@10.20.0.207
+sudo mount -t nfs 10.20.0.6:/Public/genomics/junjun/Data-Dec2020/panRust /work	
+
+nohup $TRINITY_HOME/Trinity --seqType fq --samples_file panRust_samples.txt --max_memory 944G --CPU 64 --output trinityOut 2>&1 1>trinity_run.log &
+
+--
+Hi Jun-Jun,
+I have begun running Trinity on the pan-rust files. There are 47 pairs. The unpaired reads which Trimmomatic filtered out of these files are not included. I'll monitor the progress.
+
+--
+Hello Ben:
+Thanks for your updating. The following procedures are the same as last time you did, such as LP36, and WWP18.
+
+--
+Hi Jun-Jun, 
+
+The Trinity run has finished successfully. There was one warning which occured during the assembly stage, but it still said the assembly completed successfully. Here is the warning:
+
+# Repeated seqs found:
+c0_g1_i1 len=456 path=[3:0-109 6:110-230 8:231-455]
+c0_g1_i2 len=456 path=[5:0-109 6:110-230 8:231-455]
+ATCTTATCCGGCTCAGCTAATTGTTACCATTTACCTGCATGGTCCAAAATGGTCTGGGATTTTCATCTCGAAATCGCTGTTTAATAATGTACTGAATGCTTATAAACAAACCATGTCACCATCTTATCCAGCTCAGCTCAGCTCAGCTCATTGACACATACATGAAACAACCGCGAAACCAACATAAAACATATTTTAATAACCTGTCACGATTGAAGGAAACATTTTTTTACTACGAATACCACCAAACACAAAACGTGTGGTATAACTTCCATTTGTAATCAAACAGCTCTGGTATTCTTTCCATTTCTAAGCAAACAGCTCTGTTTTGTTTAATCGTAGAGTAGTTAAGCAAGCACGCCCTTGGCCTTCGCCGACTCTACAGCATCATCGTAGATTTCGTCGATGCCAAATTTGAAGGAGAAACCGCTGTCCACCAATTTTTTTGACGAAAGG
+
+WARNING - please share w/ Trinity Developers:  Error, cmd: /home/centos/software/trinity/trinityrnaseq-Trinity-v2.8.5/util/support_scripts/fasta_find_duplicates.pl /work/panRust-trinity/trinityOut/read_partitions/Fb_0/CBin_585/c58560.trinity.reads.fa.out/Trinity.tmp.fasta.filt.ST.transcripts.fa died with ret 256 at /home/centos/software/trinity/trinityrnaseq-Trinity-v2.8.5/util/support_scripts/../../Trinity line 2745.
+
+It looks like it was unable to successfully run the script fasta_find_duplicates.pl, related to those repeated seqs. Is there anything you'd like me to do about this? 
+
+The final Trinity.fasta file is 1.2 GB in size, and has 1,322,600 sequences.
+ 
+Here's some information I extracted from the log file:
+176969701 / 2223317073 = 7.96% reads selected during normalization.
+0 / 2223317073 = 0.00% reads discarded as likely aberrant based on coverage profiles.
+0 / 2223317073 = 0.00% reads discarded as below minimum coverage threshold=1
+
+Would you like me to modify the sequence names to replace TRINITY with something identifying the dataset? Here is an example sequence name:
+>TRINITY_DN85_c0_g4_i1 
+
+
+Based on my notes from LP36 and WWP18, I believe the next step is to run BLASTx on the fasta file, correct? I will split it up into ten parts and run it on ten virtual machines, as done previously. I hope I will be able to get the resources on the Boreal Cloud.
+
+After running BLASTx I will open the results with MEGAN6.
+
+Ben
+ 
+--
+Hello, Ben:
+The next step is to run Transdecoder, and pick up longest isoform per gene (or based on expression values of FPKM. Or mapped read number across the samples) to narrow down transcripts/isoform number from 1,322,600 to a lower number!
+
+Before running BLASTx I will open the results with MEGAN6, we need to further narrow down the number. But you run the above two step first.
+
+Thanks!
+Jun-Jun
+
+--
+Ok, sounds good. Should I replace TRINITY in the sequence names with something more descriptive?
+--
+replace TRINITY with Cr47
+
+--
+This work is trying to get all rust fungal transcripts. But current assembly is using infected plant tissues, majority of assembly comes from plants, only a small part of 1,322,600 are truly rust fungal seq.
+
+I consider to rust gDNA reads to map to these 1,322,600. The mapped are true and no-mapped are considered to be discarded. I’ll send you a list of files to be used for mapping against 1,322,600. If doing like this, you still need to split 1,322,600 to 10~100 subsets for read mapping using all available rust gDNA reads. This may require to run many times with several subsets of 1,322,600!
+--
+
+sed -i 's/^>TRINITY_/>Cr47_/g' panRust_Trinity.fasta
+
+--
+
+Here's how I ran TransDecoder (in two steps, based on how I did it in ass6-pt6.txt and ass8-tree503.txt), in a shell script called runTransDecoder.sh: 
+
+echo "======================================"
+echo "running LongOrfs"
+TransDecoder.LongOrfs -m 50 -t ../panRust_Cr47_Trinity.fasta 2>&1 1> panRust_Cr47_TransDecoder.LongOrfs.log 
+echo "======================================"
+echo "done LongOrfs"
+echo "======================================"
+echo "======================================"
+echo "running Predict"
+TransDecoder.Predict --single_best_only -t ../panRust_Cr47_Trinity.fasta 2>&1 1> panRust_Cr47_TransDecoder.Predict.log 
+echo "======================================"
+echo "done Predict"
+
+
+nohup ./runTransDecoder.sh 2>&1 1> runTransDecoder.log &
+
+After finishing running transdecoder, use my two scripts (choose_longest_orf_fasta-FAST.sh and chooseLongestOrfs_fasta.R) to select the longesr orfs, etc: 
+
+nohup ./choose_longest_orf_fasta-FAST.sh 2>&1 1> choose_longest_orf_fasta-FAST.log &
+
+
+--
+Hi Jun-Jun,
+
+I've finished running TransDecoder on the Trinity output, and I've also finished running my scripts to select the sequences based on the longest ORF or longest DNA sequence.
+
+The number of sequences in the new filtered fasta file is now 805572, down from 1,322,600. Of these sequences, 503376 came from finding the longest ORF in the pep file, and 302196 came from finding the longest sequence in the fasta file in cases where there wasn't a longest ORF.
+
+Here are the two TransDecoder commands I used (to filter the pep length at 50):
+ 
+TransDecoder.LongOrfs -m 50 -t panRust_Cr47_Trinity.fasta
+TransDecoder.Predict --single_best_only -t panRust_Cr47_Trinity.fasta
+
+Here is a zip file containing the output data after processing it with my scripts. I've replaced all occurrences of "TRINITY" in the files with "Cr47".
+https://www.dropbox.com/s/shikki9ad6d50ba/panRust_Cr47_longestOrfs.zip?dl=1
+
+Here's what my scripts do:
+  - for each gene, check which transcript has the longest ORF (in .pep file)
+  - if there is a tie for longest ORF, pick the transcript that has the longest DNA sequence (in .fasta file)
+  - if no good ORF is generated from TransDecoder, pick the transcript that has the longest DNA sequence (in .fasta file)
+
+The files that I generated are:
+
+-selected-longest.fasta  : final output
+-allGeneIds.txt  : all unique gene ids.
+-fastaData.csv  : some data extracted from the sequence headers in the Trinity fasta file.
+-pepData.csv  : some data extracted from the sequence headers in the TransDecoder .pep file.
+-longestDNASeqs-fromFasta.txt  : all sequence ids whose gene id didn't have a match in the .pep file, so the longest sequence for that gene was selected from the Trinity .fasta file.
+-longestOrfSeqs-all.txt  : all sequence ids that were selected either from the .pep file or (if not found in the .pep file) the .fasta file.
+-longestOrfSeqs-fromPep.txt  : all sequence ids that were selected from the .pep file.
+
+
+What should be the next step?
+
+By the way, I've just received the list of publications that my exam (tomorrow) will be based on. I will review it this afternoon and tomorrow morning. It still looks to me like the level of scientific knowledge they are expecting the candidates to have is quite a bit more than mine. We will see how this goes!
+
+
+Ben
+
+
+--
+Hi Jun-Jun,
+
+The last time I ran RSEM was on the Rust-tree503-mRNA-seq-march2022 data. The input fasta file (from Trinity) had 461240 transcripts. The sample files were twelve pairs, and each R1 or R2 file was about 5-6 GB in size. Running RSEM on our most powerful VM took about two weeks to complete. Our current fasta file has 805572 transcripts, and we have 47 sample pairs (the average size of R1 and R2 files is probably 4-5 GB), so unless we divide it up it will take significantly longer. How should I divide it? By using the full fasta file on smaller subsets of the samples? Or or by splitting the fasta file up and keeping all the samples as one group?
+
+After completing RSEM on our previous runs, I ran a script which I had written to combine the results from all samples into one master table, and then filter it by TPM >= 1 in at least one of the samples. I also added the columns total_expected_count, total_TPM, and total_FPKM.
+
+
+
+
+Below are the parameters I used to run RSEM. I used the same parameters for the run as with the WWP18, WBP47, Hemlock30, LP36 data.
+
+I ran RSEM using the align_and_estimate_abundance.pl script which was provided with Trinity utils, specifying RSEM as the --est_method and bowtie2 and the --aln_method. RSEM uses bowtie2, and the bowtie2 parameters we used were the recommended defaults: "--no-mixed --no-discordant --gbar 1000 --end-to-end -k 200 ".
+
+We had some discussion about whether to use --end-to-end or --very-fast-local. We have used --end-to-end for all the RSEM runs which I've done so far (WWP18, WBP47, Hemlock30, LP36, tree503)
+
+From this page: https://bowtie-bio.sourceforge.net/bowtie2/manual.shtml#setting-function-options
+
+Preset options in --end-to-end mode (default is --sensitive)
+--very-fast  Same as: -D 5 -R 1 -N 0 -L 22 -i S,0,2.50
+--fast  Same as: -D 10 -R 2 -N 0 -L 22 -i S,0,2.50
+--sensitive  Same as: -D 15 -R 2 -N 0 -L 22 -i S,1,1.15 (default in --end-to-end mode)
+--very-sensitive  Same as: -D 20 -R 3 -N 0 -L 20 -i S,1,0.50
+
+Preset options in --local mode
+--very-fast-local  Same as: -D 5 -R 1 -N 0 -L 25 -i S,1,2.00
+--fast-local  Same as: -D 10 -R 2 -N 0 -L 22 -i S,1,1.75
+--sensitive-local  Same as: -D 15 -R 2 -N 0 -L 20 -i S,1,0.75 (default in --local mode)
+--very-sensitive-local  Same as: -D 20 -R 3 -N 0 -L 20 -i S,1,0.50
+
+Let me know if you'd like me to use a different setting than --end-to-end
+
+
+I've pasted below the descriptions of the other bowtie2 parameters: 
+
+--no-mixed
+By default, when bowtie2 cannot find a concordant or discordant alignment for a pair, it then tries to find alignments for the individual mates. This option disables that behavior.
+
+--no-discordant
+By default, bowtie2 looks for discordant alignments if it cannot find any concordant alignments. A discordant alignment is an alignment where both mates align uniquely, but that does not satisfy the paired-end constraints (--fr/--rf/--ff, -I, -X). This option disables that behavior.
+
+--gbar <int>
+Disallow gaps within <int> positions of the beginning or end of the read. Default: 4.
+
+-k mode: search for one or more alignments, report each
+In -k mode, Bowtie 2 searches for up to N distinct, valid alignments for each read, where N equals the integer specified with the -k parameter. That is, if -k 2 is specified, Bowtie 2 will search for at most 2 distinct alignments. It reports all alignments found, in descending order by alignment score. The alignment score for a paired-end alignment equals the sum of the alignment scores of the individual mates. Each reported read or pair alignment beyond the first has the SAM 'secondary' bit (which equals 256) set in its FLAGS field. Supplementary alignments will also be assigned a MAPQ of 255. See the SAM specification for details.
+Bowtie 2 does not "find" alignments in any specific order, so for reads that have more than N distinct, valid alignments, Bowtie 2 does not guarantee that the N alignments reported are the best possible in terms of alignment score. Still, this mode can be effective and fast in situations where the user cares more about whether a read aligns (or aligns a certain number of times) than where exactly it originated.
+
+
+Ben
+
+--
+
+two parameters
+identity 90-95%
+coverage, fraction size
+
+
+--
+Have you already run RSEM using RNA-seq data of those rust 47 samples?
+
+If not, for input of seq-reads, using marked [see attached screenshot] 12samples/24 RNA-seq files (paired-end), plus 77 gDNA samples/144 gDNA read files:
+7 samples from folder ‘tcag-data-2023’
+30 samples from folder ‘RUST-Raw-data=2013’/’Isolate30-gDNA’
+40 samples from folder ‘RUST-Raw-data=2013’/’Isolate40-2021’
+These 77 samples needs to clean them first using ‘Trimmomatic’, you may save a copy of them after cleaning.
+
+transcript-805572 as reference for read mapping, in -- local (-- very sensitive).
+
+Save the output ‘BAM’ files, after extraction of data such as ‘total_count, total_expected_count, total_TPM, and total_FPKM’, we need extract SNPs using FreeBayes  at a later stage.
+
+--
+Hi Jun-Jun,
+
+I have run RSEM on most of the samples we're using for the 47-sample pan-rust dataset. I've run RSEM on all the files which were from WWP18, WBP47, Hemlock30, LP36 and Tree503, each of them using its own reference fasta file though.
+
+The only samples which I haven't run RSEM on are: 
+RUST_Raw-data-2013/Rust-data/BC-Aec/
+S001AB3_ATCACG_L002_R1.fq  S001AB3_ATCACG_L002_R2.fq  
+S001AB4_CGATGT_L002_R1.fq  S001AB4_CGATGT_L002_R2.fq  
+S001AB6_TTAGGC_L002_R1.fq  S001AB6_TTAGGC_L002_R2.fq
+RUST_Raw-data-2013/Rust-data/BC-Ure/
+S001AA3_GATCAG_L002_R1.fq  S001AA3_GATCAG_L002_R2.fq  
+S001AA8_ACTTGA_L002_R1.fq  S001AA8_ACTTGA_L002_R2.fq  
+S001AAF_CAGATC_L002_R1.fq  S001AAF_CAGATC_L002_R2.fq
+RUST_Raw-data-2013/Rust-data/OR-Aec/
+S001AA5_GCCAAT_L002_R1.fq  S001AA5_GCCAAT_L002_R2.fq  
+S001AAA_ACAGTG_L002_R1.fq  S001AAA_ACAGTG_L002_R2.fq  
+S001AAD_TGACCA_L002_R1.fq  S001AAD_TGACCA_L002_R2.fq
+
+These are 9 of the 12 samples which you've selected for running RSEM, so should I go ahead and run RSEM as you explained?
+
+For the 7 samples from folder ‘tcag-data-2023’, some of the names you listed in Subm-list40- Feb-18-2021.xlsx don't quite match the files that I downloaded. These are the 7 samples that most closely match the ones you listed (also with the corresponding R2 file, but not listed here):
+LP503_S56_L004_R1_001.fastq.gz
+LP508_1_S57_L004_R1_001.fastq.gz
+LP508_2_S58_L004_R1_001.fastq.gz
+LP508_3_S59_L004_R1_001.fastq.gz
+LP508_4_S60_L004_R1_001.fastq.gz
+LP508_5_S61_L004_R1_001.fastq.gz
+LP508_6_S62_L004_R1_001.fastq.gz
+
+I found the 40 samples from ‘RUST-Raw-data=2013’/’Isolate40-2021’ in the folder rust-gDNA-40samples-May2021.
+I found the 30 samples from ‘RUST-Raw-data=2013’/’Isolate30-gDNA’ in the folder RUST_Raw-data-2013/Rust-data/Isolate30-gDNA.
+
+I will run Trimmomatic on the 77 samples first, then I'll run RSEM using the 805572 transcripts file as reference. RSEM creates a separate output folder for each sample, does this mean that I can run RSEM on multile VMs using the same reference file, with a smaller amount of samples on each VM?
+
+You've specified that I run RSEM/bowtie2 with preset --very-sensitive-local. This is different from the previous times, when we used --end-to-end. I don't know what effect this will have on the running time. I remember we tested --very-fast-local and --end-to-end on a small subset of data before deciding to use --end-to-end on the full dataset. Let me know if you'd like me to do a similar test.
+
+Ben
+
+--
+Hello, Ben:
+I do not know you how to split the input data to run RSEM, either splitting reference data set, or reads set, or both. You may run all the reads set (12+77 samples) one time against a subset of the reference. Here the reference sequence data set is too big, we need to split it into 10~20 subsets? For the reference sequences of 805,572, you may focus on seq-503,376 came from finding the longest ORF in the pep file, and later to use to seq-302,196 came from finding the longest sequence in the fasta file in cases where there wasn't a longest ORF?
+
+For this RSEM run, we have two objectives: (1) to extract fungal transcripts based on counts of mapped reads against the reference set, the we can separate this reference sequence set into fungal and non-fungal (plant) subsets. (2) based on outcomes of the BAM file, to continue a run of FreeBayes to get SNPs across all samples (12 +77).
+
+In consideration of objective-2, better to run read mapping for all samples at the same time? We need to get SNPs for comparison across all samples at the 2nd stage.
+
+--
+I think that for the read mapping done by RSEM, it is mapping each sample individually to the reference, without relating the samples to each other, because it uses bowtie2 for the mapping, and it produces a separate bam file for each sample. If the input samples were being treated as pooled data by bowtie2, I think it would only produce one bam file for all samples. Does this make sense?
+
+When we used FreeBayes recently for the LP36 data to get SNPs across all samples, the BAM files that we used as input had been created individually per sample by our SNPpipeline by calling bowtie2 like this, separately for each sample:
+bowtie2 -p <numCpus> -x reference.fasta -1 sample_R1.fq -2 sample_R2.fq --local --very-sensitive-local -S sample.sam
+
+So I think that at the RSEM stage, I can divide the samples into smaller groups to run on multiple VMs, but for the FreeBayes stage I have to have all samples together. However, if I want to use multiple VMs for the FreeBayes stage I would need to have created the BAM files with RSEM using smaller reference fasta files. I think your idea to use two reference files, seq-503,376 from the longest ORF in the pep file, and on a different VM use seq-302,196 from the longest sequence in the fasta file in cases where there wasn't a longest ORF, would be sufficient, because I think FreeBayes doesn't take too long to complete. If there would be a benefit to keeping it all together, we could probably use the full 805,572 file, with no negative effect on RSEM timing, and not too much negative effect on FreeBayes timing.
+
+--
+I think that for the read mapping done by RSEM, it is mapping each sample individually to the reference, without relating the samples to each other, because it uses bowtie2 for the mapping, and it produces a separate bam file for each sample. If the input samples were being treated as pooled data by bowtie2, I think it would only produce one bam file for all samples. Does this make sense?
+
+When we used FreeBayes recently for the LP36 data to get SNPs across all samples, the BAM files that we used as input had been created individually per sample by our SNPpipeline by calling bowtie2 like this, separately for each sample:
+bowtie2 -p <numCpus> -x reference.fasta -1 sample_R1.fq -2 sample_R2.fq --local --very-sensitive-local -S sample.sam
+This would imply that the samples don't need to be related to each other at the read mapping stage, but only at the SNP-finding stage.
+
+So I think that at the RSEM stage, I can divide the samples into smaller groups to run on multiple VMs, but for the FreeBayes stage I have to have all samples together. Does this make sense to you?
+
+However, if I want to use multiple VMs for the FreeBayes stage (for speed) I would need to have created the BAM files with RSEM using sub-divided reference fasta files. I think your idea to use two reference files, seq-503,376 from the longest ORF in the pep file, and on a different VM use seq-302,196 from the longest sequence in the fasta file in cases where there wasn't a longest ORF, would be sufficient, because I think FreeBayes doesn't take very long to complete. If there would be a benefit to keeping it all together in one reference file, we could probably use the full 805,572 file, with no negative effect on RSEM timing, and not too much negative effect on FreeBayes timing. Which would you prefer?
+
+Ben
+
+--
+>>See comments below. Have a nice weekend!
+
+I think that for the read mapping done by RSEM, it is mapping each sample individually to the reference, without relating the samples to each other, because it uses bowtie2 for the mapping, and it produces a separate bam file for each sample.
+
+>>Right, What are we want to get a separate bam file for each sample.
+
+If the input samples were being treated as pooled data by bowtie2, I think it would only produce one bam file for all samples. Does this make sense?
+
+>>Here, we no need to produce only one bam file for all samples.
+
+When we used FreeBayes recently for the LP36 data to get SNPs across all samples, the BAM files that we used as input had been created individually per sample by our SNPpipeline by calling bowtie2 like this, separately for each sample:
+bowtie2 -p <numCpus> -x reference.fasta -1 sample_R1.fq -2 sample_R2.fq --local --very-sensitive-local -S sample.sam
+This would imply that the samples don't need to be related to each other at the read mapping stage, but only at the SNP-finding stage.
+
+>>OK.
+
+So I think that at the RSEM stage, I can divide the samples into smaller groups to run on multiple VMs, but for the FreeBayes stage I have to have all samples together. Does this make sense to you?
+
+>>Yes. You divide the samples into smaller groups to run on multiple VMs, but the reference seqs are the same of full 805,572 as you said below, right?
+
+However, if I want to use multiple VMs for the FreeBayes stage (for speed) I would need to have created the BAM files with RSEM using sub-divided reference fasta files.
+
+>>Forget about this strategy?
+
+I think your idea to use two reference files, seq-503,376 from the longest ORF in the pep file, and on a different VM use seq-302,196 from the longest sequence in the fasta file in cases where there wasn't a longest ORF, would be sufficient, because I think FreeBayes doesn't take very long to complete.
+
+>>To keep the full 805,572 in one run of FreeBayes?
+
+If there would be a benefit to keeping it all together in one reference file, we could probably use the full 805,572 file, with no negative effect on RSEM timing, and not too much negative effect on FreeBayes timing. Which would you prefer?
+
+>>OK to use the full 805,572 file to generate BAM files for each individual sample. Here each time to run a subset of total (12+77) samples. 
+
+--
+In regards to your questions below, I would prefer to use just one reference file of 805,572 seqs for both the RSEM stage and the FreeBayes stage, even if that means it will take a few extra days to complete the FreeBayes stage (I don't know how long it would take), but I thought that if we want to speed up the FreeBayes stage we could use two reference files, 503,376 and 302,196. If we did this we would have to also do this for the RSEM stage in order to create smaller BAM files to use for the FreeBayes stage. I will just one the one file of 805,572 seqs for both stages unless you would like to create separate BAM files for the sequences based on longest ORFs from the pep and for the sequences based on longest sequence from the fasta file.
+
+Also, one more question. Can you confirm the names of the seven samples you would like me to use from the folder ‘tcag-data-2023’? Some of the names you listed in Subm-list40- Feb-18-2021.xlsx don't quite match the files that I downloaded. These are the 7 samples whose names most closely match the ones you listed (which also have the corresponding R2 file, but not listed here):
+LP503_S56_L004_R1_001.fastq.gz
+LP508_1_S57_L004_R1_001.fastq.gz
+LP508_2_S58_L004_R1_001.fastq.gz
+LP508_3_S59_L004_R1_001.fastq.gz
+LP508_4_S60_L004_R1_001.fastq.gz
+LP508_5_S61_L004_R1_001.fastq.gz
+LP508_6_S62_L004_R1_001.fastq.gz
+
+Thanks,
+
+Ben
+
+--
+Yes. The 7 samples of Yr2023 are correct.
+
+Whatever to do, then key issue is if the BAM files can be created by both read count/TPM and SNP calling. If can, read mapping no needs top be repeated for both work objectives.
+
+Have a nice weekend!
+
+--
+Ok, I will plan to use one reference file of 805,572 seqs then, because it will simplify some of the work.
+
+After completing Trimmomatic on the 77 samples, I can do some small tests of RSEM to estimate running time. Should I test the difference between --very-sensitive-local, --sensitive-local, --fast-local and --end-to-end, or are you certain that you want to use --very-sensitive-local regardless of running time? 
+
+--
+Yes. To use --very-sensitive-local. It is better for gDNA reads (77 samples) to be mapped to transcript references
+
+--
+Getting ready to run Trimmomatic on the 77 samples: 
+
+sudo mount -t nfs 10.20.0.6:/Public/genomics/junjun/Data-Dec2020/ /work2
+cd /work2
+
+
+For the 7 samples from folder ‘tcag-data-2023’, some of the names you listed in Subm-list40- Feb-18-2021.xlsx don't quite match the files that I downloaded. These are the 7 samples that most closely match the ones you listed (also with the corresponding R2 file, but not listed here):
+LP503_S56_L004_R1_001.fastq.gz
+
+
+mkdir TCAG-Shotgun-7samples-raw
+cp ZAM23143-Jan2023/TCAG-Shotgun-sample20-Y2023/LP503_S56_L004_R* panRust/12_RNAseq_samples_77_gDNA_samples/TCAG-Shotgun-7samples-raw/
+cp ZAM23143-Jan2023/TCAG-Shotgun-sample20-Y2023/LP508_1_S57_L004_R* panRust/12_RNAseq_samples_77_gDNA_samples/TCAG-Shotgun-7samples-raw/
+cp ZAM23143-Jan2023/TCAG-Shotgun-sample20-Y2023/LP508_2_S58_L004_R* panRust/12_RNAseq_samples_77_gDNA_samples/TCAG-Shotgun-7samples-raw/
+cp ZAM23143-Jan2023/TCAG-Shotgun-sample20-Y2023/LP508_3_S59_L004_R* panRust/12_RNAseq_samples_77_gDNA_samples/TCAG-Shotgun-7samples-raw/
+cp ZAM23143-Jan2023/TCAG-Shotgun-sample20-Y2023/LP508_4_S60_L004_R* panRust/12_RNAseq_samples_77_gDNA_samples/TCAG-Shotgun-7samples-raw/
+cp ZAM23143-Jan2023/TCAG-Shotgun-sample20-Y2023/LP508_5_S61_L004_R* panRust/12_RNAseq_samples_77_gDNA_samples/TCAG-Shotgun-7samples-raw/
+cp ZAM23143-Jan2023/TCAG-Shotgun-sample20-Y2023/LP508_6_S62_L004_R* panRust/12_RNAseq_samples_77_gDNA_samples/TCAG-Shotgun-7samples-raw/
+
+I found the 40 samples from ‘RUST-Raw-data=2013’/’Isolate40-2021’ in the folder rust-gDNA-40samples-May2021.
+I found the 30 samples from ‘RUST-Raw-data=2013’/’Isolate30-gDNA’ in the folder RUST_Raw-data-2013/Rust-data/Isolate30-gDNA.
+
+Ran Trimmomatic on all 77 of these.
+
+--
+To run RSEM: 
+
+x1.16x  64 cpu x 1
+mm1.16x 56 cpu
+mm2.8x  28 cpu x 5
+mm1.8x 28 cpu  x 1
+
+
+12+7+30+40 samples = 89 samples in total
+
+
+6x11 samples each on the 28 cpu VMs
+1x23 samples on the 64 cpu VM
+
+1x10 samples
+5x12 samples each on the 28 cpu VMs
+1x19 samples on the 64 cpu VM
+
+
+461240/805572
+The last time I ran RSEM was on the Rust-tree503-mRNA-seq-march2022 data. The input fasta file (from Trinity) had 461240 transcripts. The sample files were twelve pairs, and each R1 or R2 file was about 5-6 GB in size. Running RSEM on our most powerful VM took about two weeks to complete. Our current fasta file has 805572 transcripts, and we have 47 sample pairs (the average size of R1 and R2 files is probably 4-5 GB), so unless we divide it up it will take significantly longer. 
+
+openstack server create \
+	--image CentOS7_BenWork7 \
+  --security-group default \
+	--key-name brancourt \
+	--nic net-id=Private \
+	--flavor mm2.8xlarge \
+	benw6
+
+--
+Hi Brian,
+
+I'm getting ready to run some heavy processing on the Boreal Cloud for Jun-Jun. I have one x1.16xlarge VM, one mm1.8xlarge VM, and four mm2.8xlarge VMs. Based on the last time I ran this particular pipeline (on a smaller dataset), I think this will probably take around six weeks to complete if there isn't major cpu sharing. 
+
+Do you have any other cloud computing resources available to us that aren't currently being used?
+
+Thanks,
+
+Ben
+
+
+
+--
+Hi Jun-Jun,
+
+I've finished running Trimmomatic on the 77 samples, and I've created as many VMs as are currently available on the Boreal Cloud. With the computing resources available to us, and based on how long RSEM took on our last dataset, I think this could take around 6 weeks to complete. This assumes that the resources aren't being heavily used at the same time by other users, which would slow it down. It also assumes that --very-sensitive-local doesn't take any longer than --end-to-end for bowtie2. I don't know if that's the case.
+
+I've emailed Brian to ask if there are additional resources available.
+
+Are you okay with this estimated timeline?
+
+Ben
+
+--
+
+
+/public/genomics/junjun/Data-Dec2020/panRust/RSEM/vm1_19samples
+/public/genomics/junjun/Data-Dec2020/panRust
+
+vm1 x1
+sudo mount -t nfs 10.20.0.6:/Public/genomics/junjun/Data-Dec2020/panRust/RSEM/vm1_19samples /work	
+sudo mount -t nfs 10.20.0.6:/Public/genomics/junjun/Data-Dec2020/panRust /work2	
+vm2 b1
+sudo mount -t nfs 10.20.0.6:/Public/genomics/junjun/Data-Dec2020/panRust/RSEM/vm2_10samples /work	
+sudo mount -t nfs 10.20.0.6:/Public/genomics/junjun/Data-Dec2020/panRust /work2	
+vm3 w5
+sudo mount -t nfs 10.20.0.6:/Public/genomics/junjun/Data-Dec2020/panRust/RSEM/vm3_12samples /work	
+sudo mount -t nfs 10.20.0.6:/Public/genomics/junjun/Data-Dec2020/panRust /work2
+vm4 w6
+sudo mount -t nfs 10.20.0.6:/Public/genomics/junjun/Data-Dec2020/panRust/RSEM/vm4_12samples /work	
+sudo mount -t nfs 10.20.0.6:/Public/genomics/junjun/Data-Dec2020/panRust /work2
+vm5 w7
+sudo mount -t nfs 10.20.0.6:/Public/genomics/junjun/Data-Dec2020/panRust/RSEM/vm5_12samples /work	
+sudo mount -t nfs 10.20.0.6:/Public/genomics/junjun/Data-Dec2020/panRust /work2
+vm6 w8
+sudo mount -t nfs 10.20.0.6:/Public/genomics/junjun/Data-Dec2020/panRust/RSEM/vm6_12samples /work	
+sudo mount -t nfs 10.20.0.6:/Public/genomics/junjun/Data-Dec2020/panRust /work2
+vm7 w9
+sudo mount -t nfs 10.20.0.6:/Public/genomics/junjun/Data-Dec2020/panRust/RSEM/vm7_12samples /work	
+sudo mount -t nfs 10.20.0.6:/Public/genomics/junjun/Data-Dec2020/panRust /work2
+
+
+These below commands have been updated to use --very-sensitive instead of --very-sensitive-local after running to erros with --very-sensitive-local, as documented below:
+I used the same parameters (but --very-sensitive) as tree503, and the WWP18, WBP47, Hemlock30, LP36 runs: 
+Usage for bowtie2/RSEM (with samples file, default params):
+
+vm1 x1:
+nohup perl $TRINITY_HOME/util/align_and_estimate_abundance.pl --transcripts ./panRust_Cr47_Trinity-selected-longest.fasta --seqType fq --samples_file ./vm1_rsem_input_19samples.txt --est_method RSEM --aln_method bowtie2 --bowtie2_RSEM "--no-mixed --no-discordant --gbar 1000 --very-sensitive -k 200 " --trinity_mode --prep_reference --thread_count 63 --output_dir outRSEM 2>&1 1> vm1_align_and_estimate_abundance-rsem.log &
+
+vm2 b1:
+nohup perl $TRINITY_HOME/util/align_and_estimate_abundance.pl --transcripts ./panRust_Cr47_Trinity-selected-longest.fasta --seqType fq --samples_file ./vm2_rsem_input_10samples.txt --est_method RSEM --aln_method bowtie2 --bowtie2_RSEM "--no-mixed --no-discordant --gbar 1000 --very-sensitive -k 200 " --trinity_mode --prep_reference --thread_count 27 --output_dir outRSEM 2>&1 1> vm2_align_and_estimate_abundance-rsem.log &
+
+vm3 w5:
+nohup perl $TRINITY_HOME/util/align_and_estimate_abundance.pl --transcripts ./panRust_Cr47_Trinity-selected-longest.fasta --seqType fq --samples_file ./vm3_rsem_input_12samples.txt --est_method RSEM --aln_method bowtie2 --bowtie2_RSEM "--no-mixed --no-discordant --gbar 1000 --very-sensitive -k 200 " --trinity_mode --prep_reference --thread_count 27 --output_dir outRSEM 2>&1 1> vm3_align_and_estimate_abundance-rsem.log &
+
+vm4 w6:
+nohup perl $TRINITY_HOME/util/align_and_estimate_abundance.pl --transcripts ./panRust_Cr47_Trinity-selected-longest.fasta --seqType fq --samples_file ./vm4_rsem_input_12samples.txt --est_method RSEM --aln_method bowtie2 --bowtie2_RSEM "--no-mixed --no-discordant --gbar 1000 --very-sensitive -k 200 " --trinity_mode --prep_reference --thread_count 27 --output_dir outRSEM 2>&1 1> vm4_align_and_estimate_abundance-rsem.log &
+
+vm5 w7:
+nohup perl $TRINITY_HOME/util/align_and_estimate_abundance.pl --transcripts ./panRust_Cr47_Trinity-selected-longest.fasta --seqType fq --samples_file ./vm5_rsem_input_12samples.txt --est_method RSEM --aln_method bowtie2 --bowtie2_RSEM "--no-mixed --no-discordant --gbar 1000 --very-sensitive -k 200 " --trinity_mode --prep_reference --thread_count 27 --output_dir outRSEM 2>&1 1> vm5_align_and_estimate_abundance-rsem.log &
+
+vm6 w8:
+nohup perl $TRINITY_HOME/util/align_and_estimate_abundance.pl --transcripts ./panRust_Cr47_Trinity-selected-longest.fasta --seqType fq --samples_file ./vm6_rsem_input_12samples.txt --est_method RSEM --aln_method bowtie2 --bowtie2_RSEM "--no-mixed --no-discordant --gbar 1000 --very-sensitive -k 200 " --trinity_mode --prep_reference --thread_count 27 --output_dir outRSEM 2>&1 1> vm6_align_and_estimate_abundance-rsem.log &
+
+vm7 w9:
+nohup perl $TRINITY_HOME/util/align_and_estimate_abundance.pl --transcripts ./panRust_Cr47_Trinity-selected-longest.fasta --seqType fq --samples_file ./vm7_rsem_input_12samples.txt --est_method RSEM --aln_method bowtie2 --bowtie2_RSEM "--no-mixed --no-discordant --gbar 1000 --very-sensitive -k 200 " --trinity_mode --prep_reference --thread_count 27 --output_dir outRSEM 2>&1 1> vm7_align_and_estimate_abundance-rsem.log &
+
+
+Command to clear the memory buffer/cache before restarting the processes:
+sudo sh -c 'echo 3 >/proc/sys/vm/drop_caches'
+
+[brancourt@jump ~]$ openstack server list
++--------------------------------------+------------------------------+-------------------+------------------------------------+--------------------------+-------------+
+| ID                                   | Name                         | Status            | Networks                           | Image                    | Flavor      |
++--------------------------------------+------------------------------+-------------------+------------------------------------+--------------------------+-------------+
+| bc13c0ae-886d-488c-834a-2dc6bdedc9a3 | benw5                        | ACTIVE            | Private=10.20.0.54, 192.168.0.69   | CentOS7_BenWork7         | mm2.8xlarge |
+| 92aafb7a-6d0b-40e6-a7e5-a72c9703d19d | Holly_Salmon                 | ACTIVE            | Private=10.20.0.174, 192.168.0.124 | CentOS7_BenWork-HW       | x1.8xlarge  |
+| 4bed850f-2d2b-4388-98c0-3a0b7507678a | benw6                        | ACTIVE            | Private=10.20.0.153, 192.168.0.93  | CentOS7_BenWork7         | mm2.8xlarge |
+| f4a3c7eb-3fc2-4eb8-ac11-0a2c236b4139 | benb1                        | ACTIVE            | Private=10.20.0.210, 192.168.0.104 | CentOS7_BenWork7         | mm1.8xlarge |
+| 46f2a460-82ce-4c4a-8594-c305f30c768b | benw9                        | ACTIVE            | Private=10.20.0.134, 192.168.0.106 | CentOS7_BenWork7         | mm2.8xlarge |
+| e246c227-af0d-4c11-810b-fd76dec688d3 | benw8                        | ACTIVE            | Private=10.20.0.203, 192.168.0.101 | CentOS7_BenWork7         | mm2.8xlarge |
+| 8e23c782-a5b6-47a0-9b9f-b70e68466398 | gwylim test                  | ACTIVE            | genomics=10.20.0.200, 192.168.0.25 | N/A (booted from volume) | mm2.xlarge  |
+| 2e87314c-286b-48f9-b22a-dac1b3daf057 | ben_x                        | ACTIVE            | Private=10.20.0.207, 192.168.0.86  | CentOS7_BenWork7         | x1.16xlarge |
+| da7de2df-b6c9-436f-8310-bd81d42cb228 | benw7                        | ACTIVE            | Private=10.20.0.88, 192.168.0.109  | CentOS7_BenWork7         | mm2.8xlarge |
+| 10309b73-dec1-46c4-b31b-cc843224e429 | ben_vnc                      | SHELVED_OFFLOADED | Private=10.20.0.120, 192.168.0.140 | CentOS7_GUI_VNC-Java14   | x1.8xlarge  |
+| 262bab58-d15a-4efd-9e04-a247e7f61cf2 | clc-workbench-client-dec2020 | ACTIVE            | genomics=10.20.0.181, 192.168.0.41 | N/A (booted from volume) | mm2.xlarge  |
+| 45e6819f-6391-42a3-abbf-ef0279007eeb | clc-license-server-dec2020   | ACTIVE            | genomics=10.20.0.147, 192.168.0.36 | clc-workbench-license    | mm1.small   |
+| acbe98d8-94e3-4f25-978b-f82a7fd28d08 | gsb_vm01                     | SHELVED_OFFLOADED | genomics=10.20.0.131, 192.168.0.23 | N/A (booted from volume) | mm2.2xlarge |
++--------------------------------------+------------------------------+-------------------+------------------------------------+--------------------------+-------------+
+
+
+--
+Hi Jun-Jun,
+
+I've started running RSEM on seven of the most powerful VMs that were available to me. I'll monitor them closely. I'll have a better time estimate after a few samples have been completed.
+
+Ben
+
+--
+Hi Jun-Jun,
+
+I've encountered an error in RSEM execution. It looks like every VM that has progressed this far has gotten the same error. Here is the error from one of the VMs:
+
+After aligning with bowtie2, it runs rsem-sam-validator, which gives this message: 
+Clipping or padding is detected (cigar S) for read A00977:449:H7YLCDSX3:3:1101:1000:3129!
+RSEM currently doest not support clipping or padding.
+The input file is not valid!
+
+The pipeline continues by trying to run rsem-calculate-expression, which gives this message: 
+Read A00977:449:H7YLCDSX3:3:1101:1000:3129: RSEM currently does not support gapped alignments, sorry!
+
+I've done a bit of googling, and I found this chat, in regards to a different aligner, which says: 
+https://www.biostars.org/p/285102/
+"RSEM does not support gapped alignment. So when you map to a genome (which has introns) you need to use an end to end aligner like bowtie or set up STAR appropriately. Try these options for STAR to prohibit gaps"
+
+This would explain why we did not get this error the previous times we've run RSEM, because previously we ran bowtie2 with --end-to-end, and this time we ran it with --very-sensitive-local.
+By the way, from some of the other google results I also discovered that RSEM doesn't work with indels. Do we have indels in this dataset?
+            
+Below is the documentation on bowtie2 presets. If we have to chose one of the --end-to-end modes rather than one of the --local modes, would --very-sensitive be an improvement? 
+https://bowtie-bio.sourceforge.net/bowtie2/manual.shtml#setting-function-options
+
+Preset options in --end-to-end mode (default is --sensitive)
+--very-fast  Same as: -D 5 -R 1 -N 0 -L 22 -i S,0,2.50
+--fast  Same as: -D 10 -R 2 -N 0 -L 22 -i S,0,2.50
+--sensitive  Same as: -D 15 -R 2 -N 0 -L 22 -i S,1,1.15 (default in --end-to-end mode)
+--very-sensitive  Same as: -D 20 -R 3 -N 0 -L 20 -i S,1,0.50
+
+Preset options in --local mode
+--very-fast-local  Same as: -D 5 -R 1 -N 0 -L 25 -i S,1,2.00
+--fast-local  Same as: -D 10 -R 2 -N 0 -L 22 -i S,1,1.75
+--sensitive-local  Same as: -D 15 -R 2 -N 0 -L 20 -i S,1,0.75 (default in --local mode)
+--very-sensitive-local  Same as: -D 20 -R 3 -N 0 -L 20 -i S,1,0.50
+
+--
+OK. Please try the ‘--end-to-end’ modes with ‘--very-sensitive’.
+
+--
+Hi Jun-Jun, I've restarted the RSEM processes on all VMs. I will monitor them.
+
+--
+Hello, Ben:
+Thanks for your updating.
+My meeting with Thomas is delayed to Thursday. I will get his advice on how to continue this work after March.
+
+--
+
+grep -cE "Err|not valid" vm1_align_and_estimate_abundance-rsem.log 
+0
+[brancourt@jump RSEM]$ grep -cE "Err|not valid" vm2_10samples/vm2_align_and_estimate_abundance-rsem.log 
+0
+[brancourt@jump RSEM]$ grep -cE "Err|not valid" vm3_12samples/vm3_align_and_estimate_abundance-rsem.log 
+0
+[brancourt@jump RSEM]$ grep -cE "Err|not valid" vm4_12samples/vm4_align_and_estimate_abundance-rsem.log 
+0
+[brancourt@jump RSEM]$ grep -cE "Err|not valid" vm5_12samples/vm5_align_and_estimate_abundance-rsem.log 
+0
+[brancourt@jump RSEM]$ grep -cE "Err|not valid" vm6_12samples/vm6_align_and_estimate_abundance-rsem.log 
+0
+[brancourt@jump RSEM]$ grep -cE "Err|not valid" vm7_12samples/vm7_align_and_estimate_abundance-rsem.log 
+0
+
+--
+Thanks Jun-Jun.
+
+I don't know why, but the RSEM runs (using --very-sentive for the bowtie2 call) are finishing much faster than I anticipated. I think they might all finish tomorrow. When they're finished I'll run my scripts to combine the data and extract total_expected_count, total_TPM, and total_FPKM. After just a quick look at the RSEM.genes.results and RSEM.isoforms.results output files for two of the samples, it looks like these values are 0 for most of the sequences. Is that what you would expect?
+
+Ben
+
+--
+It is expected. Majority of the assembly came from plant origins, therefore no fungal reads can be mapped to them!
+
+--
+After RSEM finished, I edited the filter_RSEM_ scripts to use a subdirectory level of 3, then created a folder RSEM_filtered and ran them:
+
+nohup Rscript ./filter_RSEM_output-genes.R 2>&1 > filter_RSEM_genes.log &
+nohup Rscript ./filter_RSEM_output-isoforms.R 2>&1 > filter_RSEM_isoforms.log &
+
+After that, create tables containing just the first 4 and 5 columns: 
+
+options(stringsAsFactors = FALSE, warn = 1)
+
+iso <- read.delim("ALLsamples.RSEM.isoforms.results.filtered.tab",header=TRUE, check.names=FALSE)
+write.table(iso[,1:5], file = "ALLsamples.RSEM.isoforms.results.filtered-summary.tab", quote = FALSE, sep = "\t", na = "-", row.names = FALSE, col.names = TRUE)
+
+gen <- read.delim("ALLsamples.RSEM.genes.results.filtered.tab",header=TRUE, check.names=FALSE)
+write.table(gen[,1:4], file = "ALLsamples.RSEM.genes.results.filtered-summary.tab", quote = FALSE, sep = "\t", na = "-", row.names = FALSE, col.names = TRUE)
+
+
+
+--
+Hi Jun-Jun,
+
+RSEM has completed running on all the VMs used for these 89 samples.
+ 
+I've run my script to combine the results of the RSEM read mapping process from all samples into a single file each for genes and isoforms, and then filter them by TPM >= 1 in at least one of the samples. I've also included total_expected_count, total_TPM and total_FPKM columns. Here's a link to the results:
+https://www.dropbox.com/s/y3a6rqr3chr0075/RSEM_filtered_89samples.zip?dl=1
+
+These files are in tab-delimited format. If you open it in Excel as a text or csv file, but choose tab as the delimiting field instead of comma, it should display properly. I'm happy to convert them to comma-separated format if you prefer.
+
+The .selected.tab files just show the selected genes or isoforms after combining and then filtering the results.
+The -summary.tab files contain only the summary columns (id columns, and total_expected_count, total_TPM, total_FPKM), for easy opening and viewing.
+The .filtered.tab files contain the combined results.
+
+I ran my TPM filtering script on the RSEM.genes.results files and the RSEM.isoforms.results files separately, so if the TPM values were different in the genes vs isoforms files, or if the RSEM output recorded different gene selections in the genes vs isoforms files then there might have been a different set of ids selected after the filtering. However, they both have the same number of rows.
+
+Ben
+
+--
+Next step: run FreeBayes on all the BAMs created by RSEM/bowtie2:
+
+For reference, my previous full run of FreeBayes in parallel on all samples into one VCF was in: 
+/public/genomics/junjun/Data-Dec2020/LP-NGS-RawData/LP36-SNPpipeline2022/bamsWithSNs/pipe1
+
+
+What I need to do:
+- rename and move all the bam files generated by the RSEM runs into the one folder (see rough script rename_and_move_subfiles.sh)
+- run my add_samplenames_to_bams-pipe1.sh script
+    - the results on a bam file can be tested by doing: 
+      samtools view -H file.bam | tail
+    - the above test output should include a line like "@RG	ID:readGroup_samplename	SM:samplename"
+    - in doing the above, the add_samplenames_to_bams-pipe1.sh also runs the samtools index command, which requires the bam fileo be sorted, so it gave me an error, so I wrote a script to sort the bam files in parallel: sort_bams_in_parallel.sh. I then wrote a script to index the bam files in parallel: index_bams_in_parallel.sh.
+- run fasta_generate_regions.py (how large should the regions be? see example?)
+    - first, not sure if this is necessary, but index the fasta file:  /work2/SNPpipeline/tools/samtools-1.3.1/samtools faidx panRust_Cr47_Trinity-selected-longest.fasta
+    - /work2/SNPpipeline/tools/freebayes/scripts/fasta_generate_regions.py ../panRust_Cr47_Trinity-selected-longest.fasta.fai 100000 > panRust_Cr47_Trinity-selected-longest_regions.txt
+- run my freebayes-parallel-ben.sh script
+    - create bam file list:  ls bam_files_from_all_RSEM_with_sampleNames_sorted/*.bam > forFreeBayes_89samples_bamlist.txt
+    - mv /work2/SNPpipeline/tools/ .   # my freebayes-parallel-ben.sh script has some hardcoded relative references to things in /tools
+    - nohup ./freebayes-parallel-ben.sh <(cat panRust_Cr47_Trinity-selected-longest_regions.txt) 27 -f ../panRust_Cr47_Trinity-selected-longest.fasta -p 2 -L forFreeBayes_89samples_bamlist.txt > panRust_Cr47_89samples_freebayes.vcf &
+    
+    
+
+
+
+
+
+/work2/SNPpipeline/tools/samtools-1.3.1/samtools view -H bowtie2.bam | tail
+
+nohup time /work2/SNPpipeline/tools/samtools-1.3.1/samtools addreplacerg -r "ID:$readGroup_U1" -r "SM:U1" --output-fmt BAM -o bowtie2-readgrouped.bam bowtie2.bam 2>&1 1>addreplacerg.log &
+
+/work2/SNPpipeline/tools/samtools-1.3.1/samtools view -H bowtie2-readgrouped.bam | tail
+
+cd 
+mv bowtie2.bam /work2/tmp2/${PWD##*/}_bowtie2.bam
+
+
+
+nohup time /work2/SNPpipeline/tools/samtools-1.3.1/samtools addreplacerg -r "ID:readGroup_UC_7_S92" -r "SM:UC_7_S92" --output-fmt BAM -o UC_7_S92.bowtie2-sampleNames.bam UC_7_S92.bowtie2.bam 2>&1 1>addreplacerg.log &
+
+/work2/SNPpipeline/tools/samtools-1.3.1/samtools view -H UC_7_S92.bowtie2-sampleNames.bam | tail
+
+UC_7_S92.bowtie2.bam
+
+
+
+nohup time /work2/SNPpipeline/tools/samtools-1.3.1/samtools addreplacerg -r "ID:readGroup_UC_7_S92" -r "SM:UC_7_S92" --output-fmt BAM -o UC_7_S92.bowtie2.bam.for_rsem-sampleNames.bam bowtie2.bam.for_rsem.bam 2>&1 1>addreplacerg.log &
+
+/work2/SNPpipeline/tools/samtools-1.3.1/samtools view -H UC_7_S92.bowtie2.bam.for_rsem-sampleNames.bam | tail
+
+nohup time /work2/SNPpipeline/tools/samtools-1.3.1/samtools index UC_7_S92.bowtie2.bam.for_rsem-sampleNames.bam 2>&1 1>index.log &
+
+nohup time /work2/SNPpipeline/tools/samtools-1.3.1/samtools sort -o UC_7_S92.bowtie2.bam.for_rsem-sampleNames_sorted.bam UC_7_S92.bowtie2.bam.for_rsem-sampleNames.bam 2>&1 1>sort.log &
+
+
+
+
+[
+
+I also created the add_samplenames_to_bams.sh script. After testing I began running it on the bam files from the three LP36 pipelines.
+
+For each pipeline: 
+./add_samplenames_to_bams-pipe1.sh
+Then check one of the samples to make sure it has the proper sample name and readgroup: 
+../tools/samtools-1.3.1/samtools view -H RS10_filtered_sorted_markDup_withSN_pipe1.bam | tail
+ls bamsWithSNs_pipe1/*.bam > pipe1_bamlist.txt
+./fasta_generate_regions.py reference/formatted_output.fasta.fai 100000 > pipe1_regions.txt
+nohup ./freebayes-parallel-ben <(cat pipe1_regions.txt) 26 -f reference/formatted_output.fasta -p 2 -L pipe1_bamlist.txt > LP36_pipe1.vcf &
+
+nohup ./freebayes-parallel-ben <(cat pipe2_regions.txt) 26 -f reference/formatted_output.fasta -p 2 -L pipe2_bamlist.txt > LP36_pipe2.vcf &
+
+nohup ./freebayes-parallel-ben <(cat pipe3_regions.txt) 26 -f reference/formatted_output.fasta -p 2 -L pipe3_bamlist.txt > LP36_pipe3.vcf &
+
+]
+
+
+
+
+
+
+
+
+
+

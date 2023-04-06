@@ -1,0 +1,324 @@
+
+https://github.com/vcflib/vcflib/blob/master/scripts/vcffirstheader
+https://github.com/vcflib/vcflib/blob/master/doc/vcfuniq.md
+https://github.com/vcflib/vcflib/blob/master/src/vcfuniq.cpp
+https://askubuntu.com/questions/1284764/show-all-lines-before-a-match
+
+
+----
+https://groups.google.com/g/freebayes/c/WqSNO8ltD1U?pli=1
+https://www.biostars.org/p/364221/
+https://github.com/freebayes/freebayes/issues/359
+https://github.com/samtools/hts-specs
+https://www.biostars.org/p/457503/
+https://groups.google.com/g/freebayes/c/FEAxsZve0NY
+https://www.biostars.org/p/349213/
+https://github.com/ekg/bamaddrg
+https://github.com/freebayes/freebayes/issues/471
+https://www.biostars.org/p/230720/
+
+=========
+================
+
+[centos@bentest perl]$ ./vcf-sort -h
+Usage: vcf-sort > out.vcf
+       cat file.vcf | vcf-sort > out.vcf
+Options:
+   -c, --chromosomal-order       Use natural ordering (1,2,10,MT,X) rather then the default (1,10,2,MT,X). This requires
+                                     new version of the unix "sort" command which supports the --version-sort option.
+   -p, --parallel <int>          Change the number of sorts run concurrently to <int>
+   -t, --temporary-directory     Use a directory other than /tmp as the temporary directory for sorting.
+   -h, -?, --help                This help message.
+
+
+cat file.vcf | tools/vcftools/src/perl/vcf-sort -c -t ./tmp > out.vcf
+
+===========================
+
+[centos@bentest bams-few]$ ../tools/samtools-1.3.1/samtools addreplacerg
+Usage: samtools addreplacerg [options] [-r <@RG line> | -R <existing id>] [-o <output.bam>] <input.bam>
+
+Options:
+  -m MODE   Set the mode of operation from one of overwrite_all, orphan_only [overwrite_all]
+  -o FILE   Where to write output to [stdout]
+  -r STRING @RG line text
+  -R STRING ID of @RG line in existing header to use
+      --input-fmt FORMAT[,OPT[=VAL]]...
+               Specify input format (SAM, BAM, CRAM)
+      --input-fmt-option OPT[=VAL]
+               Specify a single input file format option in the form
+               of OPTION or OPTION=VALUE
+  -O, --output-fmt FORMAT[,OPT[=VAL]]...
+               Specify output format (SAM, BAM, CRAM)
+      --output-fmt-option OPT[=VAL]
+               Specify a single output file format option in the form
+               of OPTION or OPTION=VALUE
+      --reference FILE
+               Reference sequence FASTA FILE [null]
+
+
+
+
+../tools/samtools-1.3.1/samtools addreplacerg -r "ID:TSP0007.175-2-9_R" -r "SM:sample0007" -o MI.M05812_0140.001.TSP0007.175-2-9_R_sorted_markDup-withRG.bam MI.M05812_0140.001.TSP0007.175-2-9_R_sorted_markDup.bam
+
+../tools/samtools-1.3.1/samtools addreplacerg -r "ID:TSP0008.175-2-6_S" -r "SM:sample0008" -o MI.M05812_0140.001.TSP0008.175-2-6_S_sorted_markDup-withRG.bam MI.M05812_0140.001.TSP0008.175-2-6_S_sorted_markDup.bam
+
+
+
+=====================================
+
+[centos@benw7 testFreebayesParallel]$ parallel --help
+Usage:
+
+parallel [options] [command [arguments]] < list_of_arguments
+parallel [options] [command [arguments]] (::: arguments|:::: argfile(s))...
+cat ... | parallel --pipe [options] [command [arguments]]
+
+-j n            Run n jobs in parallel
+-k              Keep same order
+-X              Multiple arguments with context replace
+--colsep regexp Split input on regexp for positional replacements
+{} {.} {/} {/.} {#} {%} {= perl code =} Replacement strings
+{3} {3.} {3/} {3/.} {=3 perl code =}    Positional replacement strings
+With --plus:    {} = {+/}/{/} = {.}.{+.} = {+/}/{/.}.{+.} = {..}.{+..} =
+                {+/}/{/..}.{+..} = {...}.{+...} = {+/}/{/...}.{+...}
+
+-S sshlogin     Example: foo@server.example.com
+--slf ..        Use ~/.parallel/sshloginfile as the list of sshlogins
+--trc {}.bar    Shorthand for --transfer --return {}.bar --cleanup
+--onall         Run the given command with argument on all sshlogins
+--nonall        Run the given command with no arguments on all sshlogins
+
+--pipe          Split stdin (standard input) to multiple jobs.
+--recend str    Record end separator for --pipe.
+--recstart str  Record start separator for --pipe.
+
+See 'man parallel' for details
+
+Academic tradition requires you to cite works you base your article on.
+When using programs that use GNU Parallel to process data for publication
+please cite:
+
+  O. Tange (2011): GNU Parallel - The Command-Line Power Tool,
+  ;login: The USENIX Magazine, February 2011:42-47.
+
+This helps funding further development; AND IT WON'T COST YOU A CENT.
+If you pay 10000 EUR you should feel free to use GNU Parallel without citing.
+
+=====================================================
+
+#!/bin/bash
+
+if [ $# -lt 3 ];
+then
+    echo "usage: $0 [regions file] [ncpus] [freebayes arguments]"
+    echo
+    echo "Run freebayes in parallel over regions listed in regions file, using ncpus processors."
+    echo "Will merge and sort output, producing a uniform VCF stream on stdout.  Flags to freebayes"
+    echo "which would write to e.g. a particular file will obviously cause problms, so caution is"
+    echo "encouraged when using this script."
+    echo
+    echo "examples:"
+    echo
+    echo "Run freebayes in parallel on 100000bp chunks of the ref (fasta_generate_regions.py is also"
+    echo "located in the scripts/ directory in the freebayes distribution).  Use 36 threads."
+    echo
+    echo "    freebayes-parallel <(fasta_generate_regions.py ref.fa.fai 100000) 36 -f ref.fa aln.bam >out.vcf"
+    echo
+    echo "Generate regions that are equal in terms of data content, and thus have lower variance"
+    echo "in runtime.  This will yield better resource utilization."
+    echo
+    echo "    bamtools coverage -in aln.bam | coverage_to_regions.py ref.fa 500 >ref.fa.500.regions"
+    echo "    freebayes-parallel ref.fa.500.regions 36 -f ref.fa aln.bam >out.vcf"
+    echo
+    exit
+fi
+
+regionsfile=$1
+shift
+ncpus=$1
+shift
+
+command=("freebayes" "$@")
+
+(
+#$command | head -100 | grep "^#" # generate header
+# iterate over regions using gnu parallel to dispatch jobs
+cat "$regionsfile" | parallel -k -j "$ncpus" "${command[@]}" --region {}
+) | vcffirstheader \
+    | vcfstreamsort -w 1000 | vcfuniq # remove duplicates at region edges
+
+==============================================
+
+[centos@benw7 testFreebayesParallel]$ ./freebayes-parallel-ben 
+usage: ./freebayes-parallel-ben [regions file] [ncpus] [freebayes arguments]
+
+Run freebayes in parallel over regions listed in regions file, using ncpus processors.
+Will merge and sort output, producing a uniform VCF stream on stdout.  Flags to freebayes
+which would write to e.g. a particular file will obviously cause problms, so caution is
+encouraged when using this script.
+
+examples:
+
+Run freebayes in parallel on 100000bp chunks of the ref (fasta_generate_regions.py is also
+located in the scripts/ directory in the freebayes distribution).  Use 36 threads.
+
+    freebayes-parallel <(fasta_generate_regions.py ref.fa.fai 100000) 36 -f ref.fa aln.bam >out.vcf
+
+Generate regions that are equal in terms of data content, and thus have lower variance
+in runtime.  This will yield better resource utilization.
+
+    bamtools coverage -in aln.bam | coverage_to_regions.py ref.fa 500 >ref.fa.500.regions
+    freebayes-parallel ref.fa.500.regions 36 -f ref.fa aln.bam >out.vcf
+
+----------------
+
+grep -c ^processor /proc/cpuinfo
+28
+
+tools/freebayes/bin/freebayes -f reference/formatted_output.fasta -p 2 -L bamList2.txt > test1-twoSamples-sansParallel.vcf
+
+./freebayes-parallel-ben <(./fasta_generate_regions.py reference/formatted_output.fasta.fai 1000) 26 -f reference/formatted_output.fasta -p 2 -L bamList2.txt > test1-twoSamples.vcf
+
+
+
+
+
+
+
+
+
+
+
+
+
+===========================================
+
+I've put this on consignment at Marrs Audio in Vic West. Store hours are Tuesday-Saturday 1pm-6pm.
+
+No need to say this, given its reputation, but this is a beautiful sounding amp head. It does something to single-coil guitars which is hard to get elsewhere. Records really well, breaks up beautifully.
+
+This unit has 6L6 power tubes (sweeter top end, bigger bottom) rather than KT66 (more midrange), but it's an easy swap if you prefer the KT66.
+
+For those who don't know, this is a reissue of Marshall's "seminal" amp. From the serial number it was made in the UK in 2002.
+
+
+
+
+=========================
+
+https://www.reddit.com/r/Radix/comments/x4y10d/hetzner_tos_prohibits_running_any_kind_of_crypto/
+
+https://www.reddit.com/r/Radix/comments/xbbtra/why_should_i_buy_xrd/
+
+https://www.reddit.com/r/Radix/comments/xcfbfy/if_radix_is_not_a_blockchain_how_can_the_network/
+
+https://www.reddit.com/r/Radix/comments/qzz9dv/after_we_reach_24b_coins_in_40_years_how_will/?utm_source=share&utm_medium=ios_app&utm_name=iossmf
+
+https://www.reddit.com/r/Radix/comments/ws57na/scrypto_vs_move_vs_solidity/
+
+https://www.radixdlt.com/post/comparing-virtual-machines-message-only-vs-asset-oriented
+
+https://www.radixdlt.com/post/babylon-alphanet-release-roadmap-update
+
+=================
+
+untilthedaydawns.com
+
+utdd.org
+
+
+
+V9A3S5
+
+----
+Sunday School: 
+
+Prayer requests
+Songs
+Review (Gen 12:1-9) 
+
+Then the LORD said to Abram, “Leave your country, your kindred, and your father’s household, and go to the land I will show you.a
+2 I will make you into a great nation,
+and I will bless you;
+I will make your name great,
+so that you will be a blessing.
+3 I will bless those who bless you
+and curse those who curse you;
+and all the families of the earth
+will be blessed through you.”
+4 So Abram departed, as the LORD had directed him, and Lot went with him. Abram was seventy-five years old when he left Haran. 5And Abram took his wife Sarai, his nephew Lot, and all the possessions and people they had acquired in Haran, and set out for the land of Canaan. 
+
+Journey game: 
+Ur -> (200km) Babylon -> (480km) Ninevah -> (400km) Haran -> (640km) Damascus -> (240km) Oak of Moreh at Shechem -> (50km) Mamre (betw. Bethel & Ai) -> (100km) Negev
+
+Lesson
+	- What are you most looking forward to this year? (Abraham left home because he was looking forward to promises that God gave him).
+Gen 15:1-7
+	- What promise did God give to Abraham?
+	- Count how many descendants your grandparents have.
+	- Why did God want to give Abraham so many descendants? (God wants to have a family too, made up of people who believe God like Abraham did).
+	- Why did God consider Abraham righteous when he believed? (and what does "righteous" mean?)
+Gen 18:1-15
+	- What promise did God give to Sarah?
+	- Did Sarah believe God right away?
+	- Why did Sarah have a hard time believing God's promise?
+	- Has God given us any promises that people find hard to believe today?
+Gen 21:1-8
+	- What promises did God give to Abraham and Sarah?
+	- Did they see the fulfillment of all God's promises?
+	- How many descendants did they eventually have?
+	- Who is the most important descendant of Abraham and Sarah?
+	- How many spiritual descendants did they have?
+	- How can we be spiritual descendants of Abraham and Sarah?
+	- What promises does God give to those who believe in Jesus?
+	- Did Abraham's believing God change the way he lived?
+	- Does believing Jesus change the way we live?
+	
+Memory verse - Gen 15:5-6
+
+If we still have more time:
+	Gen 17:1-5,15-16
+	Revelation 2:17
+
+Closing
+	- Back to... what are you most looking forward to this year?
+		"I am... your very great reward." (Gen 15:1)
+Prayer
+
+
+
+============
+# OLD Pseudocode:
+#
+# read MAF_cutoff_report.csv
+# set MAF report "CHROM","POS","REF" as masterForDeepBSA and masterGeneral
+# for each vcf report
+# 	read report
+# 	(replace all 0/1 etc with REF/ALT etc)
+# 	if first report
+# 		merge with masterForDeepBSA (left-join, keeping only and all rows occurring in master) by "CHROM","POS","REF", adding cols "ALT","sample_RO","sample_AO"
+# 		merge with masterGeneral by "CHROM","POS","REF", adding cols "sample-ALT","sample-GT","sample-DP","sample_RO","sample_AO" (and DON'T rename "ALT" to "sample-ALT"??)
+# 	else 
+# 		merge with masterForDeepBSA (left-join, keeping only and all rows occurring in master) by "CHROM","POS","REF","ALT", adding cols "sample_RO","sample_AO"
+# 		merge with masterGeneral (left-join, keeping only and all rows occurring in master) by "CHROM","POS","REF", adding cols "sample_ALT", "sample_GT", "sample_DP", "sample_RO", "sample_AO"
+# done
+# if num rows of masterForDeepBSA != num rows of masterGeneral:
+# 	get row nums, and rows, from masterGeneral that contain non-uniform ALTs across samples
+# 	??add these rows to the master???
+# 	for each of these rows
+# 		don't need any "sample-GT","sample-DP" columns
+# 		set sample1's RO,AO values to NA, and all samples whose ALT matches sample1's ALT
+# 		if there's more than one alternative ALT, just pick the one with the most occurences, set the other RO,AO values to NA
+# 		create row using "CHROM","POS","REF" and a master "ALT" followed by RO,AO values for all samples
+# 		if there isn't already a row in masterForDeepBSA with said "CHROM","POS","REF","ALT", add this row to the bottom of masterForDeepBSA
+# split the master report into separate reports according to use
+# finally, concat final reports from all three pipelines
+
+
+awk 'NR > 1' MAF_cutoff_depth_forDeepBSA.csv > MAF_cutoff_depth_forDeepBSA-noHeader.csv 
+grep -v ",NA" MAF_cutoff_depth_forDeepBSA-noHeader.csv > MAF_cutoff_depth_forDeepBSA-noHeader-noNA.csv 
+sed 's/\"//g' MAF_cutoff_depth_forDeepBSA-noHeader-noNA.csv > MAF_cutoff_depth_forDeepBSA-noHeader-noNA-noQuote.csv 
+sed 's/\"//g' MAF_cutoff_depth_forDeepBSA-noHeader.csv > MAF_cutoff_depth_forDeepBSA-noHeader-noQuote.csv 
+
+
